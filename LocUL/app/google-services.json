@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "599549183484",
+    "project_id": "admin-site-4b122",
+    "storage_bucket": "admin-site-4b122.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599549183484:android:1bf3fd4bddd275a0d6de79",
+        "android_client_info": {
+          "package_name": "tg.univlome.epl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPpQo7PtM8e0eY3HU3205XOOdg2S4kOeE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
