@@ -36,9 +36,9 @@ class MainActivity2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
         Configuration.getInstance().userAgentValue = packageName
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main2)
 
-        mapView = findViewById(R.id.mapView)
+        mapView = findViewById(R.id.mapView2)
         mapView.setTileSource(TileSourceFactory.MAPNIK) // Chargement de la carte OSM
         mapView.setMultiTouchControls(true) // Zoom avec les doigts
         mapView.controller.setZoom(17.0)

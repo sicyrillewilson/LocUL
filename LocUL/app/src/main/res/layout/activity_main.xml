@@ -23,7 +23,7 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bouton_navigation"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="70dp"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bouton_nav_menu"
             android:layout_alignParentBottom="true"

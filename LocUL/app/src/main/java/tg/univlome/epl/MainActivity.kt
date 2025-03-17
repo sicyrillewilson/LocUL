@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tg.univlome.epl.fragments.TestFragment
+import tg.univlome.epl.fragments.MapsFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,6 +43,10 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     loadFragment(TestFragment())
+                    true
+                }
+                R.id.nav_maps -> {
+                    loadFragment(MapsFragment())
                     true
                 }
                 else -> false

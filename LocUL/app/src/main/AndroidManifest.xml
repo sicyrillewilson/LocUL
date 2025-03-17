@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:allowBackup="true"
@@ -18,15 +20,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LocUL"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31">
-        <activity
-            android:name=".MainActivity2"
-            android:exported="false" />
+        tools:targetApi="31"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true">
+
+        <meta-data android:name="android.hardware.opengles.aep" android:value="false" />
 
         <meta-data
             android:name="org.osmdroid.config"
             android:value="true" />
 
+        <activity
+            android:name=".MainActivity2"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
