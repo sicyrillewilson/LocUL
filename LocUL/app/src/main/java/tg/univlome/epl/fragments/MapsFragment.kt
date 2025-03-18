@@ -189,24 +189,6 @@ class MapsFragment : Fragment(), LocationListener  {
         locationOverlay.enableFollowLocation() // Pour suivre la position en temps réel
         mapView.overlays.add(locationOverlay)
 
-        /*// Créer un gestionnaire pour l'actualisation périodique
-        val handler = Handler(Looper.getMainLooper())
-
-        locationOverlay.runOnFirstFix {
-            handler.post(object : Runnable {
-                override fun run() {
-                    val userLocation = locationOverlay.myLocation
-                    if (isAdded && userLocation != null) {
-                        requireActivity().runOnUiThread {
-                            mapView.controller.setCenter(userLocation)
-                            updateRoute(userLocation) // Met à jour l'itinéraire
-                        }
-                    }
-                    handler.postDelayed(this, 5000) // Rafraîchit toutes les 5 secondes
-                }
-            })
-        }
-*/
         locationOverlay.runOnFirstFix {
             val userLocation = locationOverlay.myLocation
             if (isAdded) {
