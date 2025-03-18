@@ -12,6 +12,7 @@ import tg.univlome.epl.databinding.FragmentMapsBinding
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -31,13 +32,16 @@ import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.io.IOException
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
 import tg.univlome.epl.services.BatimentService
-import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
+import android.annotation.SuppressLint
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 
-
-class MapsFragment : Fragment() {
+class MapsFragment : Fragment(), LocationListener  {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -49,6 +53,10 @@ class MapsFragment : Fragment() {
     private lateinit var batimentService: BatimentService
     private lateinit var infrastructureService: InfrastructureService
     private lateinit var salleService: SalleService
+
+    private lateinit var locationManager: LocationManager
+    private var currentPolyline: Polyline? = null
+    private var lastLocation: Location? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -96,8 +104,25 @@ class MapsFragment : Fragment() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
-            //Handler(Looper.getMainLooper()).postDelayed({ initLocationOverlay() }, 1000)
-            view.post { initLocationOverlay() }
+            view.post {
+                initLocationOverlay()
+                initLocationTracking()
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initLocationTracking() {
+        locationManager = requireActivity().getSystemService(LocationManager::class.java)
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this) // Maj toutes les 3 sec, 10m de différence
+    }
+
+    override fun onLocationChanged(location: Location) {
+        val userLocation = GeoPoint(location.latitude, location.longitude)
+
+        if (lastLocation == null || location.distanceTo(lastLocation!!) > 3) {
+            lastLocation = location
+            updateRoute(userLocation)
         }
     }
 
@@ -110,7 +135,7 @@ class MapsFragment : Fragment() {
                             val lat = batiment.latitude.toDouble()
                             val lon = batiment.longitude.toDouble()
                             val position = GeoPoint(lat, lon)
-                            addMarker(position, batiment.nom)
+                            addMarker(position, batiment.nom, batiment.image)
                         } catch (e: NumberFormatException) {
                             Log.e("MapsFragment", "Coordonnées invalides pour ${batiment.nom}")
                         }
@@ -129,7 +154,7 @@ class MapsFragment : Fragment() {
                             val lat = infrastructure.latitude.toDouble()
                             val lon = infrastructure.longitude.toDouble()
                             val position = GeoPoint(lat, lon)
-                            addMarker(position, infrastructure.nom)
+                            addMarker(position, infrastructure.nom, infrastructure.image)
                         } catch (e: NumberFormatException) {
                             Log.e("MapsFragment", "Coordonnées invalides pour ${infrastructure.nom}")
                         }
@@ -148,7 +173,7 @@ class MapsFragment : Fragment() {
                             val lat = salle.latitude.toDouble()
                             val lon = salle.longitude.toDouble()
                             val position = GeoPoint(lat, lon)
-                            addMarker(position, salle.nom)
+                            addMarker(position, salle.nom, salle.image)
                         } catch (e: NumberFormatException) {
                             Log.e("MapsFragment", "Coordonnées invalides pour ${salle.nom}")
                         }
@@ -161,8 +186,27 @@ class MapsFragment : Fragment() {
     private fun initLocationOverlay() {
         locationOverlay = MyLocationNewOverlay(mapView)
         locationOverlay.enableMyLocation()
+        locationOverlay.enableFollowLocation() // Pour suivre la position en temps réel
         mapView.overlays.add(locationOverlay)
 
+        /*// Créer un gestionnaire pour l'actualisation périodique
+        val handler = Handler(Looper.getMainLooper())
+
+        locationOverlay.runOnFirstFix {
+            handler.post(object : Runnable {
+                override fun run() {
+                    val userLocation = locationOverlay.myLocation
+                    if (isAdded && userLocation != null) {
+                        requireActivity().runOnUiThread {
+                            mapView.controller.setCenter(userLocation)
+                            updateRoute(userLocation) // Met à jour l'itinéraire
+                        }
+                    }
+                    handler.postDelayed(this, 5000) // Rafraîchit toutes les 5 secondes
+                }
+            })
+        }
+*/
         locationOverlay.runOnFirstFix {
             val userLocation = locationOverlay.myLocation
             if (isAdded) {
@@ -175,7 +219,7 @@ class MapsFragment : Fragment() {
                             GeoPoint(userLocation.latitude + 0.009, userLocation.longitude)
                         addMarker(destination, "Destination à 1 km")
 
-                        getRoute(userLocation, destination)
+                        //getRoute(userLocation, destination)
                     } else {
                         Toast.makeText(
                             requireContext(),
@@ -190,11 +234,35 @@ class MapsFragment : Fragment() {
         mapView.overlays.add(locationOverlay)
     }
 
-    private fun addMarker(position: GeoPoint, title: String) {
+    private fun updateRoute(userLocation: GeoPoint) {
+        val destination = GeoPoint(userLocation.latitude + 0.009, userLocation.longitude) // Ex. Destination fixe
+
+        // Supprimer l'ancien tracé
+        currentPolyline?.let { mapView.overlays.remove(it) }
+
+        // Récupérer le nouvel itinéraire
+        getRoute(userLocation, destination)
+    }
+
+    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null) {
         val marker = Marker(mapView)
         marker.position = position
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         marker.title = title
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(this)
+                .asBitmap()
+                .load(imageUrl)
+                .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                        val drawable = android.graphics.drawable.BitmapDrawable(resources, resource)
+                        marker.image = drawable
+                        mapView.invalidate() // Rafraîchir la carte après chargement
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+        }
 
         val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
         val bitmap = (drawable as android.graphics.drawable.BitmapDrawable).bitmap
@@ -233,7 +301,7 @@ class MapsFragment : Fragment() {
 
                             val polyline = Polyline()
                             if (isAdded) {
-                                polyline.color = resources.getColor(android.R.color.black, null)
+                                polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
                             }
 
                             for (i in 0 until coordinates.length()) {
@@ -245,6 +313,8 @@ class MapsFragment : Fragment() {
 
                             if (isAdded) {
                                 requireActivity().runOnUiThread {
+                                    currentPolyline?.let { mapView.overlays.remove(it) }
+                                    currentPolyline = polyline
                                     mapView.overlays.add(polyline)
                                     mapView.invalidate()
                                 }
