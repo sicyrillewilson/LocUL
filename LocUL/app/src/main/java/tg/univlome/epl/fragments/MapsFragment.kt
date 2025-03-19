@@ -13,8 +13,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -41,6 +39,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import tg.univlome.epl.models.Lieu
+import tg.univlome.epl.models.Salle
 
 class MapsFragment : Fragment(), LocationListener  {
 
@@ -63,7 +62,7 @@ class MapsFragment : Fragment(), LocationListener  {
     private var userLocation: GeoPoint? = null
     private var destination: GeoPoint? = null
 
-    private val lieuxList = mutableListOf<Lieu>()
+    private val markerList = mutableListOf<Marker>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -113,9 +112,6 @@ class MapsFragment : Fragment(), LocationListener  {
         mapView.overlays.add(scaleBarOverlay)
 
         // Charger les bâtiments depuis Firebase et les afficher sur la carte
-        /*loadBatiments()
-        loadInfrastructures()
-        loadSalles()*/
         loadLieux()
 
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -161,7 +157,6 @@ class MapsFragment : Fragment(), LocationListener  {
     }
 
     private fun loadLieux() {
-        lieuxList.clear()
 
         // Charger les bâtiments
         batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
@@ -198,68 +193,11 @@ class MapsFragment : Fragment(), LocationListener  {
                 val lat = lieu.latitude.toDouble()
                 val lon = lieu.longitude.toDouble()
                 val position = GeoPoint(lat, lon)
-                addMarker(position, lieu.nom, lieu.image)
+                markerList.add(addMarker(position, lieu.nom, lieu.image))  // Store the marker in the list
             } catch (e: NumberFormatException) {
                 Log.e("MapsFragment", "Coordonnées invalides pour ${lieu.nom}")
             }
         }
-    }
-
-    private fun loadBatiments() {
-        batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
-            if (batiments != null) {
-                for (batiment in batiments) {
-                    if (batiment.latitude.isNotEmpty() && batiment.longitude.isNotEmpty()) {
-                        try {
-                            val lat = batiment.latitude.toDouble()
-                            val lon = batiment.longitude.toDouble()
-                            val position = GeoPoint(lat, lon)
-                            addMarker(position, batiment.nom, batiment.image)
-                        } catch (e: NumberFormatException) {
-                            Log.e("MapsFragment", "Coordonnées invalides pour ${batiment.nom}")
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    private fun loadInfrastructures() {
-        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
-            if (infrastructures != null) {
-                for (infrastructure in infrastructures) {
-                    if (infrastructure.latitude.isNotEmpty() && infrastructure.longitude.isNotEmpty()) {
-                        try {
-                            val lat = infrastructure.latitude.toDouble()
-                            val lon = infrastructure.longitude.toDouble()
-                            val position = GeoPoint(lat, lon)
-                            addMarker(position, infrastructure.nom, infrastructure.image)
-                        } catch (e: NumberFormatException) {
-                            Log.e("MapsFragment", "Coordonnées invalides pour ${infrastructure.nom}")
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    private fun loadSalles() {
-        salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
-            if (salles != null) {
-                for (salle in salles) {
-                    if (salle.latitude.isNotEmpty() && salle.longitude.isNotEmpty()) {
-                        try {
-                            val lat = salle.latitude.toDouble()
-                            val lon = salle.longitude.toDouble()
-                            val position = GeoPoint(lat, lon)
-                            addMarker(position, salle.nom, salle.image)
-                        } catch (e: NumberFormatException) {
-                            Log.e("MapsFragment", "Coordonnées invalides pour ${salle.nom}")
-                        }
-                    }
-                }
-            }
-        })
     }
 
     private fun initLocationOverlay() {
@@ -305,7 +243,7 @@ class MapsFragment : Fragment(), LocationListener  {
         getRoute(userLocation, destination!!)
     }
 
-    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null) {
+    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker {
         Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
         val marker = Marker(mapView)
         marker.position = position
@@ -337,6 +275,15 @@ class MapsFragment : Fragment(), LocationListener  {
 
         mapView.overlays.add(marker)
         mapView.invalidate()
+        return marker
+    }
+
+    private fun removeAllMarkers() {
+        for (marker in markerList) {
+            mapView.overlays.remove(marker)
+        }
+        markerList.clear()  // Optionally, clear the list after removal
+        mapView.invalidate()  // Refresh the map
     }
 
     private fun getRoute(start: GeoPoint, end: GeoPoint) {
@@ -392,70 +339,53 @@ class MapsFragment : Fragment(), LocationListener  {
         })
     }
 
-    /*
-    // Fonction pour filtrer et afficher les résultats
     private fun filterMarkers(query: String?) {
-        mapView.overlays.clear() // Supprime tous les marqueurs actuels
+        removeAllMarkers()
 
-        if (query.isNullOrBlank()) {
-            // Si aucun texte n'est entré, recharger tous les marqueurs
-            loadBatiments()
-            loadInfrastructures()
-            loadSalles()
-        } else {
-            val lowerCaseQuery = query.lowercase()
-
-            batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
-                Log.d("MapsFragment", "Bâtiments récupérés: ${batiments.size}")
-            })
-
-            // Filtrer et afficher uniquement les bâtiments qui correspondent à la recherche
-            batimentService.getBatiments().value?.filter {
-                it.nom.lowercase().contains(lowerCaseQuery)
-            }?.forEach {
-                addMarker(GeoPoint(it.latitude.toDouble(), it.longitude.toDouble()), it.nom, it.image)
-            }
-
-            // Filtrer et afficher uniquement les infrastructures qui correspondent à la recherche
-            infrastructureService.getInfrastructures().value?.filter {
-                it.nom.lowercase().contains(lowerCaseQuery)
-            }?.forEach {
-                addMarker(GeoPoint(it.latitude.toDouble(), it.longitude.toDouble()), it.nom, it.image)
-            }
-
-            // Filtrer et afficher uniquement les salles qui correspondent à la recherche
-            salleService.getSalles().value?.filter {
-                it.nom.lowercase().contains(lowerCaseQuery)
-            }?.forEach {
-                addMarker(GeoPoint(it.latitude.toDouble(), it.longitude.toDouble()), it.nom, it.image)
-            }
-        }
-
-        mapView.invalidate() // Rafraîchissement de la carte
-    }*/
-
-    private fun filterMarkers(query: String?) {
         if (query.isNullOrEmpty()) {
-            mapView.overlays.clear()
-            loadBatiments()
-            loadInfrastructures()
-            loadSalles()
+            loadLieux()
             return
         }
 
         val lowerCaseQuery = query.lowercase()
 
-        // Filtrer les marqueurs existants
-        val newOverlays = mapView.overlays.filter { overlay ->
-            if (overlay is Marker) {
-                val name = overlay.title?.lowercase() ?: ""
-                return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
+        batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
+            if (batiments != null) {
+                val batiments = batiments.filter { batiment ->
+                    val name = batiment.nom?.lowercase() ?: ""
+                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
+                }
+                for (batiment in batiments) {
+                    ajouterLieuSurCarte(batiment)
+                }
             }
-            true // Conserver les autres overlays (boussole, échelle, etc.)
-        }
+        })
 
-        mapView.overlays.clear()
-        mapView.overlays.addAll(newOverlays)
+        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
+            if (infrastructures != null) {
+                val infrastructures = infrastructures.filter { infrastructure ->
+                    val name = infrastructure.nom?.lowercase() ?: ""
+                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
+                }
+                for (infrastructure in infrastructures) {
+                    ajouterLieuSurCarte(infrastructure)
+                }
+            }
+        })
+
+        salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
+            if (salles != null) {
+                val salles = salles.filter { salle ->
+                    val name = salle.nom?.lowercase() ?: ""
+                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
+                }
+                for (salle in salles) {
+                    ajouterLieuSurCarte(salle)
+                }
+            }
+        })
+
+        removeAllMarkers()
         mapView.invalidate()
     }
 
