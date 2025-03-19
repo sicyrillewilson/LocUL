@@ -54,7 +54,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Charger un fragment par défaut
-        bottomNavigationView.selectedItemId = R.id.nav_home
+        //bottomNavigationView.selectedItemId = R.id.nav_home
+        bottomNavigationView.selectedItemId = R.id.nav_maps
 
     }
     private fun loadFragment(fragment: Fragment) {

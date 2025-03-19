@@ -3,12 +3,12 @@ package tg.univlome.epl.models
 import java.io.Serializable
 
 data class Salle(
-    var id: String,
+    override var id: String,
     var infrastructureId: String,
-    var nom: String,
-    var description: String,
+    override var nom: String,
+    override var description: String,
     var capacite: String,
-    var longitude: String,
-    var latitude: String,
-    var image: String
-) : Serializable
+    override var longitude: String,
+    override var latitude: String,
+    override var image: String
+) : Lieu(id, nom, description, longitude, latitude, image), Serializable

@@ -4,18 +4,18 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
-import tg.univlome.epl.models.Infrastructure
+import tg.univlome.epl.models.Batiment
 
 class InfrastructureService {
     private val db = FirebaseFirestore.getInstance()
     private val infrastructuresCollection = db.collection("infrastructures")
 
-    fun getInfrastructures(): LiveData<List<Infrastructure>> {
-        val infrastructuresLiveData = MutableLiveData<List<Infrastructure>>()
+    fun getInfrastructures(): LiveData<List<Batiment>> {
+        val infrastructuresLiveData = MutableLiveData<List<Batiment>>()
 
         infrastructuresCollection.get()
             .addOnSuccessListener { result ->
-                val infrastructuresList = mutableListOf<Infrastructure>()
+                val infrastructuresList = mutableListOf<Batiment>()
                 for (document in result) {
                     val id = document.id
                     val nom = document.getString("name") ?: ""
@@ -24,7 +24,7 @@ class InfrastructureService {
                     val latitude = document.getString("latitude") ?: ""
                     val image = document.getString("image") ?: ""
 
-                    infrastructuresList.add(Infrastructure(id, nom, description, longitude, latitude, image))
+                    infrastructuresList.add(Batiment(id, nom, description, longitude, latitude, image))
                 }
                 infrastructuresLiveData.value = infrastructuresList
             }
