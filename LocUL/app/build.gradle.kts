@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.gms.google.services)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -27,6 +27,11 @@ android {
             )
         }
     }
+
+    buildFeatures{
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -54,4 +59,10 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.16")
     implementation("org.osmdroid:osmdroid-mapsforge:6.1.16") // Ajout pour ScaleBarOverlay
     implementation("com.squareup.okhttp3:okhttp:4.9.0")  // Pour les requêtes HTTP (GraphHopper)
+
+    implementation("com.google.android.gms:play-services-location:21.1.0") //exemple
+    implementation("com.google.android.gms:play-services-maps:18.2.0") //exemple
+
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
 }
