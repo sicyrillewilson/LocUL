@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="16dp"
     android:paddingTop="5dp"
-    tools:context=".ui.SudBatimentFragment">
+    tools:context=".ui.batiment.SudBatimentFragment">
 
     <!-- Liste horizontale des bâtiments -->
     <androidx.recyclerview.widget.RecyclerView

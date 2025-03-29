@@ -1,14 +1,15 @@
-package tg.univlome.epl.ui
+package tg.univlome.epl.ui.infrastructure
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import tg.univlome.epl.R
+import tg.univlome.epl.ui.infrastructure.SudInfraFragment
 
 class InfraFragment : Fragment() {
     private var currentSelectedNav: View? = null

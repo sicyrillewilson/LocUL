@@ -1,21 +1,19 @@
-package tg.univlome.epl.ui
+package tg.univlome.epl.ui.batiment
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Adapter
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.Batiment
-import tg.univlome.epl.adapter.BatimentAdapter
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
+import tg.univlome.epl.ui.SearchBarFragment
 
-class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
+class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var batiments: List<Batiment>
     private lateinit var filteredList: MutableList<Batiment>
@@ -29,23 +27,23 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_all_batiment, container, false)
+        val view = inflater.inflate(R.layout.fragment_sud_batiment, container, false)
 
         batiments = listOf(
             Batiment("Bâtiment enseignement A", "Campus Nord", "500m", R.drawable.img),
-            Batiment("Qwerty enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Asdfgh enseignement C", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Zxcvb enseignement D", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement E", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement F", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement G", "Campus Sud", "300m", R.drawable.img),
+            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
+            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
+            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
+            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
+            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
         )
         filteredList = batiments.toMutableList()
 
         adapter = BatimentFragmentAdapter(batiments)
-        val recyclerAllBatiments = view.findViewById<RecyclerView>(R.id.recyclerAllBatiments)
-        recyclerAllBatiments.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerAllBatiments.adapter = adapter
+        val recyclerSudBatiments = view.findViewById<RecyclerView>(R.id.recyclerSudBatiments)
+        recyclerSudBatiments.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        recyclerSudBatiments.adapter = adapter
 
         return view
     }

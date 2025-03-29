@@ -10,9 +10,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
-import tg.univlome.epl.ui.HomeFragment
-import tg.univlome.epl.ui.ViewAllInfraFragment
-import tg.univlome.epl.ui.ViewAllSalleFragment
+import tg.univlome.epl.ui.home.HomeFragment
+import tg.univlome.epl.ui.home.ViewAllInfraFragment
+import tg.univlome.epl.ui.home.ViewAllSalleFragment
 
 data class Infra(val nom: String, val situation: String, val distance: String, val icon: Int)
 

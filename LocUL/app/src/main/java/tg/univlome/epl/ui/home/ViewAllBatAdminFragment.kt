@@ -1,49 +1,47 @@
-package tg.univlome.epl.ui
+package tg.univlome.epl.ui.home
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.Batiment
-import tg.univlome.epl.adapter.BatimentAdapter
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
+import tg.univlome.epl.ui.SearchBarFragment
 
-class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
+class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
 
-    private lateinit var batiments: List<Batiment>
+    private lateinit var batimentsAdmin: List<Batiment>
     private lateinit var filteredList: MutableList<Batiment>
     private lateinit var adapter: BatimentFragmentAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_sud_batiment, container, false)
+        val view = inflater.inflate(R.layout.fragment_view_all_bat_admin, container, false)
 
-        batiments = listOf(
+        val recyclerBatimentsAdmin = view.findViewById<RecyclerView>(R.id.recyclerAllBatimentsAdmin)
+
+        batimentsAdmin = listOf(
             Batiment("Bâtiment enseignement A", "Campus Nord", "500m", R.drawable.img),
             Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
             Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
             Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
             Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
             Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
+            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
         )
-        filteredList = batiments.toMutableList()
+        filteredList = batimentsAdmin.toMutableList()
 
-        adapter = BatimentFragmentAdapter(batiments)
-        val recyclerSudBatiments = view.findViewById<RecyclerView>(R.id.recyclerSudBatiments)
-        recyclerSudBatiments.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerSudBatiments.adapter = adapter
+        adapter = BatimentFragmentAdapter(batimentsAdmin)
+        recyclerBatimentsAdmin.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        recyclerBatimentsAdmin.adapter = adapter
 
         return view
     }
@@ -59,7 +57,7 @@ class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
     }
 
     override fun onSearch(query: String) {
-        filteredList = batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        filteredList = batimentsAdmin.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
 

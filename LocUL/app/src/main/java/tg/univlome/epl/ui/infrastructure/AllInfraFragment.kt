@@ -1,18 +1,17 @@
-package tg.univlome.epl.ui
+package tg.univlome.epl.ui.infrastructure
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.InfraFragmentAdapter
 import tg.univlome.epl.adapter.Infra
-import tg.univlome.epl.adapter.InfraAdapter
+import tg.univlome.epl.adapter.InfraFragmentAdapter
+import tg.univlome.epl.ui.SearchBarFragment
 
 class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
 
@@ -31,20 +30,21 @@ class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         val view = inflater.inflate(R.layout.fragment_all_infra, container, false)
 
         infrasAll = listOf(
-            Infra("Infra A", "Campus All","500m", R.drawable.img),
-            Infra("Infra B", "Campus Sud","300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud","300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud","300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud","300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud","300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud","300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud","300m", R.drawable.img),
+            Infra("Infra A", "Campus All", "500m", R.drawable.img),
+            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
+            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
+            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
+            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
+            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
+            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
+            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
         )
         filteredList = infrasAll.toMutableList()
 
         adapter = InfraFragmentAdapter(infrasAll)
         val recyclerAllInfra = view.findViewById<RecyclerView>(R.id.recyclerAllInfra)
-        recyclerAllInfra.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        recyclerAllInfra.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recyclerAllInfra.adapter = adapter
 
         return view

@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="16dp"
     android:paddingTop="15dp"
-    tools:context=".ui.ViewAllInfraFragment">
+    tools:context=".ui.home.ViewAllInfraFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAllInfraHome"

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package tg.univlome.epl
 
 import android.animation.ValueAnimator
@@ -28,10 +30,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
 import tg.univlome.epl.databinding.ActivityMainBinding
-import tg.univlome.epl.ui.BatimentFragment
-import tg.univlome.epl.ui.HomeFragment
-import tg.univlome.epl.ui.InfraFragment
+import tg.univlome.epl.ui.batiment.BatimentFragment
+import tg.univlome.epl.ui.home.HomeFragment
+import tg.univlome.epl.ui.infrastructure.InfraFragment
 import tg.univlome.epl.ui.SearchBarFragment
+import tg.univlome.epl.ui.maps.MapsFragment
 import java.util.Locale
 
 data class NavItem(
@@ -131,7 +134,8 @@ class MainActivity : AppCompatActivity() {
         val navItems = listOf(
             NavItem(findViewById(R.id.nav_home), findViewById(R.id.text_home), findViewById(R.id.icon_home), HomeFragment()),
             NavItem(findViewById(R.id.nav_batiment), findViewById(R.id.text_batiment), findViewById(R.id.icon_batiment), BatimentFragment()),
-            NavItem(findViewById(R.id.nav_salle), findViewById(R.id.text_salle), findViewById(R.id.icon_salle), InfraFragment())
+            NavItem(findViewById(R.id.nav_salle), findViewById(R.id.text_salle), findViewById(R.id.icon_salle), InfraFragment()),
+            NavItem(findViewById(R.id.nav_maps), findViewById(R.id.text_maps), findViewById(R.id.icon_maps), MapsFragment())
         )
 
         val defaultItem = navItems[0]
@@ -342,9 +346,7 @@ fun setLocale(activity: Activity, languageCode: String) {
     activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
 }
 
-/*@file:Suppress("DEPRECATION")
-
-package tg.univlome.epl
+/*package tg.univlome.epl
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

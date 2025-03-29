@@ -16,4 +16,9 @@
         android:icon="@drawable/salle_nav_icon"
         android:title="Infrastructures" />
 
+    <item
+        android:id="@+id/nav_maps"
+        android:icon="@drawable/salle_nav_icon"
+        android:title="maps" />
+
 </menu>

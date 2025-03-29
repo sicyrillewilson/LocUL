@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="16dp"
     android:paddingTop="5dp"
-    tools:context=".ui.NordInfraFragment">
+    tools:context=".ui.infrastructure.NordInfraFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerNordInfra"

@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package tg.univlome.epl.fragments
+package tg.univlome.epl.ui.maps
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -38,10 +38,12 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import tg.univlome.epl.MainActivity
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.SearchBarFragment
 
-class MapsFragment : Fragment(), LocationListener  {
+class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationListener {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -64,6 +66,10 @@ class MapsFragment : Fragment(), LocationListener  {
 
     private val markerList = mutableListOf<Marker>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -71,7 +77,6 @@ class MapsFragment : Fragment(), LocationListener  {
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -402,6 +407,7 @@ class MapsFragment : Fragment(), LocationListener  {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        (activity as MainActivity).showSearchBarFragment(this)
     }
 
     override fun onPause() {
@@ -418,11 +424,16 @@ class MapsFragment : Fragment(), LocationListener  {
 
         editor.apply()
         mapView.onPause()
+        (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onSearch(query: String) {
+        filterMarkers(query)
     }
 
 }
