@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/customBottomNav"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/bottom_nav_background"
+    android:orientation="horizontal"
+    android:layout_marginTop="5dp"
+    android:layout_marginStart="18dp"
+    android:layout_marginEnd="18dp"
+    android:gravity="center"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:id="@+id/container_home"
+        android:layout_width="15dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <!-- Item Accueil -->
+        <LinearLayout
+            android:id="@+id/nav_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:background="@drawable/nav_item_bg">
+
+            <ImageView
+                android:id="@+id/icon_home"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/home_icon" />
+
+            <TextView
+                android:id="@+id/text_home"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="Accueil"
+                android:textSize="13sp"
+                android:fontFamily="@font/gotham_medium"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/container_batiment"
+        android:layout_width="25dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/nav_batiment"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingHorizontal="10dp">
+
+            <ImageView
+                android:id="@+id/icon_batiment"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/batiment_nav_icon" />
+
+            <TextView
+                android:id="@+id/text_batiment"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:text="Batiments"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/gotham_medium"
+                android:gravity="center"
+                android:paddingStart="8dp"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/container_salle"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/nav_salle"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingHorizontal="10dp">
+
+            <ImageView
+                android:id="@+id/icon_salle"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/salle_nav_icon" />
+
+            <TextView
+                android:id="@+id/text_salle"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="Infrastructures"
+                android:fontFamily="@font/gotham_medium"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

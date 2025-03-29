@@ -53,6 +53,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.drawerlayout:drawerlayout:1.2.0")
+
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
 
     implementation("org.osmdroid:osmdroid-wms:6.1.16") // Optionnel si besoin de WMS

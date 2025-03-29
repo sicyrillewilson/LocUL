@@ -1,0 +1,85 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="10dp"
+    android:background="@drawable/rounded_frame">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Réglages"
+        android:fontFamily="@font/gotham_book"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="25dp" />
+
+    <TextView
+        android:id="@+id/languageLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:text="Langage"
+        android:fontFamily="@font/gotham_medium"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentStart="true" />
+
+    <Spinner
+        android:id="@+id/languageSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/gotham_book"
+        android:textColor="@color/black"
+        android:layout_below="@id/title"
+        android:layout_toEndOf="@id/languageLabel"
+        android:layout_alignBaseline="@id/languageLabel"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/themeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/languageLabel"
+        android:text="Thème"
+        android:fontFamily="@font/gotham_medium"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginEnd="20dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp" />
+
+    <Spinner
+        android:id="@+id/themeSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/languageLabel"
+        android:fontFamily="@font/gotham_book"
+        android:textColor="@color/black"
+        android:layout_toEndOf="@id/themeLabel"
+        android:layout_marginTop="16dp"
+        android:layout_alignBaseline="@id/themeLabel"
+        android:layout_alignParentEnd="true"/>
+
+    <Button
+        android:id="@+id/appliquer"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="Appliquer"
+        android:fontFamily="@font/gotham_book"
+        android:textColor="@color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp" />
+</RelativeLayout>
