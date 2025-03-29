@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_frame"
+    android:orientation="horizontal"
+    android:padding="3dp"
+    android:paddingEnd="6dp"
+    android:layout_marginEnd="10dp">
+
+    <!-- Icône du bâtiment -->
+    <LinearLayout
+        android:layout_width="150dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/rounded_frame"
+        android:layout_marginEnd="10dp" >
+
+        <ImageView
+            android:id="@+id/imgBatiment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:scaleType="fitXY"
+            android:clipToOutline="true"
+            android:background="@drawable/img_backgroung"
+            android:src="@drawable/img" />
+
+    </LinearLayout>
+
+    <!-- Bloc nom + distance -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Nom du bâtiment -->
+        <TextView
+            android:id="@+id/txtNomBatiment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lines="2"
+            android:maxLines="2"
+            android:gravity="center_vertical"
+            android:ellipsize="end"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/gotham_book"
+            android:text="Nom Bâtiment"
+            android:layout_marginBottom="5dp"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+
+        <!-- Ligne de séparation -->
+        <View
+            android:layout_width="130dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="5dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:id="@+id/situationBat"
+            android:layout_width="wrap_content"
+            android:fontFamily="@font/gotham_book"
+            android:layout_height="wrap_content"
+            android:text="Campus Nord"
+            android:textSize="14sp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/route_icon"
+                android:layout_marginEnd="15dp"/>
+
+            <!-- Distance -->
+            <TextView
+                android:id="@+id/txtDistanceBatiment"
+                android:layout_width="wrap_content"
+                android:fontFamily="@font/gotham_book"
+                android:layout_height="wrap_content"
+                android:text="500m"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

@@ -5,20 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".fragments.MapsFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        android:elevation="4dp">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:queryHint="Rechercher un bâtiment, une salle ou une infrastructure"/>
-    </LinearLayout>
-
     <org.osmdroid.views.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
