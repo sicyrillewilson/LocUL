@@ -310,7 +310,8 @@ class MapsFragment : Fragment(), LocationListener  {
 
                             val polyline = Polyline()
                             if (isAdded) {
-                                polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                //polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                polyline.color = resources.getColor(R.color.mainColor, null)
                             }
 
                             for (i in 0 until coordinates.length()) {
