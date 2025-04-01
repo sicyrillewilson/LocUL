@@ -7,14 +7,14 @@
     android:background="@drawable/bottom_nav_background"
     android:orientation="horizontal"
     android:layout_marginTop="5dp"
-    android:layout_marginStart="18dp"
-    android:layout_marginEnd="18dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     android:gravity="center"
-    android:padding="12dp">
+    android:padding="10dp">
 
     <LinearLayout
         android:id="@+id/container_home"
-        android:layout_width="15dp"
+        android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -27,7 +27,6 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center"
-            android:paddingHorizontal="10dp"
             android:background="@drawable/nav_item_bg">
 
             <ImageView
@@ -38,21 +37,21 @@
 
             <TextView
                 android:id="@+id/text_home"
-                android:layout_width="60dp"
+                android:layout_width="wrap_content"
+                android:minWidth="60dp"
                 android:layout_height="wrap_content"
                 android:text="Accueil"
                 android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:paddingStart="8dp"
                 android:textColor="@color/black" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/container_batiment"
-        android:layout_width="25dp"
+        android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -60,11 +59,11 @@
 
         <LinearLayout
             android:id="@+id/nav_batiment"
-            android:layout_width="50dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center"
-            android:paddingHorizontal="10dp">
+            android:background="@drawable/nav_item_bg">
 
             <ImageView
                 android:id="@+id/icon_batiment"
@@ -74,22 +73,23 @@
 
             <TextView
                 android:id="@+id/text_batiment"
-                android:layout_width="75dp"
+                android:layout_width="wrap_content"
+                android:minWidth="60dp"
                 android:layout_height="wrap_content"
-                android:text="Batiments"
                 android:textSize="13sp"
-                android:textStyle="bold"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
-                android:paddingStart="8dp"
+                android:textStyle="bold"
                 android:textColor="@color/black"
+                android:text="Batiments"
+                android:paddingStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/container_salle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -97,11 +97,11 @@
 
         <LinearLayout
             android:id="@+id/nav_salle"
-            android:layout_width="50dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center"
-            android:paddingHorizontal="10dp">
+            android:background="@drawable/nav_item_bg">
 
             <ImageView
                 android:id="@+id/icon_salle"
@@ -111,22 +111,23 @@
 
             <TextView
                 android:id="@+id/text_salle"
-                android:layout_width="60dp"
+                android:layout_width="wrap_content"
+                android:minWidth="60dp"
                 android:layout_height="wrap_content"
-                android:text="Infrastructures"
-                android:fontFamily="@font/gotham_medium"
                 android:textSize="13sp"
+                android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:paddingStart="8dp"
                 android:textColor="@color/black"
+                android:text="Infrastructures"
+                android:paddingStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/container_maps"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -134,11 +135,11 @@
 
         <LinearLayout
             android:id="@+id/nav_maps"
-            android:layout_width="50dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center"
-            android:paddingHorizontal="10dp">
+            android:background="@drawable/nav_item_bg">
 
             <ImageView
                 android:id="@+id/icon_maps"
@@ -148,15 +149,16 @@
 
             <TextView
                 android:id="@+id/text_maps"
-                android:layout_width="60dp"
+                android:layout_width="wrap_content"
+                android:minWidth="60dp"
                 android:layout_height="wrap_content"
-                android:text="Maps"
-                android:fontFamily="@font/gotham_medium"
                 android:textSize="13sp"
+                android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:paddingStart="8dp"
                 android:textColor="@color/black"
+                android:text="Maps"
+                android:paddingStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>

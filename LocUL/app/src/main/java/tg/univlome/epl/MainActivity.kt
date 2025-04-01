@@ -2,7 +2,6 @@
 
 package tg.univlome.epl
 
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
 import android.graphics.Color
@@ -10,7 +9,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
@@ -36,6 +34,8 @@ import tg.univlome.epl.ui.infrastructure.InfraFragment
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.ui.maps.MapsFragment
 import java.util.Locale
+import android.os.Handler
+import android.os.Looper
 
 data class NavItem(
     val layout: LinearLayout,
@@ -51,6 +51,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
     private lateinit var searchBarFragment: SearchBarFragment
+
+    private var doubleBackToExitPressedOnce = false // Variable pour gérer le double appui
+    private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,6 +134,10 @@ class MainActivity : AppCompatActivity() {
             }
         }, true) // "true" permet de surveiller même les fragments imbriqués
 
+        chargerItems()
+    }
+
+    private fun chargerItems(){
         val navItems = listOf(
             NavItem(findViewById(R.id.nav_home), findViewById(R.id.text_home), findViewById(R.id.icon_home), HomeFragment()),
             NavItem(findViewById(R.id.nav_batiment), findViewById(R.id.text_batiment), findViewById(R.id.icon_batiment), BatimentFragment()),
@@ -138,16 +145,27 @@ class MainActivity : AppCompatActivity() {
             NavItem(findViewById(R.id.nav_maps), findViewById(R.id.text_maps), findViewById(R.id.icon_maps), MapsFragment())
         )
 
+        for (item in navItems) {
+            item.layout.setBackgroundColor(Color.TRANSPARENT)
+            item.textView.visibility = View.GONE
+            item.icon.setColorFilter(
+            ContextCompat.getColor(
+                this,
+                R.color.gray
+            ))
+        }
+
         val defaultItem = navItems[0]
         selectedItem = defaultItem
         defaultItem.layout.setBackgroundResource(R.drawable.nav_item_bg)
         defaultItem.textView.visibility = View.VISIBLE
         defaultItem.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
         defaultItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
-        navItems[2].icon.setColorFilter(ContextCompat.getColor(this, R.color.gray))
+
+        animateItemSelection(defaultItem)
 
         // Charge le fragment par défaut
-        loadFragment(HomeFragment())
+        loadFragment(defaultItem.fragment)
 
         for (item in navItems) {
             item.layout.setOnClickListener {
@@ -161,15 +179,10 @@ class MainActivity : AppCompatActivity() {
                     otherItem.layout.setBackgroundColor(Color.TRANSPARENT)
                     otherItem.textView.visibility = View.GONE
                     otherItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.gray)) // Couleur inactive
-                    collapseItem(otherItem.layout) // Réduire la largeur de l'item
                 }
 
-                // Activer l'élément sélectionné
-                item.layout.setBackgroundResource(R.drawable.nav_item_bg)
-                item.textView.visibility = View.VISIBLE
-                item.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
-                item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black)) // Couleur active
-                expandItem(item.layout) // Étendre la largeur de l'item
+                // Animer l'élément sélectionné
+                animateItemSelection(item)
 
                 // Mettre à jour l'item sélectionné
                 selectedItem = item
@@ -178,17 +191,21 @@ class MainActivity : AppCompatActivity() {
                 loadFragment(item.fragment)
             }
         }
-
     }
 
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            // Si le drawer est ouvert, fermez-le
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            // Sinon, comportement par défaut (fermeture de l'activité)
-            super.onBackPressed()
-        }
+    private fun animateItemSelection(item: NavItem) {
+        item.layout.setBackgroundResource(R.drawable.nav_item_bg)
+
+        // Animation d'apparition progressive du texte
+        item.textView.alpha = 0f
+        item.textView.visibility = View.VISIBLE
+        item.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
+        item.textView.animate()
+            .alpha(1f)
+            .setDuration(350)
+            .start()
+
+        item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
     }
 
     fun showSearchBarFragment(listener: SearchBarFragment.SearchListener?) {
@@ -210,41 +227,43 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, fragment)
             .commit()
+        currentFragment = fragment
     }
 
-    private fun expandItem(view: View) {
-        val width = view.width
-        val parentWidth = (view.parent as View).width // Largeur du parent
-        val targetWidth = parentWidth
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            // Si le drawer est ouvert, fermez-le
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            if (currentFragment is HomeFragment) {
+                // Si on est sur HomeFragment, gérer le double appui pour quitter l'application
+                if (doubleBackToExitPressedOnce) {
+                    super.onBackPressed() // Quitter l'application
+                    return
+                }
 
-        val animator = ValueAnimator.ofInt(width, targetWidth)
-        animator.duration = 300 // Durée de l'animation en millisecondes
-        animator.interpolator = DecelerateInterpolator()
-        animator.addUpdateListener { animation ->
-            val animatedValue = animation.animatedValue as Int
-            val layoutParams = view.layoutParams
-            layoutParams.width = animatedValue
-            view.layoutParams = layoutParams
+                this.doubleBackToExitPressedOnce = true
+                // Afficher un message à l'utilisateur
+                Toast.makeText(this, "Appuyez à nouveau pour quitter", Toast.LENGTH_SHORT)
+                    .show()
+
+                // Remettre la variable à false après un délai
+                Handler(Looper.getMainLooper()).postDelayed({
+                    doubleBackToExitPressedOnce = false
+                }, 2000) // Le délai pour un deuxième appui est de 2 secondes
+            } else {
+                chargerItems()
+            }
         }
-        animator.start()
     }
 
-    private fun collapseItem(view: View) {
-        val width = view.width
-        val targetWidth = 150 // Largeur initiale
-
-        val animator = ValueAnimator.ofInt(width, targetWidth)
-        animator.duration = 300 // Durée de l'animation en millisecondes
-        animator.interpolator = DecelerateInterpolator()
-        animator.addUpdateListener { animation ->
-            val animatedValue = animation.animatedValue as Int
-            val layoutParams = view.layoutParams
-            layoutParams.width = animatedValue
-            view.layoutParams = layoutParams
-        }
-        animator.start()
+    override fun onResume() {
+        super.onResume()
     }
 
+    override fun onPause() {
+        super.onPause()
+    }
 }
 
 fun showSettingsDialog(activity: Activity, show: Boolean) {
@@ -345,101 +364,3 @@ fun setLocale(activity: Activity, languageCode: String) {
 
     activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
 }
-
-/*package tg.univlome.epl
-
-import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import android.widget.Toast
-import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import tg.univlome.epl.fragments.TestFragment
-import tg.univlome.epl.fragments.MapsFragment
-
-class MainActivity : AppCompatActivity() {
-
-    private var doubleBackToExitPressedOnce = false // Variable pour gérer le double appui
-    private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
-
-        setContentView(R.layout.activity_main)
-
-        setContentView(R.layout.activity_main)
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bouton_navigation)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        // Définir l'action sur les éléments de navigation
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    loadFragment(TestFragment())
-                    true
-                }
-                R.id.nav_maps -> {
-                    loadFragment(MapsFragment())
-                    true
-                }
-                else -> false
-            }
-        }
-
-        // Charger un fragment par défaut
-        //bottomNavigationView.selectedItemId = R.id.nav_home
-        bottomNavigationView.selectedItemId = R.id.nav_maps
-
-    }
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
-        currentFragment = fragment
-    }
-    override fun onBackPressed() {
-        if (currentFragment is TestFragment) {
-            // Si on est sur HomeFragment, gérer le double appui pour quitter l'application
-            if (doubleBackToExitPressedOnce) {
-                super.onBackPressed() // Quitter l'application
-                return
-            }
-
-            this.doubleBackToExitPressedOnce = true
-            // Afficher un message à l'utilisateur
-            Toast.makeText(this, "Appuyez à nouveau pour quitter", Toast.LENGTH_SHORT).show()
-
-            // Remettre la variable à false après un délai
-            Handler(Looper.getMainLooper()).postDelayed({
-                doubleBackToExitPressedOnce = false
-            }, 2000) // Le délai pour un deuxième appui est de 2 secondes
-        } else {
-            // Si on n'est pas dans HomeFragment, on retourne au HomeFragment
-            loadFragment(TestFragment())
-            // Charger un fragment par défaut
-            val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bouton_navigation)
-            bottomNavigationView.selectedItemId = R.id.nav_home
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-}*/
