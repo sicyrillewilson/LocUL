@@ -1,5 +1,6 @@
 package tg.univlome.epl.models
 
+import tg.univlome.epl.R
 import java.io.Serializable
 
 data class Salle(
@@ -10,5 +11,8 @@ data class Salle(
     var capacite: String,
     override var longitude: String,
     override var latitude: String,
-    override var image: String
-) : Lieu(id, nom, description, longitude, latitude, image), Serializable
+    override var image: String,
+    override var situation: String = "",
+    override var distance: String = "",
+    override val icon: Int  = R.drawable.img
+) : Lieu(id, nom, description, longitude, latitude, image, situation, distance, icon), Serializable

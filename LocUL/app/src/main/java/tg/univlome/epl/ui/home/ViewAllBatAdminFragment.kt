@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.Batiment
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.ui.SearchBarFragment
 
@@ -28,13 +28,13 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
         val recyclerBatimentsAdmin = view.findViewById<RecyclerView>(R.id.recyclerAllBatimentsAdmin)
 
         batimentsAdmin = listOf(
-            Batiment("Bâtiment enseignement A", "Campus Nord", "500m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
+            Batiment("1", "Bâtiment enseignement A", "Batiment Administratif", "", "", "", "Campus Nord", "500m", R.drawable.img),
+            Batiment("2", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img),
+            Batiment("3", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img),
+            Batiment("4", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img),
+            Batiment("5", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img),
+            Batiment("6", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img),
+            Batiment("7", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img),
         )
         filteredList = batimentsAdmin.toMutableList()
 

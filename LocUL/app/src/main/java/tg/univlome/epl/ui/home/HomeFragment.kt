@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.Batiment
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.adapter.BatimentAdapter
 import tg.univlome.epl.adapter.Infra
 import tg.univlome.epl.adapter.InfraAdapter
@@ -38,13 +38,13 @@ class HomeFragment : Fragment() {
         val recyclerInfra = view.findViewById<RecyclerView>(R.id.recyclerInfra)
 
         val batimentsEns = listOf(
-            Batiment("Bâtiment enseignement A", "Campus Nord", "500m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img)
+            Batiment("1", "Bâtiment enseignement A", "Batiment Enseignement", "", "", "", "Campus Nord", "500m", R.drawable.img),
+            Batiment("2", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", R.drawable.img)
         )
 
         val batimentsAdmin = listOf(
-            Batiment("DAAS", "Campus Nord", "500m", R.drawable.img),
-            Batiment("Bâtiment admin A", "Campus Sud", "300m", R.drawable.img)
+            Batiment("1", "DAAS", "Batiment Administratif", "", "", "", "Campus Nord", "500m", R.drawable.img),
+            Batiment("2", "Bâtiment admin A","Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img)
         )
 
         val Infras = listOf(

@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.R
+import tg.univlome.epl.models.Batiment
 
 class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

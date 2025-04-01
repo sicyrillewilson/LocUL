@@ -11,9 +11,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.ui.home.HomeFragment
 
-data class Batiment(val nom: String, val situation: String, val distance: String, val icon: Int)
+//data class Batiment(val nom: String, val situation: String, val distance: String, val icon: Int)
 
 class BatimentAdapter(
     private val batiments: List<Batiment>,
