@@ -30,12 +30,12 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         val view = inflater.inflate(R.layout.fragment_nord_batiment, container, false)
 
         batiments = listOf(
-            Batiment("1", "Bâtiment enseignement A", "Batiment Enseignement", "", "", "", "Campus Nord", "500m", R.drawable.img),
-            Batiment("2", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", R.drawable.img),
-            Batiment("3", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", R.drawable.img),
-            Batiment("4", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", R.drawable.img),
-            Batiment("5", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", R.drawable.img),
-            Batiment("6", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", R.drawable.img),
+            Batiment("1", "Bâtiment enseignement A", "Batiment Enseignement", "", "", "", "Campus Nord", "500m", "", R.drawable.img),
+            Batiment("2", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
+            Batiment("3", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
+            Batiment("4", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
+            Batiment("5", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
+            Batiment("6", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
         )
         filteredList = batiments.toMutableList()
 

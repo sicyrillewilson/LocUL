@@ -67,13 +67,13 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                updateBatimentsDistances(userGeoPoint)
+                updateBatiments(userGeoPoint)
             }
         }
     }
 
-    private fun updateBatimentsDistances(userLocation: GeoPoint) {
-        Log.d("AllBatimentFragement", "updateBatimentsDistances appelée avec : $userLocation")
+    private fun updateBatiments(userLocation: GeoPoint) {
+        Log.d("AllBatimentFragement", "updateBatiments appelée avec : $userLocation")
         // Charger les bâtiments
         batimentService.getBatiments().observe(viewLifecycleOwner, Observer { bats ->
             if (bats != null) {
@@ -83,8 +83,14 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
                         val distance = calculateDistance(userLocation, batimentLocation)
                         Log.d("AllBatimentFragement", "Distance calculée pour ${batiment.nom}: $distance mètres")
 
-                        // Mettre à jour l'objet Batiment avec la nouvelle distance
-                        batiment.distance = String.format("%.2f m", distance)
+                        // Conversion en km si la distance dépasse 1000 m
+                        val formattedDistance = if (distance >= 1000) {
+                            String.format("%.2f km", distance / 1000)
+                        } else {
+                            String.format("%.2f m", distance)
+                        }
+
+                        batiment.distance = formattedDistance
 
                         Log.d("AllBatimentFragement", "Distance mise à jour pour ${batiment.nom}: ${batiment.distance}")
 

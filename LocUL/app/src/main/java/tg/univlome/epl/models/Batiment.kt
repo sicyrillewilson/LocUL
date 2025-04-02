@@ -12,5 +12,6 @@ data class Batiment(
     override var image: String,
     override var situation: String = "",
     override var distance: String = "",
+    override val type: String = "",
     override val icon: Int  = R.drawable.img
-) : Lieu(id, nom, description, longitude, latitude, image, situation, distance, icon), Serializable
+) : Lieu(id, nom, description, longitude, latitude, image, situation, distance, type, icon), Serializable

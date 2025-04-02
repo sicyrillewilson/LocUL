@@ -13,5 +13,6 @@ open class Lieu(
     open var image: String,
     open var situation: String = "",
     open var distance: String = "",
+    open val type: String = "",
     open val icon: Int  = R.drawable.img
 ) : Serializable

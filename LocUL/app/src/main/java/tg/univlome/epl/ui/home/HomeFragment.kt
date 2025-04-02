@@ -38,13 +38,13 @@ class HomeFragment : Fragment() {
         val recyclerInfra = view.findViewById<RecyclerView>(R.id.recyclerInfra)
 
         val batimentsEns = listOf(
-            Batiment("1", "Bâtiment enseignement A", "Batiment Enseignement", "", "", "", "Campus Nord", "500m", R.drawable.img),
-            Batiment("2", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", R.drawable.img)
+            Batiment("1", "Bâtiment enseignement A", "Batiment Enseignement", "", "", "", "Campus Nord", "500m", "", R.drawable.img),
+            Batiment("2", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", "", R.drawable.img)
         )
 
         val batimentsAdmin = listOf(
-            Batiment("1", "DAAS", "Batiment Administratif", "", "", "", "Campus Nord", "500m", R.drawable.img),
-            Batiment("2", "Bâtiment admin A","Batiment Administratif", "", "", "", "Campus Sud", "300m", R.drawable.img)
+            Batiment("1", "DAAS", "Batiment Administratif", "", "", "", "Campus Nord", "500m", "", R.drawable.img),
+            Batiment("2", "Bâtiment admin A","Batiment Administratif", "", "", "", "Campus Sud", "300m", "", R.drawable.img)
         )
 
         val Infras = listOf(

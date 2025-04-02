@@ -36,13 +36,7 @@ import tg.univlome.epl.ui.maps.MapsFragment
 import java.util.Locale
 import android.os.Handler
 import android.os.Looper
-
-data class NavItem(
-    val layout: LinearLayout,
-    val textView: TextView,
-    val icon: ImageView,
-    val fragment: Fragment
-)
+import tg.univlome.epl.models.NavItem
 
 class MainActivity : AppCompatActivity() {
     lateinit var ui: ActivityMainBinding
@@ -100,12 +94,15 @@ class MainActivity : AppCompatActivity() {
                 R.id.settings -> {
                     showSettingsDialog(this, true)
                 }
+
                 R.id.share -> {
 
                 }
+
                 R.id.contact -> {
 
                 }
+
                 R.id.about -> {
 
                 }
@@ -137,22 +134,43 @@ class MainActivity : AppCompatActivity() {
         chargerItems()
     }
 
-    private fun chargerItems(){
+    private fun chargerItems() {
         val navItems = listOf(
-            NavItem(findViewById(R.id.nav_home), findViewById(R.id.text_home), findViewById(R.id.icon_home), HomeFragment()),
-            NavItem(findViewById(R.id.nav_batiment), findViewById(R.id.text_batiment), findViewById(R.id.icon_batiment), BatimentFragment()),
-            NavItem(findViewById(R.id.nav_salle), findViewById(R.id.text_salle), findViewById(R.id.icon_salle), InfraFragment()),
-            NavItem(findViewById(R.id.nav_maps), findViewById(R.id.text_maps), findViewById(R.id.icon_maps), MapsFragment())
+            NavItem(
+                findViewById(R.id.nav_home),
+                findViewById(R.id.text_home),
+                findViewById(R.id.icon_home),
+                HomeFragment()
+            ),
+            NavItem(
+                findViewById(R.id.nav_batiment),
+                findViewById(R.id.text_batiment),
+                findViewById(R.id.icon_batiment),
+                BatimentFragment()
+            ),
+            NavItem(
+                findViewById(R.id.nav_salle),
+                findViewById(R.id.text_salle),
+                findViewById(R.id.icon_salle),
+                InfraFragment()
+            ),
+            NavItem(
+                findViewById(R.id.nav_maps),
+                findViewById(R.id.text_maps),
+                findViewById(R.id.icon_maps),
+                MapsFragment()
+            )
         )
 
         for (item in navItems) {
             item.layout.setBackgroundColor(Color.TRANSPARENT)
             item.textView.visibility = View.GONE
             item.icon.setColorFilter(
-            ContextCompat.getColor(
-                this,
-                R.color.gray
-            ))
+                ContextCompat.getColor(
+                    this,
+                    R.color.gray
+                )
+            )
         }
 
         val defaultItem = navItems[0]
@@ -178,7 +196,12 @@ class MainActivity : AppCompatActivity() {
                 for (otherItem in navItems) {
                     otherItem.layout.setBackgroundColor(Color.TRANSPARENT)
                     otherItem.textView.visibility = View.GONE
-                    otherItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.gray)) // Couleur inactive
+                    otherItem.icon.setColorFilter(
+                        ContextCompat.getColor(
+                            this,
+                            R.color.gray
+                        )
+                    ) // Couleur inactive
                 }
 
                 // Animer l'élément sélectionné
@@ -264,103 +287,115 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
     }
-}
 
-fun showSettingsDialog(activity: Activity, show: Boolean) {
-    val dialog = Dialog(activity)
-    val view = LayoutInflater.from(activity).inflate(R.layout.settings, null)
-    dialog.setContentView(view)
+    fun showSettingsDialog(activity: Activity, show: Boolean) {
+        val dialog = Dialog(activity)
+        val view = LayoutInflater.from(activity).inflate(R.layout.settings, null)
+        dialog.setContentView(view)
 
-    val languageSpinner = view.findViewById<Spinner>(R.id.languageSpinner)
-    val themeSpinner = view.findViewById<Spinner>(R.id.themeSpinner)
-    val applyButton = view.findViewById<Button>(R.id.appliquer)
+        val languageSpinner = view.findViewById<Spinner>(R.id.languageSpinner)
+        val themeSpinner = view.findViewById<Spinner>(R.id.themeSpinner)
+        val applyButton = view.findViewById<Button>(R.id.appliquer)
 
-    val languageOptions = listOf(activity.getString(R.string.francais), activity.getString(R.string.anglais))
-    val themeOptions = listOf(activity.getString(R.string.clair), activity.getString(R.string.sombre), activity.getString(R.string.systeme))
+        val languageOptions =
+            listOf(activity.getString(R.string.francais), activity.getString(R.string.anglais))
+        val themeOptions = listOf(
+            activity.getString(R.string.clair),
+            activity.getString(R.string.sombre),
+            activity.getString(R.string.systeme)
+        )
 
-    val languageAdapter = ArrayAdapter(activity, R.layout.spinner_item, languageOptions)
-    languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    languageSpinner.adapter = languageAdapter
+        val languageAdapter = ArrayAdapter(activity, R.layout.spinner_item, languageOptions)
+        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        languageSpinner.adapter = languageAdapter
 
-    val themeAdapter = ArrayAdapter(activity, R.layout.spinner_item, themeOptions)
-    themeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    themeSpinner.adapter = themeAdapter
+        val themeAdapter = ArrayAdapter(activity, R.layout.spinner_item, themeOptions)
+        themeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        themeSpinner.adapter = themeAdapter
 
-    // Charger les préférences sauvegardées
-    val sharedPreferences = activity.getSharedPreferences("AppSettings", AppCompatActivity.MODE_PRIVATE)
-    val savedLanguageCode = sharedPreferences.getString("language_code", Locale.getDefault().language) // Langue par défaut du système
-    val savedTheme = sharedPreferences.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) // Thème par défaut : Système
+        // Charger les préférences sauvegardées
+        val sharedPreferences =
+            activity.getSharedPreferences("AppSettings", AppCompatActivity.MODE_PRIVATE)
+        val savedLanguageCode = sharedPreferences.getString(
+            "language_code",
+            Locale.getDefault().language
+        ) // Langue par défaut du système
+        val savedTheme = sharedPreferences.getInt(
+            "theme_mode",
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        ) // Thème par défaut : Système
 
-    // Appliquer les préférences sauvegardées
-    setLocale(activity, savedLanguageCode!!)
-    //AppCompatDelegate.setDefaultNightMode(savedTheme)
+        // Appliquer les préférences sauvegardées
+        setLocale(activity, savedLanguageCode!!)
+        //AppCompatDelegate.setDefaultNightMode(savedTheme)
 
-    // Définir les sélections des spinners
-    val savedLanguagePosition = when (savedLanguageCode) {
-        "fr" -> 0
-        "en" -> 1
-        else -> 0 // Français par défaut
-    }
-    languageSpinner.setSelection(savedLanguagePosition)
-
-    val savedThemePosition = when (savedTheme) {
-        AppCompatDelegate.MODE_NIGHT_NO -> 0
-        AppCompatDelegate.MODE_NIGHT_YES -> 1
-        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> 2 // Système
-        else -> 0 // Clair par défaut
-    }
-    themeSpinner.setSelection(savedThemePosition)
-
-    // Appliquer les choix au clic sur "Appliquer"
-    applyButton.setOnClickListener {
-        val selectedLanguagePosition = languageSpinner.selectedItemPosition
-        val selectedThemePosition = themeSpinner.selectedItemPosition
-
-        // Appliquer la langue
-        val selectedLanguageCode = when (selectedLanguagePosition) {
-            0 -> "fr" // Français
-            1 -> "en" // Anglais
-            else -> "fr"
+        // Définir les sélections des spinners
+        val savedLanguagePosition = when (savedLanguageCode) {
+            "fr" -> 0
+            "en" -> 1
+            else -> 0 // Français par défaut
         }
-        setLocale(activity, selectedLanguageCode)
+        languageSpinner.setSelection(savedLanguagePosition)
 
-        // Appliquer le thème
-        val selectedThemeMode = when (selectedThemePosition) {
-            0 -> AppCompatDelegate.MODE_NIGHT_NO // Clair
-            1 -> AppCompatDelegate.MODE_NIGHT_YES // Sombre
-            2 -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM // Système
-            else -> AppCompatDelegate.MODE_NIGHT_NO
+        val savedThemePosition = when (savedTheme) {
+            AppCompatDelegate.MODE_NIGHT_NO -> 0
+            AppCompatDelegate.MODE_NIGHT_YES -> 1
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> 2 // Système
+            else -> 0 // Clair par défaut
         }
-        AppCompatDelegate.setDefaultNightMode(selectedThemeMode)
+        themeSpinner.setSelection(savedThemePosition)
 
-        // Sauvegarder les préférences
-        val editor = sharedPreferences.edit()
-        editor.putString("language_code", selectedLanguageCode)
-        editor.putInt("theme_mode", selectedThemeMode)
-        editor.apply()
+        // Appliquer les choix au clic sur "Appliquer"
+        applyButton.setOnClickListener {
+            val selectedLanguagePosition = languageSpinner.selectedItemPosition
+            val selectedThemePosition = themeSpinner.selectedItemPosition
 
-        dialog.dismiss()
-        activity.recreate() // Recréer l'activité pour appliquer les changements
+            // Appliquer la langue
+            val selectedLanguageCode = when (selectedLanguagePosition) {
+                0 -> "fr" // Français
+                1 -> "en" // Anglais
+                else -> "fr"
+            }
+            setLocale(activity, selectedLanguageCode)
+
+            // Appliquer le thème
+            val selectedThemeMode = when (selectedThemePosition) {
+                0 -> AppCompatDelegate.MODE_NIGHT_NO // Clair
+                1 -> AppCompatDelegate.MODE_NIGHT_YES // Sombre
+                2 -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM // Système
+                else -> AppCompatDelegate.MODE_NIGHT_NO
+            }
+            AppCompatDelegate.setDefaultNightMode(selectedThemeMode)
+
+            // Sauvegarder les préférences
+            val editor = sharedPreferences.edit()
+            editor.putString("language_code", selectedLanguageCode)
+            editor.putInt("theme_mode", selectedThemeMode)
+            editor.apply()
+
+            dialog.dismiss()
+            activity.recreate() // Recréer l'activité pour appliquer les changements
+        }
+
+        // Personnaliser l'apparence du Dialog
+        dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_frame)
+        dialog.window?.setLayout(
+            (activity.resources.displayMetrics.widthPixels * 0.8).toInt(), // 65% de la largeur de l'écran
+            (activity.resources.displayMetrics.heightPixels * 0.28).toInt(),
+        )
+        if (show) {
+            dialog.show()
+        }
     }
 
-    // Personnaliser l'apparence du Dialog
-    dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_frame)
-    dialog.window?.setLayout(
-        (activity.resources.displayMetrics.widthPixels * 0.8).toInt(), // 65% de la largeur de l'écran
-        (activity.resources.displayMetrics.heightPixels * 0.28).toInt(),
-    )
-    if (show) {
-        dialog.show()
+    fun setLocale(activity: Activity, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+
+        val config = activity.resources.configuration
+        config.setLocale(locale)
+        config.setLayoutDirection(locale)
+
+        activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
     }
-}
-
-fun setLocale(activity: Activity, languageCode: String) {
-    val locale = Locale(languageCode)
-    Locale.setDefault(locale)
-
-    val config = activity.resources.configuration
-    config.setLocale(locale)
-    config.setLayoutDirection(locale)
-
-    activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
 }
