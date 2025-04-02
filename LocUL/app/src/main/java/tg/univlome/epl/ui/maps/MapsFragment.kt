@@ -128,19 +128,15 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             }
         }
 
-        /*val searchView = binding.searchView // Récupération du SearchView
-        // Écouteur pour la recherche
-        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                filterMarkers(query)
-                return true
-            }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterMarkers(newText)
-                return true
+        arguments?.let {
+            val lat = it.getDouble("latitude", 0.0)
+            val lon = it.getDouble("longitude", 0.0)
+            if (lat != 0.0 && lon != 0.0) {
+                destination = GeoPoint(lat, lon)
+                Log.e("MapsFragment", "Destination changée: $destination")
             }
-        })*/
+        }
 
     }
 
@@ -315,7 +311,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
                             val polyline = Polyline()
                             if (isAdded) {
-                                polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                //polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                polyline.color = resources.getColor(R.color.mainColor, null)
                             }
 
                             for (i in 0 until coordinates.length()) {

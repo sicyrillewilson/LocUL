@@ -38,7 +38,9 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
         )
         filteredList = batimentsEns.toMutableList()
 
-        adapter = BatimentFragmentAdapter(batimentsEns)
+        adapter = BatimentFragmentAdapter(batimentsEns)  { batiment ->
+            //ouvrirMapsFragment(batiment)
+        }
         recyclerBatimentsEns.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recyclerBatimentsEns.adapter = adapter

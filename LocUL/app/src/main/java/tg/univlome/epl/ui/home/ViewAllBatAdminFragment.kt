@@ -38,7 +38,9 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
         )
         filteredList = batimentsAdmin.toMutableList()
 
-        adapter = BatimentFragmentAdapter(batimentsAdmin)
+        adapter = BatimentFragmentAdapter(batimentsAdmin)  { batiment ->
+            //ouvrirMapsFragment(batiment)
+        }
         recyclerBatimentsAdmin.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recyclerBatimentsAdmin.adapter = adapter

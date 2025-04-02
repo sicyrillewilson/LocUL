@@ -5,16 +5,11 @@ package tg.univlome.epl.ui.batiment
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
@@ -22,8 +17,10 @@ import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.models.modelsfragments.BatimentFragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
+import tg.univlome.epl.utils.BatimentUtils
 
 class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
@@ -33,7 +30,8 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var batimentService: BatimentService
 
-    //Pour la localisation
+    private lateinit var batimentFragmentModel: BatimentFragmentModel
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,12 +45,16 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         val view = inflater.inflate(R.layout.fragment_all_batiment, container, false)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        getUserLocation()
 
         batimentService = BatimentService()
         batiments = mutableListOf()
         filteredList = mutableListOf()
+        adapter = BatimentFragmentAdapter(batiments) { batiment ->
+            BatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
+        }
 
+        batimentFragmentModel = BatimentFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatiments)
+        getUserLocation()
         return view
     }
 
@@ -67,58 +69,9 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                updateBatiments(userGeoPoint)
+                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, batimentFragmentModel)
             }
         }
-    }
-
-    private fun updateBatiments(userLocation: GeoPoint) {
-        Log.d("AllBatimentFragement", "updateBatiments appelée avec : $userLocation")
-        // Charger les bâtiments
-        batimentService.getBatiments().observe(viewLifecycleOwner, Observer { bats ->
-            if (bats != null) {
-                for (batiment in bats) {
-                    try {
-                        val batimentLocation = GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble())
-                        val distance = calculateDistance(userLocation, batimentLocation)
-                        Log.d("AllBatimentFragement", "Distance calculée pour ${batiment.nom}: $distance mètres")
-
-                        // Conversion en km si la distance dépasse 1000 m
-                        val formattedDistance = if (distance >= 1000) {
-                            String.format("%.2f km", distance / 1000)
-                        } else {
-                            String.format("%.2f m", distance)
-                        }
-
-                        batiment.distance = formattedDistance
-
-                        Log.d("AllBatimentFragement", "Distance mise à jour pour ${batiment.nom}: ${batiment.distance}")
-
-                    } catch (e: Exception) {
-                        Log.e("AllBatimentFragement", "Erreur lors de la mise à jour de la distance pour ${batiment.nom}", e)
-                    }
-                    //ajouterLieuSurCarte(batiment)
-                    batiments.add(batiment)
-                }
-            }
-            filteredList = batiments.toMutableList()
-
-            adapter = BatimentFragmentAdapter(batiments)
-            val recyclerAllBatiments = view?.findViewById<RecyclerView>(R.id.recyclerAllBatiments)
-            recyclerAllBatiments?.layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            recyclerAllBatiments?.adapter = adapter
-        })
-    }
-
-    private fun calculateDistance(start: GeoPoint, end: GeoPoint): Double {
-        val results = FloatArray(1)
-        android.location.Location.distanceBetween(
-            start.latitude, start.longitude,
-            end.latitude, end.longitude,
-            results
-        )
-        return results[0].toDouble() // Retourne la distance en mètres
     }
 
     override fun onResume() {

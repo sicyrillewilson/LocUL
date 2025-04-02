@@ -26,7 +26,7 @@ class BatimentService {
                     val situation = document.getString("situation") ?: ""
                     val type = document.getString("type") ?: ""
 
-                    batimentsList.add(Batiment(id, nom, description, longitude, latitude, image))
+                    batimentsList.add(Batiment(id, nom, description, longitude, latitude, image, situation, type))
                 }
                 batimentsLiveData.value = batimentsList
             }

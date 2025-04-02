@@ -15,7 +15,7 @@ import org.osmdroid.views.overlay.Marker
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Batiment
 
-class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
+class BatimentFragmentAdapter(private var batiments: List<Batiment>,  private val onItemClick: (Batiment) -> Unit) : RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img = view.findViewById<ImageView>(R.id.imgBatiment)
         val nom = view.findViewById<TextView>(R.id.txtNomBatiment)
@@ -48,6 +48,10 @@ class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerV
                 })
         } else {
             holder.img.setImageResource(batiment.icon)
+        }
+        
+        holder.itemView.setOnClickListener {
+            onItemClick(batiment)
         }
     }
 
