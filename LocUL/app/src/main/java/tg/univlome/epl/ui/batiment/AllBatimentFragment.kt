@@ -17,7 +17,7 @@ import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.models.Batiment
-import tg.univlome.epl.models.modelsfragments.BatimentFragmentModel
+import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.BatimentUtils
@@ -30,7 +30,7 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var batimentService: BatimentService
 
-    private lateinit var batimentFragmentModel: BatimentFragmentModel
+    private lateinit var fragmentModel: FragmentModel
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -53,7 +53,7 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
             BatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
         }
 
-        batimentFragmentModel = BatimentFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatiments)
+        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatiments)
         getUserLocation()
         return view
     }
@@ -69,7 +69,7 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, batimentFragmentModel)
+                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, fragmentModel)
             }
         }
     }

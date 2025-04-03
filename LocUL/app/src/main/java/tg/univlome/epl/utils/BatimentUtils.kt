@@ -10,7 +10,7 @@ import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.models.Batiment
-import tg.univlome.epl.models.modelsfragments.BatimentFragmentModel
+import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.maps.MapsFragment
 
@@ -34,7 +34,7 @@ object BatimentUtils {
             .commit()
     }
     
-    fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentFragmentAdapter, batimentFragmentModel: BatimentFragmentModel) {
+    fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentFragmentAdapter, fragmentModel: FragmentModel) {
         batimentService = BatimentService()
         this.filteredList = filteredList
         this.batiments = batiments
@@ -42,7 +42,7 @@ object BatimentUtils {
 
         Log.d("BatimentUtils", "updateBatiments appelée avec : $userLocation")
         // Charger les bâtiments
-        batimentService.getBatiments().observe(batimentFragmentModel.viewLifecycleOwner, Observer { bats ->
+        batimentService.getBatiments().observe(fragmentModel.viewLifecycleOwner, Observer { bats ->
             if (bats != null) {
                 for (batiment in bats) {
                     try {
@@ -64,7 +64,7 @@ object BatimentUtils {
                     } catch (e: Exception) {
                         Log.e("BatimentUtils", "Erreur lors de la mise à jour de la distance pour ${batiment.nom}", e)
                     }
-                    when (batimentFragmentModel.type) {
+                    when (fragmentModel.type) {
                         "" -> {
                             batiments.add(batiment)
                         }
@@ -85,12 +85,12 @@ object BatimentUtils {
             this.filteredList = batiments.toMutableList()
 
             this.adapter = BatimentFragmentAdapter(batiments) { batiment ->
-                ouvrirMapsFragment(batiment, batimentFragmentModel.fragmentActivity)
+                ouvrirMapsFragment(batiment, fragmentModel.fragmentActivity)
             }
 
-            val recyclerBatiments = batimentFragmentModel.view?.findViewById<RecyclerView>(batimentFragmentModel.recyclerViewId)
+            val recyclerBatiments = fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
             recyclerBatiments?.layoutManager =
-                LinearLayoutManager(batimentFragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
+                LinearLayoutManager(fragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
             recyclerBatiments?.adapter = adapter
         })
     }

@@ -4,11 +4,9 @@ import android.content.Context
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
-import tg.univlome.epl.adapter.BatimentFragmentAdapter
-import tg.univlome.epl.models.Batiment
 import java.io.Serializable
 
-data class BatimentFragmentModel(
+data class FragmentModel(
     var view: View,
     var fragmentContext: Context,
     var fragmentActivity: FragmentActivity,
