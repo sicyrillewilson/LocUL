@@ -10,8 +10,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.R
 import tg.univlome.epl.FragmentUtils
+import tg.univlome.epl.models.Salle
 
-data class Salle(val nom: String, val distance: String, val icon: Int)
+//data class Salle(val nom: String, val distance: String, val icon: Int)
 
 class SalleAdapter(
     private val salles: List<Salle>,
@@ -43,6 +44,7 @@ class SalleAdapter(
             val salle = salles[position]
             holder.icone.setImageResource(salle.icon)
             holder.nom.text = salle.nom
+            holder.situation.text = salle.situation
             holder.distance.text = salle.distance
         } else if (holder is ButtonViewHolder) {
             holder.btnVoirTout.setOnClickListener {
@@ -58,6 +60,7 @@ class SalleAdapter(
     class SalleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val icone: ImageView = view.findViewById(R.id.imgSalle)
         val nom: TextView = view.findViewById(R.id.txtNomSalle)
+        val situation = view.findViewById<TextView>(R.id.situationSalle)
         val distance: TextView = view.findViewById(R.id.txtDistanceSalle)
     }
 

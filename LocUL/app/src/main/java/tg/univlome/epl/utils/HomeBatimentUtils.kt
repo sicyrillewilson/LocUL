@@ -8,18 +8,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.BatimentFragmentAdapter
+import tg.univlome.epl.adapter.BatimentAdapter
 import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.modelsfragments.FragmentModel
+import tg.univlome.epl.models.modelsfragments.HomeFragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.maps.MapsFragment
 
-object BatimentUtils {
+object HomeBatimentUtils {
 
     private lateinit var batimentService: BatimentService
     private lateinit var filteredList: MutableList<Batiment>
     private lateinit var batiments: MutableList<Batiment>
-    private lateinit var adapter: BatimentFragmentAdapter
+    private lateinit var adapter: BatimentAdapter
 
     fun ouvrirMapsFragment(batiment: Batiment, fragmentActivity: FragmentActivity) {
         val fragment = MapsFragment()
@@ -34,7 +35,7 @@ object BatimentUtils {
             .commit()
     }
     
-    fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentFragmentAdapter, fragmentModel: FragmentModel) {
+    fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentAdapter, homeFragmentModel: HomeFragmentModel) {
         batimentService = BatimentService()
         this.filteredList = filteredList
         this.batiments = batiments
@@ -42,7 +43,7 @@ object BatimentUtils {
 
         Log.d("BatimentUtils", "updateBatiments appelée avec : $userLocation")
         // Charger les bâtiments
-        batimentService.getBatiments().observe(fragmentModel.viewLifecycleOwner, Observer { bats ->
+        batimentService.getBatiments().observe(homeFragmentModel.viewLifecycleOwner, Observer { bats ->
             if (bats != null) {
                 for (batiment in bats) {
                     try {
@@ -64,32 +65,18 @@ object BatimentUtils {
                     } catch (e: Exception) {
                         Log.e("BatimentUtils", "Erreur lors de la mise à jour de la distance pour ${batiment.nom}", e)
                     }
-                    when (fragmentModel.situation) {
-                        "" -> {
-                            batiments.add(batiment)
-                        }
-                        "sud" -> {
-                            if (batiment.situation == "Campus sud") {
-                                batiments.add(batiment)
-                            }
-                        }
-                        "nord" -> {
-                            if (batiment.situation == "Campus nord") {
-                                batiments.add(batiment)
-                            }
-                        }
-                    }
+                    batiments.add(batiment)
                 }
             }
             this.filteredList = batiments.toMutableList()
 
-            this.adapter = BatimentFragmentAdapter(batiments) { batiment ->
-                ouvrirMapsFragment(batiment, fragmentModel.fragmentActivity)
+            this.adapter = BatimentAdapter(batiments, homeFragmentModel.fragmentManager, homeFragmentModel.newFragment) { batiment ->
+                ouvrirMapsFragment(batiment, homeFragmentModel.fragmentActivity)
             }
 
-            val recyclerBatiments = fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
+            val recyclerBatiments = homeFragmentModel.view?.findViewById<RecyclerView>(homeFragmentModel.recyclerViewId)
             recyclerBatiments?.layoutManager =
-                LinearLayoutManager(fragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
+                LinearLayoutManager(homeFragmentModel.fragmentContext, LinearLayoutManager.HORIZONTAL, false)
             recyclerBatiments?.adapter = adapter
         })
     }

@@ -1,18 +1,23 @@
 package tg.univlome.epl.adapter
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import tg.univlome.epl.R
+import tg.univlome.epl.models.Infrastructure
 
-class InfraFragmentAdapter(private var infras: List<Infra>) : RecyclerView.Adapter<InfraFragmentAdapter.InfraViewHolder>() {
+class InfraFragmentAdapter(private var infras: List<Infrastructure>, private val onItemClick: (Infrastructure) -> Unit) : RecyclerView.Adapter<InfraFragmentAdapter.InfraViewHolder>() {
 
     class InfraViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val icone: ImageView = view.findViewById(R.id.imgInfra)
+        val img: ImageView = view.findViewById(R.id.imgInfra)
         val nom: TextView = view.findViewById(R.id.txtNomInfra)
+        val situation = view.findViewById<TextView>(R.id.situationInfra)
         val distance: TextView = view.findViewById(R.id.txtDistanceInfra)
     }
 
@@ -22,15 +27,35 @@ class InfraFragmentAdapter(private var infras: List<Infra>) : RecyclerView.Adapt
     }
 
     override fun onBindViewHolder(holder: InfraViewHolder, position: Int) {
-        val salle = infras[position]
-        holder.icone.setImageResource(salle.icon)
-        holder.nom.text = salle.nom
-        holder.distance.text = salle.distance
+        val infra = infras[position]
+        //holder.img.setImageResource(salle.icon)
+        holder.nom.text = infra.nom
+        holder.situation.text = infra.situation
+        holder.distance.text = infra.distance
+        if (!infra.image.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .asBitmap()
+                .load(infra.image)
+                .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                        val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                        holder.img.setImageDrawable(drawable)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+        } else {
+            holder.img.setImageResource(infra.icon)
+        }
+
+        holder.itemView.setOnClickListener {
+            onItemClick(infra)
+        }
     }
 
     override fun getItemCount(): Int = infras.size
 
-    fun updateList(newList: List<Infra>) {
+    fun updateList(newList: List<Infrastructure>) {
         infras = newList
         notifyDataSetChanged()
     }

@@ -10,14 +10,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
+import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.ui.home.HomeFragment
 import tg.univlome.epl.ui.home.ViewAllInfraFragment
 import tg.univlome.epl.ui.home.ViewAllSalleFragment
 
-data class Infra(val nom: String, val situation: String, val distance: String, val icon: Int)
+//data class Infra(val nom: String, val situation: String, val distance: String, val icon: Int)
 
 class InfraAdapter(
-    private val infras: List<Infra>,
+    private val infras: List<Infrastructure>,
     private val fragmentManager: FragmentManager,
     private val newFragment: Fragment
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

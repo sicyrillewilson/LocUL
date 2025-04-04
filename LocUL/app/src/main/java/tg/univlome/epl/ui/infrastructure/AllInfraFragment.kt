@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.Infra
 import tg.univlome.epl.adapter.InfraFragmentAdapter
+import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.ui.SearchBarFragment
 
 class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
 
-    private lateinit var infrasAll: List<Infra>
-    private lateinit var filteredList: MutableList<Infra>
+    private lateinit var infrasAll: List<Infrastructure>
+    private lateinit var filteredList: MutableList<Infrastructure>
     private lateinit var adapter: InfraFragmentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +29,7 @@ class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_all_infra, container, false)
 
-        infrasAll = listOf(
+        /*infrasAll = listOf(
             Infra("Infra A", "Campus All", "500m", R.drawable.img),
             Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
             Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
@@ -45,7 +45,7 @@ class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         val recyclerAllInfra = view.findViewById<RecyclerView>(R.id.recyclerAllInfra)
         recyclerAllInfra.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerAllInfra.adapter = adapter
+        recyclerAllInfra.adapter = adapter*/
 
         return view
     }

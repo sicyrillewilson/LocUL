@@ -2,7 +2,6 @@ package tg.univlome.epl.adapter
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +9,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.Marker
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Batiment
 
 class BatimentFragmentAdapter(private var batiments: List<Batiment>,  private val onItemClick: (Batiment) -> Unit) : RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img = view.findViewById<ImageView>(R.id.imgBatiment)
         val nom = view.findViewById<TextView>(R.id.txtNomBatiment)
@@ -55,29 +53,7 @@ class BatimentFragmentAdapter(private var batiments: List<Batiment>,  private va
         }
     }
 
-    /*private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker {
-        Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
-        val marker = Marker(mapView)
-        marker.position = position
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        marker.title = title
-
-
-        val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
-        val bitmap = (drawable as android.graphics.drawable.BitmapDrawable).bitmap
-
-        // Redimensionner l'image
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 40, 40, false) // Modifier la taille selon le besoin
-        val resizedDrawable = android.graphics.drawable.BitmapDrawable(resources, scaledBitmap)
-
-        marker.icon = resizedDrawable
-
-        mapView.overlays.add(marker)
-        mapView.invalidate()
-        return marker
-    }*/
-
-    override fun getItemCount() = batiments.size
+    override fun getItemCount(): Int = batiments.size
 
     fun updateList(newList: List<Batiment>) {
         batiments = newList

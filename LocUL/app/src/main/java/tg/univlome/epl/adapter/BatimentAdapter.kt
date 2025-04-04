@@ -1,5 +1,7 @@
 package tg.univlome.epl.adapter
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Batiment
@@ -17,9 +20,10 @@ import tg.univlome.epl.ui.home.HomeFragment
 //data class Batiment(val nom: String, val situation: String, val distance: String, val icon: Int)
 
 class BatimentAdapter(
-    private val batiments: List<Batiment>,
+    private var batiments: List<Batiment>,
     private val fragmentManager: FragmentManager,
-    private val newFragment: Fragment
+    private val newFragment: Fragment,
+    private val onItemClick: (Batiment) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -44,10 +48,29 @@ class BatimentAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is BatimentViewHolder) {
             val batiment = batiments[position]
-            holder.img.setImageResource(batiment.icon)
+            //holder.img.setImageResource(batiment.icon)
             holder.nom.text = batiment.nom
             holder.situation.text = batiment.situation
             holder.distance.text = batiment.distance
+            if (!batiment.image.isNullOrEmpty()) {
+                Glide.with(holder.itemView.context)
+                    .asBitmap()
+                    .load(batiment.image)
+                    .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                            val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                            holder.img.setImageDrawable(drawable)
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
+            } else {
+                holder.img.setImageResource(batiment.icon)
+            }
+
+            holder.itemView.setOnClickListener {
+                onItemClick(batiment)
+            }
         } else if (holder is ButtonViewHolder) {
             holder.btnVoirTout.setOnClickListener {
                 FragmentUtils.ouvrirFragment(fragmentManager, newFragment)
@@ -69,5 +92,9 @@ class BatimentAdapter(
     class ButtonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val btnVoirTout = view.findViewById<ImageView>(R.id.imgVoirTout)
     }
-}
 
+    fun updateList(newList: List<Batiment>) {
+        batiments = newList
+        notifyDataSetChanged()
+    }
+}

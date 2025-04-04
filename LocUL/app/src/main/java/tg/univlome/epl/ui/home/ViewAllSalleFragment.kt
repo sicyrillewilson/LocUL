@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.Salle
 import tg.univlome.epl.adapter.SalleViewAllAdapter
+import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.SearchBarFragment
 
 class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
@@ -27,7 +27,7 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
 
         val recyclerSalle = view.findViewById<RecyclerView>(R.id.recyclerAllSalle)
 
-        salles = listOf(
+        /*salles = listOf(
             Salle("Salle A", "500m", R.drawable.img),
             Salle("Salle B", "300m", R.drawable.img),
             Salle("Salle B", "300m", R.drawable.img),
@@ -40,7 +40,7 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
         adapter = SalleViewAllAdapter(salles)
         recyclerSalle.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerSalle.adapter = adapter
+        recyclerSalle.adapter = adapter*/
 
         return view
     }
