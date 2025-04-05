@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package tg.univlome.epl.fragments
+package tg.univlome.epl.ui.maps
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -38,10 +38,12 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import tg.univlome.epl.MainActivity
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.SearchBarFragment
 
-class MapsFragment : Fragment(), LocationListener  {
+class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationListener {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -64,6 +66,10 @@ class MapsFragment : Fragment(), LocationListener  {
 
     private val markerList = mutableListOf<Marker>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -71,7 +77,6 @@ class MapsFragment : Fragment(), LocationListener  {
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -123,19 +128,15 @@ class MapsFragment : Fragment(), LocationListener  {
             }
         }
 
-        val searchView = binding.searchView // Récupération du SearchView
-        // Écouteur pour la recherche
-        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                filterMarkers(query)
-                return true
-            }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterMarkers(newText)
-                return true
+        arguments?.let {
+            val lat = it.getDouble("latitude", 0.0)
+            val lon = it.getDouble("longitude", 0.0)
+            if (lat != 0.0 && lon != 0.0) {
+                destination = GeoPoint(lat, lon)
+                Log.e("MapsFragment", "Destination changée: $destination")
             }
-        })
+        }
 
     }
 
@@ -310,7 +311,8 @@ class MapsFragment : Fragment(), LocationListener  {
 
                             val polyline = Polyline()
                             if (isAdded) {
-                                polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                //polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                polyline.color = resources.getColor(R.color.mainColor, null)
                             }
 
                             for (i in 0 until coordinates.length()) {
@@ -402,6 +404,7 @@ class MapsFragment : Fragment(), LocationListener  {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        (activity as MainActivity).showSearchBarFragment(this)
     }
 
     override fun onPause() {
@@ -418,11 +421,16 @@ class MapsFragment : Fragment(), LocationListener  {
 
         editor.apply()
         mapView.onPause()
+        (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onSearch(query: String) {
+        filterMarkers(query)
     }
 
 }

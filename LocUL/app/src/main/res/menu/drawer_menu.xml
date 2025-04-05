@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/group1">
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/settings_icon"
+            android:title="Reglages" />
+    </group>
+
+    <group android:id="@+id/group2">
+        <item
+            android:id="@+id/share"
+            android:icon="@drawable/share_2_icon"
+            android:title="Partager" />
+    </group>
+
+    <group android:id="@+id/group3">
+        <item
+            android:id="@+id/contact"
+            android:icon="@drawable/contact_icon"
+            android:title="Contact" />
+    </group>
+
+    <group android:id="@+id/group4">
+        <item
+            android:id="@+id/about"
+            android:icon="@drawable/about_icon"
+            android:title="A propos" />
+    </group>
+
+</menu>
