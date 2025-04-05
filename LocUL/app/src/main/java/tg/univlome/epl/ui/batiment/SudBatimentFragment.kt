@@ -24,7 +24,6 @@ import tg.univlome.epl.utils.BatimentUtils
 
 class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
-
     private lateinit var batiments: MutableList<Batiment>
     private lateinit var filteredList: MutableList<Batiment>
     private lateinit var adapter: BatimentFragmentAdapter
@@ -89,4 +88,5 @@ class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
+
 }

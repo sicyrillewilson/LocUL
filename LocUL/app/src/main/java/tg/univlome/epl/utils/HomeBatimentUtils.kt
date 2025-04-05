@@ -41,7 +41,7 @@ object HomeBatimentUtils {
         this.batiments = batiments
         this.adapter = adapter
 
-        Log.d("BatimentUtils", "updateBatiments appelée avec : $userLocation")
+        Log.d("HomeBatimentUtils", "updateBatiments appelée avec : $userLocation")
         // Charger les bâtiments
         batimentService.getBatiments().observe(homeFragmentModel.viewLifecycleOwner, Observer { bats ->
             if (bats != null) {
@@ -49,7 +49,7 @@ object HomeBatimentUtils {
                     try {
                         val batimentLocation = GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble())
                         val distance = MapsUtils.calculateDistance(userLocation, batimentLocation)
-                        Log.d("BatimentUtils", "Distance calculée pour ${batiment.nom}: $distance mètres")
+                        Log.d("HomeBatimentUtils", "Distance calculée pour ${batiment.nom}: $distance mètres")
 
                         // Conversion en km si la distance dépasse 1000 m
                         val formattedDistance = if (distance >= 1000) {
@@ -60,10 +60,10 @@ object HomeBatimentUtils {
 
                         batiment.distance = formattedDistance
 
-                        Log.d("BatimentUtils", "Distance mise à jour pour ${batiment.nom}: ${batiment.distance}")
+                        Log.d("HomeBatimentUtils", "Distance mise à jour pour ${batiment.nom}: ${batiment.distance}")
 
                     } catch (e: Exception) {
-                        Log.e("BatimentUtils", "Erreur lors de la mise à jour de la distance pour ${batiment.nom}", e)
+                        Log.e("HomeBatimentUtils", "Erreur lors de la mise à jour de la distance pour ${batiment.nom}", e)
                     }
                     batiments.add(batiment)
                 }

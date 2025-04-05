@@ -27,7 +27,7 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
 
         val recyclerBatimentsEns = view.findViewById<RecyclerView>(R.id.recyclerAllBatimentsEns)
 
-        batimentsEns = listOf(
+        /*batimentsEns = listOf(
             Batiment("1", "Bâtiment enseignement A", "Batiment Administratif", "", "", "", "Campus Nord", "500m", "", R.drawable.img),
             Batiment("2", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
             Batiment("3", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
@@ -35,7 +35,7 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
             Batiment("5", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
             Batiment("6", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
             Batiment("7", "Bâtiment enseignement B", "Batiment Administratif", "", "", "", "Campus Sud", "300m", "", R.drawable.img),
-        )
+        )*/
         filteredList = batimentsEns.toMutableList()
 
         adapter = BatimentFragmentAdapter(batimentsEns)  { batiment ->

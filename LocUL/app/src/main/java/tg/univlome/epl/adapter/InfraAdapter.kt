@@ -1,5 +1,7 @@
 package tg.univlome.epl.adapter
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,19 +10,18 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Infrastructure
-import tg.univlome.epl.ui.home.HomeFragment
-import tg.univlome.epl.ui.home.ViewAllInfraFragment
-import tg.univlome.epl.ui.home.ViewAllSalleFragment
 
 //data class Infra(val nom: String, val situation: String, val distance: String, val icon: Int)
 
 class InfraAdapter(
-    private val infras: List<Infrastructure>,
+    private var infras: List<Infrastructure>,
     private val fragmentManager: FragmentManager,
-    private val newFragment: Fragment
+    private val newFragment: Fragment,
+    private val onItemClick: (Infrastructure) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -45,10 +46,29 @@ class InfraAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is InfraViewHolder) {
             val infra = infras[position]
-            holder.img.setImageResource(infra.icon)
+            //holder.img.setImageResource(infra.icon)
             holder.nom.text = infra.nom
             holder.situation.text = infra.situation
             holder.distance.text = infra.distance
+            if (!infra.image.isNullOrEmpty()) {
+                Glide.with(holder.itemView.context)
+                    .asBitmap()
+                    .load(infra.image)
+                    .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                            val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                            holder.img.setImageDrawable(drawable)
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
+            } else {
+                holder.img.setImageResource(infra.icon)
+            }
+
+            holder.itemView.setOnClickListener {
+                onItemClick(infra)
+            }
         } else if (holder is ButtonViewHolder) {
             holder.btnVoirTout.setOnClickListener {
                 FragmentUtils.ouvrirFragment(fragmentManager, newFragment)
@@ -69,5 +89,10 @@ class InfraAdapter(
 
     class ButtonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val btnVoirTout = view.findViewById<ImageView>(R.id.imgVoirTout)
+    }
+
+    fun updateList(newList: List<Infrastructure>) {
+        infras = newList
+        notifyDataSetChanged()
     }
 }

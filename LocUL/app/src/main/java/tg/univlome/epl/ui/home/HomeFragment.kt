@@ -23,8 +23,9 @@ import tg.univlome.epl.models.Salle
 import tg.univlome.epl.adapter.SalleAdapter
 import tg.univlome.epl.models.modelsfragments.HomeFragmentModel
 import tg.univlome.epl.ui.SearchBarFragment
-import tg.univlome.epl.utils.BatimentUtils
 import tg.univlome.epl.utils.HomeBatimentUtils
+import tg.univlome.epl.utils.HomeInfraUtils
+import tg.univlome.epl.utils.HomeSalleUtils
 
 class HomeFragment : Fragment(), SearchBarFragment.SearchListener {
 
@@ -70,65 +71,31 @@ class HomeFragment : Fragment(), SearchBarFragment.SearchListener {
         batimentsEns = mutableListOf()
         batimentsEnsFilteredList = mutableListOf()
         batimentsEnsAdapter = BatimentAdapter(batimentsEns, fragmentManager, ViewAllBatEnsFragment()) { batiment ->
-            BatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
+            HomeBatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
         }
 
         batimentsAdmin = mutableListOf()
         batimentsAdminFilteredList = mutableListOf()
         batimentsAdminAdapter = BatimentAdapter(batimentsAdmin, fragmentManager, ViewAllBatAdminFragment()) { batiment ->
-            BatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
+            HomeBatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
+        }
+
+        infras = mutableListOf()
+        infrasFilteredList = mutableListOf()
+        infrasAdapter = InfraAdapter(infras, fragmentManager, ViewAllInfraFragment()) { infrastructure ->
+            HomeInfraUtils.ouvrirMapsFragment(infrastructure, requireActivity())
+        }
+
+        salles = mutableListOf()
+        sallesFilteredList = mutableListOf()
+        sallesAdapter = SalleAdapter(salles, fragmentManager, ViewAllSalleFragment()) { salle ->
+            HomeSalleUtils.ouvrirMapsFragment(salle, requireActivity())
         }
 
         batsEnsHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerBatiments, fragmentManager, ViewAllBatEnsFragment())
         batsAdminHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerBatimentsAdmin, fragmentManager, ViewAllBatAdminFragment())
         sallesHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerSalles, fragmentManager, ViewAllSalleFragment())
         infrasHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerInfra, fragmentManager, ViewAllInfraFragment())
-
-        /*val recyclerBatiments = view.findViewById<RecyclerView>(R.id.recyclerBatiments)
-        val recyclerBatimentsAdmin = view.findViewById<RecyclerView>(R.id.recyclerBatimentsAdmin)
-        val recyclerSalles = view.findViewById<RecyclerView>(R.id.recyclerSalles)
-        val recyclerInfra = view.findViewById<RecyclerView>(R.id.recyclerInfra)
-
-        val batimentsEns = listOf(
-            Batiment("1", "Bâtiment enseignement A", "Batiment Enseignement", "", "", "", "Campus Nord", "500m", "", R.drawable.img),
-            Batiment("2", "Bâtiment enseignement B", "Batiment Enseignement", "", "", "", "Campus Sud", "300m", "", R.drawable.img)
-        )
-
-        val batimentsAdmin = listOf(
-            Batiment("1", "DAAS", "Batiment Administratif", "", "", "", "Campus Nord", "500m", "", R.drawable.img),
-            Batiment("2", "Bâtiment admin A","Batiment Administratif", "", "", "", "Campus Sud", "300m", "", R.drawable.img)
-        )*/
-
-        /*val Infras = listOf(
-            Infrastructure("Infra A", "Campus Nord", "500m", R.drawable.img),
-            Infrastructure("Infra B", "Campus Sud", "300m", R.drawable.img),
-        )
-
-        val salles = listOf(
-            Salle("Salle 101", "200m", R.drawable.img),
-            Salle("Salle 202", "100m", R.drawable.img)
-        )*/
-
-
-        /*recyclerBatiments.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        recyclerBatiments.adapter =
-            BatimentAdapter(batimentsEns, fragmentManager, ViewAllBatEnsFragment()){
-                BatimentUtils.ouvrirMapsFragment(it, requireActivity())
-            }*/
-
-        /*recyclerBatimentsAdmin.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        recyclerBatimentsAdmin.adapter =
-            BatimentAdapter(batimentsAdmin, fragmentManager, ViewAllBatAdminFragment())*/
-
-        /*recyclerSalles.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        recyclerSalles.adapter = SalleAdapter(salles, fragmentManager, ViewAllSalleFragment())
-
-        recyclerInfra.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        recyclerInfra.adapter = InfraAdapter(Infras, fragmentManager, ViewAllInfraFragment())*/
 
         getUserLocation()
         return view
@@ -147,6 +114,8 @@ class HomeFragment : Fragment(), SearchBarFragment.SearchListener {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
                 HomeBatimentUtils.updateBatiments(userGeoPoint, batimentsEns, batimentsEnsFilteredList, batimentsEnsAdapter, batsEnsHomeFragmentModel)
                 HomeBatimentUtils.updateBatiments(userGeoPoint, batimentsAdmin, batimentsAdminFilteredList, batimentsAdminAdapter, batsAdminHomeFragmentModel)
+                HomeInfraUtils.updateInfrastructures(userGeoPoint, infras, infrasFilteredList, infrasAdapter, infrasHomeFragmentModel)
+                HomeSalleUtils.updateSalles(userGeoPoint, salles, sallesFilteredList, sallesAdapter, sallesHomeFragmentModel)
             }
         }
     }
@@ -166,5 +135,9 @@ class HomeFragment : Fragment(), SearchBarFragment.SearchListener {
         batimentsEnsAdapter.updateList(batimentsEnsFilteredList)
         batimentsAdminFilteredList = batimentsAdmin.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         batimentsAdminAdapter.updateList(batimentsAdminFilteredList)
+        infrasFilteredList = infras.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        infrasAdapter.updateList(infrasFilteredList)
+        sallesFilteredList = salles.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        sallesAdapter.updateList(sallesFilteredList)
     }
 }

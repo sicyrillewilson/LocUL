@@ -12,7 +12,8 @@ open class Lieu(
     open var latitude: String,
     open var image: String,
     open var situation: String = "",
-    open var distance: String = "",
     open val type: String = "",
+    open var images: List<String> = emptyList(),
+    open var distance: String = "",
     open val icon: Int  = R.drawable.img
 ) : Serializable

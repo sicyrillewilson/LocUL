@@ -11,7 +11,8 @@ data class Infrastructure(
     override var latitude: String,
     override var image: String,
     override var situation: String = "",
-    override var distance: String = "",
     override val type: String = "",
+    override var images: List<String> = emptyList(),
+    override var distance: String = "",
     override val icon: Int  = R.drawable.img
-) : Lieu(id, nom, description, longitude, latitude, image, situation, distance, type, icon), Serializable
+) : Lieu(id, nom, description, longitude, latitude, image, situation, type, images, distance, icon), Serializable
