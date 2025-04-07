@@ -38,7 +38,7 @@ import android.os.Handler
 import android.os.Looper
 import tg.univlome.epl.models.NavItem
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     lateinit var ui: ActivityMainBinding
     private var selectedItem: NavItem? = null
     private lateinit var drawerLayout: DrawerLayout
@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     private var doubleBackToExitPressedOnce = false // Variable pour gérer le double appui
     private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
+    private var currentSubFragment: Fragment? = null // Pour suivre quel fragment est affiché
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -397,5 +398,9 @@ class MainActivity : AppCompatActivity() {
         config.setLayoutDirection(locale)
 
         activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
+    }
+
+    override fun onSearch(query: String) {
+
     }
 }
