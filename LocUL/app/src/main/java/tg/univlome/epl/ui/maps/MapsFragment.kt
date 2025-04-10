@@ -88,6 +88,10 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadMapData(view)
+    }
+
+    private fun loadMapData(view: View){
 
         Configuration.getInstance().load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
         Configuration.getInstance().userAgentValue = requireActivity().packageName
@@ -154,6 +158,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             currentPolyline = null
             mapView.controller.setCenter(userLocation ?: GeoPoint(6.1375, 1.2123))
             mapView.invalidate()
+            loadMapData(view)
         }
 
 
@@ -166,7 +171,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 Log.e("MapsFragment", "Destination changée: $destination")
             }
         }
-
     }
 
     @SuppressLint("MissingPermission")
