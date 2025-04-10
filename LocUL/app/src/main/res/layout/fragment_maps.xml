@@ -3,11 +3,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.MapsFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/mapView"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
 
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/theme_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="15dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:src="@drawable/theme_icon"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/focus_location"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="15dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:src="@drawable/focus_location"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/recharger"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="17dp"
+            android:layout_marginTop="70dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toBottomOf="@id/theme_icon"
+            app:layout_constraintRight_toRightOf="parent"
+            android:src="@drawable/recharger"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

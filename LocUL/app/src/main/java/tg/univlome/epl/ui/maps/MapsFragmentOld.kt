@@ -39,18 +39,14 @@ import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Handler
-import android.os.Looper
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import de.hdodenhof.circleimageview.CircleImageView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.SearchBarFragment
-import tg.univlome.epl.utils.MapsUtils
 
-class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationListener  {
+class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationListener {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -72,7 +68,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     private var destination: GeoPoint? = null
 
     private val markerList = mutableListOf<Marker>()
-    private var isNightMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,7 +100,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         val latitude = prefs.getString("latitude", "6.1375")!!.toDouble()
         val longitude = prefs.getString("longitude", "1.2123")!!.toDouble()
         val zoom = prefs.getFloat("zoom", 17.0f)
-        isNightMode = prefs.getBoolean("isNightMode", false)
 
         val savedPoint = GeoPoint(latitude, longitude)
         mapView.controller.setZoom(zoom.toDouble())
@@ -133,36 +127,12 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             }
         }
 
-        binding.focusLocation.setOnClickListener {
-            userLocation?.let {
-                mapView.controller.animateTo(it)
-            } ?: Toast.makeText(requireContext(), "Position actuelle inconnue", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.themeIcon.setOnClickListener {
-            isNightMode = !isNightMode
-            mapView.setTileSource(
-                if (isNightMode) TileSourceFactory.WIKIMEDIA else TileSourceFactory.MAPNIK
-            )
-            mapView.invalidate()
-        }
-
-        binding.recharger.setOnClickListener {
-            destination = null
-            MapsUtils.clearDestination(requireContext())
-            currentPolyline?.let { mapView.overlays.remove(it) }
-            currentPolyline = null
-            mapView.controller.setCenter(userLocation ?: GeoPoint(6.1375, 1.2123))
-            mapView.invalidate()
-        }
-
 
         arguments?.let {
             val lat = it.getDouble("latitude", 0.0)
             val lon = it.getDouble("longitude", 0.0)
             if (lat != 0.0 && lon != 0.0) {
                 destination = GeoPoint(lat, lon)
-                MapsUtils.saveDestination(requireContext(), destination!!)
                 Log.e("MapsFragment", "Destination changée: $destination")
             }
         }
@@ -173,36 +143,20 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     private fun initLocationTracking() {
         if (isAdded){
             locationManager = requireActivity().getSystemService(LocationManager::class.java)
-            val isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            if (!isLocationEnabled) {
-                Toast.makeText(requireContext(), "Veuillez activer la localisation", Toast.LENGTH_SHORT).show()
-            } else {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this) // Maj toutes les 3 sec, 10m de différence
-            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this) // Maj toutes les 3 sec, 10m de différence
         }
     }
 
     override fun onLocationChanged(location: Location) {
-
-        // Vérification si MapView est bien initialisé
-        if (mapView == null) {
-            Log.e("MapsFragment", "MapView est nul. Impossible d'ajouter un marqueur.");
-            return
-        }
-
         userLocation = GeoPoint(location.latitude, location.longitude)
-        addMarker(userLocation!!, "Ma position  actuelle")
 
         if (userLocation != null && (lastLocation == null || location.distanceTo(lastLocation!!) > 3)) {
             lastLocation = location
-            if (destination != null && destination != GeoPoint(0.0, 0.0)) {
-                updateRoute(userLocation!!, destination!!)
-            }
+            updateRoute(userLocation!!, destination!!)
         }
     }
 
     private fun loadLieux() {
-        removeAllMarkers() // Évite les doublons de marqueurs
 
         // Charger les bâtiments
         batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
@@ -239,7 +193,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 val lat = lieu.latitude.toDouble()
                 val lon = lieu.longitude.toDouble()
                 val position = GeoPoint(lat, lon)
-                addMarker(position, lieu.nom, lieu.image)  // Store the marker in the list
+                markerList.add(addMarker(position, lieu.nom, lieu.image))  // Store the marker in the list
             } catch (e: NumberFormatException) {
                 Log.e("MapsFragment", "Coordonnées invalides pour ${lieu.nom}")
             }
@@ -258,14 +212,15 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 requireActivity().runOnUiThread {
                     if (userLocation != null) {
                         mapView.controller.setCenter(userLocation)
-                        addMarker(userLocation!!, "Ma position actuelle")
 
-                        destination = MapsUtils.loadDestination(requireContext())
                         // Définition de la destination
-                        if (!(destination == null || destination == GeoPoint(0.0, 0.0))) {
+                        if (destination == null) {
+                            destination = GeoPoint(userLocation!!.latitude + 0.009, userLocation!!.longitude)
+                        } else {
                             updateRoute(userLocation!!, destination!!)
                         }
 
+                        // getRoute(userLocation!!, destination!!)
                     } else {
                         Toast.makeText(requireContext(), "Localisation non trouvée !", Toast.LENGTH_LONG).show()
                     }
@@ -280,8 +235,11 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         addMarker(userLocation!!, "Ma position actuelle")
         addMarker(userDestination!!, "Ma destination")
 
-        if (userDestination == null || userDestination == GeoPoint(0.0, 0.0)) {
-            Log.e("MapsFragment", "Destination is null or {0,0} , cannot update route")
+        //val destination = GeoPoint(userLocation.latitude + 0.009, userLocation.longitude) // Ex. Destination fixe
+
+        //if (destination == null) {
+        if (userDestination == null) {
+            Log.e("MapsFragment", "Destination is null, cannot update route")
             return
         }
 
@@ -289,30 +247,20 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         currentPolyline?.let { mapView.overlays.remove(it) }
 
         // Récupérer le nouvel itinéraire
+        //getRoute(userLocation, destination!!)
         getRoute(userLocation, userDestination!!)
     }
 
-    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker? {
-
-        if (mapView == null) {
-            Log.w("MapsFragment", "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms...")
-            Handler(Looper.getMainLooper()).postDelayed({
-                addMarker(position, title, imageUrl)
-            }, 200)
-            return null
-        }
-
-        var oldMarker: Marker? = null
-
+    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker {
+        var oldMarker = Marker(mapView)
         for (marker in markerList) {
             if (marker.position == position && marker.title == title) {
                 oldMarker = marker
                 mapView.overlays.remove(oldMarker)
+                //return marker
             }
         }
-        if (oldMarker != null){
-            markerList.remove(oldMarker)
-        }
+        markerList.remove(oldMarker)
 
         Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
         val marker = Marker(mapView)
@@ -325,11 +273,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 .load(imageUrl)
                 .into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        if (isAdded) {
-                            val drawable = BitmapDrawable(resources, resource)
-                            marker.image = drawable
-                            mapView.invalidate() // Rafraîchir la carte après chargement
-                        }
+                        val drawable = BitmapDrawable(resources, resource)
+                        marker.image = drawable
+                        mapView.invalidate() // Rafraîchir la carte après chargement
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {}
@@ -347,8 +293,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         mapView.overlays.add(marker)
         mapView.invalidate()
-
-        markerList.add(marker)
         return marker
     }
 
@@ -368,47 +312,48 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("MapsFragment", "Erreur lors de la récupération de l'itinéraire : ${e.message}")
                 requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Impossible de récupérer l'itinéraire", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "Erreur réseau !", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    response.body?.string()?.let { jsonString ->
-                        try {
-                            val jsonObject = JSONObject(jsonString)
+                response.body?.string()?.let { jsonResponse ->
+                    try {
+                        val jsonObject = JSONObject(jsonResponse)
+                        if (jsonObject.has("features")) {
                             val features = jsonObject.getJSONArray("features")
-                            if (features.length() > 0) {
-                                val geometry = features.getJSONObject(0).getJSONObject("geometry")
-                                val coordinates = geometry.getJSONArray("coordinates")
+                            val geometry = features.getJSONObject(0).getJSONObject("geometry")
+                            val coordinates = geometry.getJSONArray("coordinates")
 
-                                val geoPoints = mutableListOf<GeoPoint>()
-                                for (i in 0 until coordinates.length()) {
-                                    val coord = coordinates.getJSONArray(i)
-                                    val lon = coord.getDouble(0)
-                                    val lat = coord.getDouble(1)
-                                    geoPoints.add(GeoPoint(lat, lon))
-                                }
+                            val polyline = Polyline()
+                            if (isAdded) {
+                                //polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                polyline.color = resources.getColor(R.color.mainColor, null)
+                            }
 
+                            for (i in 0 until coordinates.length()) {
+                                val coord = coordinates.getJSONArray(i)
+                                val lon = coord.getDouble(0)
+                                val lat = coord.getDouble(1)
+                                polyline.addPoint(GeoPoint(lat, lon))
+                            }
+
+                            if (isAdded) {
                                 requireActivity().runOnUiThread {
-                                    currentPolyline = Polyline()
-                                    currentPolyline!!.setPoints(geoPoints)
-                                    currentPolyline!!.outlinePaint.color = resources.getColor(R.color.mainColor, null)
-                                    currentPolyline!!.outlinePaint.strokeWidth = 5f
-
-                                    mapView.overlays.add(currentPolyline)
+                                    currentPolyline?.let { mapView.overlays.remove(it) }
+                                    currentPolyline = polyline
+                                    mapView.overlays.add(polyline)
                                     mapView.invalidate()
                                 }
                             }
-                        } catch (e: JSONException) {
-                            Log.e("MapsFragment", "Erreur JSON: ${e.message}")
+                        } else {
+                            Log.e("API_ERROR", "La clé 'features' est absente de la réponse JSON")
                         }
+                    } catch (e: JSONException) {
+                        Log.e("JSON_ERROR", "Erreur lors du parsing JSON: ${e.message}")
                     }
-                } else {
-                    Log.e("MapsFragment", "Erreur dans la réponse de l'API de routage")
-                }
+                } ?: Log.e("API_ERROR", "Réponse vide de l'API")
             }
         })
     }
@@ -418,12 +363,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         if (query.isNullOrEmpty()) {
             loadLieux()
-            if (userLocation != null){
-                addMarker(userLocation!!, "Ma position actuelle")
-            }
             return
         }
-
 
         val lowerCaseQuery = query.lowercase()
 
@@ -464,9 +405,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         })
 
         removeAllMarkers()
-        if (userLocation != null){
-            addMarker(userLocation!!, "Ma position actuelle")
-        }
         mapView.invalidate()
     }
 
@@ -497,7 +435,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         editor.putString("latitude", mapCenter.latitude.toString())
         editor.putString("longitude", mapCenter.longitude.toString())
         editor.putFloat("zoom", zoomLevel.toFloat())
-        editor.putBoolean("isNightMode", isNightMode)
 
         editor.apply()
         mapView.onPause()
@@ -506,26 +443,11 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     override fun onDestroyView() {
         super.onDestroyView()
-        removeAllMarkers()  // Supprime tous les marqueurs
-        locationManager.removeUpdates(this)  // Arrêtez la mise à jour de la localisation
         _binding = null
     }
 
     override fun onSearch(query: String) {
         filterMarkers(query)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initLocationOverlay()
-                initLocationTracking()
-            } else {
-                Toast.makeText(requireContext(), "Permission de localisation refusée.", Toast.LENGTH_LONG).show()
-            }
-        }
     }
 
 }

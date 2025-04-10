@@ -254,6 +254,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         currentFragment = fragment
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             // Si le drawer est ouvert, fermez-le
