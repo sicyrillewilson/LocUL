@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package tg.univlome.epl.fragments
+package tg.univlome.epl.ui.maps
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -35,13 +35,22 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
 import android.annotation.SuppressLint
+import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Handler
+import android.os.Looper
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import de.hdodenhof.circleimageview.CircleImageView
+import tg.univlome.epl.MainActivity
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.SearchBarFragment
+import tg.univlome.epl.utils.MapsUtils
 
-class MapsFragment : Fragment(), LocationListener  {
+class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationListener  {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -63,6 +72,11 @@ class MapsFragment : Fragment(), LocationListener  {
     private var destination: GeoPoint? = null
 
     private val markerList = mutableListOf<Marker>()
+    private var isNightMode = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,9 +86,12 @@ class MapsFragment : Fragment(), LocationListener  {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadMapData(view)
+    }
+
+    private fun loadMapData(view: View){
 
         Configuration.getInstance().load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
         Configuration.getInstance().userAgentValue = requireActivity().packageName
@@ -88,14 +105,11 @@ class MapsFragment : Fragment(), LocationListener  {
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
 
-        /*mapView.controller.setZoom(17.0)
-        val defaultPoint = GeoPoint(6.1375, 1.2123)
-        mapView.controller.setCenter(defaultPoint)*/
-
         val prefs = requireActivity().getSharedPreferences("map_state", 0)
         val latitude = prefs.getString("latitude", "6.1375")!!.toDouble()
         val longitude = prefs.getString("longitude", "1.2123")!!.toDouble()
         val zoom = prefs.getFloat("zoom", 17.0f)
+        isNightMode = prefs.getBoolean("isNightMode", false)
 
         val savedPoint = GeoPoint(latitude, longitude)
         mapView.controller.setZoom(zoom.toDouble())
@@ -111,7 +125,7 @@ class MapsFragment : Fragment(), LocationListener  {
         scaleBarOverlay.setScaleBarOffset(130, 20) // Ajuster la position sur l'écran
         mapView.overlays.add(scaleBarOverlay)
 
-        // Charger les bâtiments depuis Firebase et les afficher sur la carte
+        // Charger les données depuis Firebase et les afficher sur la carte
         loadLieux()
 
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -123,40 +137,76 @@ class MapsFragment : Fragment(), LocationListener  {
             }
         }
 
-        val searchView = binding.searchView // Récupération du SearchView
-        // Écouteur pour la recherche
-        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                filterMarkers(query)
-                return true
-            }
+        binding.focusLocation.setOnClickListener {
+            userLocation?.let {
+                mapView.controller.animateTo(it)
+            } ?: Toast.makeText(requireContext(), "Position actuelle inconnue", Toast.LENGTH_SHORT).show()
+        }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterMarkers(newText)
-                return true
-            }
-        })
+        binding.themeIcon.setOnClickListener {
+            isNightMode = !isNightMode
+            mapView.setTileSource(
+                if (isNightMode) TileSourceFactory.WIKIMEDIA else TileSourceFactory.MAPNIK
+            )
+            mapView.invalidate()
+        }
 
+        binding.recharger.setOnClickListener {
+            destination = null
+            MapsUtils.clearDestination(requireContext())
+            currentPolyline?.let { mapView.overlays.remove(it) }
+            currentPolyline = null
+            mapView.controller.setCenter(userLocation ?: GeoPoint(6.1375, 1.2123))
+            mapView.invalidate()
+            loadMapData(view)
+        }
+
+
+        arguments?.let {
+            val lat = it.getDouble("latitude", 0.0)
+            val lon = it.getDouble("longitude", 0.0)
+            if (lat != 0.0 && lon != 0.0) {
+                destination = GeoPoint(lat, lon)
+                MapsUtils.saveDestination(requireContext(), destination!!)
+                Log.e("MapsFragment", "Destination changée: $destination")
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")
     private fun initLocationTracking() {
         if (isAdded){
             locationManager = requireActivity().getSystemService(LocationManager::class.java)
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this) // Maj toutes les 3 sec, 10m de différence
+            val isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            if (!isLocationEnabled) {
+                Toast.makeText(requireContext(), "Veuillez activer la localisation", Toast.LENGTH_SHORT).show()
+            } else {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this) // Maj toutes les 3 sec, 10m de différence
+            }
         }
     }
 
     override fun onLocationChanged(location: Location) {
+
+        // Vérification si MapView est bien initialisé
+        if (mapView == null) {
+            Log.e("MapsFragment", "MapView est nul. Impossible d'ajouter un marqueur.");
+            return
+        }
+
         userLocation = GeoPoint(location.latitude, location.longitude)
+        addMarker(userLocation!!, "Ma position  actuelle")
 
         if (userLocation != null && (lastLocation == null || location.distanceTo(lastLocation!!) > 3)) {
             lastLocation = location
-            updateRoute(userLocation!!)
+            if (destination != null && destination != GeoPoint(0.0, 0.0)) {
+                updateRoute(userLocation!!, destination!!)
+            }
         }
     }
 
     private fun loadLieux() {
+        removeAllMarkers() // Évite les doublons de marqueurs
 
         // Charger les bâtiments
         batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
@@ -193,7 +243,7 @@ class MapsFragment : Fragment(), LocationListener  {
                 val lat = lieu.latitude.toDouble()
                 val lon = lieu.longitude.toDouble()
                 val position = GeoPoint(lat, lon)
-                markerList.add(addMarker(position, lieu.nom, lieu.image))  // Store the marker in the list
+                addMarker(position, lieu.nom, lieu.image)  // Store the marker in the list
             } catch (e: NumberFormatException) {
                 Log.e("MapsFragment", "Coordonnées invalides pour ${lieu.nom}")
             }
@@ -214,11 +264,12 @@ class MapsFragment : Fragment(), LocationListener  {
                         mapView.controller.setCenter(userLocation)
                         addMarker(userLocation!!, "Ma position actuelle")
 
+                        destination = MapsUtils.loadDestination(requireContext())
                         // Définition de la destination
-                        destination = GeoPoint(userLocation!!.latitude + 0.009, userLocation!!.longitude)
-                        addMarker(destination!!, "Destination à 1 km")
+                        if (!(destination == null || destination == GeoPoint(0.0, 0.0))) {
+                            updateRoute(userLocation!!, destination!!)
+                        }
 
-                        // getRoute(userLocation!!, destination!!)
                     } else {
                         Toast.makeText(requireContext(), "Localisation non trouvée !", Toast.LENGTH_LONG).show()
                     }
@@ -228,11 +279,13 @@ class MapsFragment : Fragment(), LocationListener  {
         mapView.overlays.add(locationOverlay)
     }
 
-    private fun updateRoute(userLocation: GeoPoint) {
-        //val destination = GeoPoint(userLocation.latitude + 0.009, userLocation.longitude) // Ex. Destination fixe
+    private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint ) {
 
-        if (destination == null) {
-            Log.e("MapsFragment", "Destination is null, cannot update route")
+        addMarker(userLocation!!, "Ma position actuelle")
+        addMarker(userDestination!!, "Ma destination")
+
+        if (userDestination == null || userDestination == GeoPoint(0.0, 0.0)) {
+            Log.e("MapsFragment", "Destination is null or {0,0} , cannot update route")
             return
         }
 
@@ -240,10 +293,31 @@ class MapsFragment : Fragment(), LocationListener  {
         currentPolyline?.let { mapView.overlays.remove(it) }
 
         // Récupérer le nouvel itinéraire
-        getRoute(userLocation, destination!!)
+        getRoute(userLocation, userDestination!!)
     }
 
-    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker {
+    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker? {
+
+        if (mapView == null) {
+            Log.w("MapsFragment", "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms...")
+            Handler(Looper.getMainLooper()).postDelayed({
+                addMarker(position, title, imageUrl)
+            }, 200)
+            return null
+        }
+
+        var oldMarker: Marker? = null
+
+        for (marker in markerList) {
+            if (marker.position == position && marker.title == title) {
+                oldMarker = marker
+                mapView.overlays.remove(oldMarker)
+            }
+        }
+        if (oldMarker != null){
+            markerList.remove(oldMarker)
+        }
+
         Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
         val marker = Marker(mapView)
         marker.position = position
@@ -253,11 +327,13 @@ class MapsFragment : Fragment(), LocationListener  {
             Glide.with(this)
                 .asBitmap()
                 .load(imageUrl)
-                .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val drawable = android.graphics.drawable.BitmapDrawable(resources, resource)
-                        marker.image = drawable
-                        mapView.invalidate() // Rafraîchir la carte après chargement
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        if (isAdded) {
+                            val drawable = BitmapDrawable(resources, resource)
+                            marker.image = drawable
+                            mapView.invalidate() // Rafraîchir la carte après chargement
+                        }
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {}
@@ -265,16 +341,18 @@ class MapsFragment : Fragment(), LocationListener  {
         }
 
         val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
-        val bitmap = (drawable as android.graphics.drawable.BitmapDrawable).bitmap
+        val bitmap = (drawable as BitmapDrawable).bitmap
 
         // Redimensionner l'image
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 40, 40, false) // Modifier la taille selon le besoin
-        val resizedDrawable = android.graphics.drawable.BitmapDrawable(resources, scaledBitmap)
+        val resizedDrawable = BitmapDrawable(resources, scaledBitmap)
 
         marker.icon = resizedDrawable
 
         mapView.overlays.add(marker)
         mapView.invalidate()
+
+        markerList.add(marker)
         return marker
     }
 
@@ -294,47 +372,47 @@ class MapsFragment : Fragment(), LocationListener  {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.e("MapsFragment", "Erreur lors de la récupération de l'itinéraire : ${e.message}")
                 requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Erreur réseau !", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "Impossible de récupérer l'itinéraire", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                response.body?.string()?.let { jsonResponse ->
-                    try {
-                        val jsonObject = JSONObject(jsonResponse)
-                        if (jsonObject.has("features")) {
+                if (response.isSuccessful) {
+                    response.body?.string()?.let { jsonString ->
+                        try {
+                            val jsonObject = JSONObject(jsonString)
                             val features = jsonObject.getJSONArray("features")
-                            val geometry = features.getJSONObject(0).getJSONObject("geometry")
-                            val coordinates = geometry.getJSONArray("coordinates")
+                            if (features.length() > 0) {
+                                val geometry = features.getJSONObject(0).getJSONObject("geometry")
+                                val coordinates = geometry.getJSONArray("coordinates")
 
-                            val polyline = Polyline()
-                            if (isAdded) {
-                                polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
-                            }
+                                val geoPoints = mutableListOf<GeoPoint>()
+                                for (i in 0 until coordinates.length()) {
+                                    val coord = coordinates.getJSONArray(i)
+                                    val lon = coord.getDouble(0)
+                                    val lat = coord.getDouble(1)
+                                    geoPoints.add(GeoPoint(lat, lon))
+                                }
 
-                            for (i in 0 until coordinates.length()) {
-                                val coord = coordinates.getJSONArray(i)
-                                val lon = coord.getDouble(0)
-                                val lat = coord.getDouble(1)
-                                polyline.addPoint(GeoPoint(lat, lon))
-                            }
-
-                            if (isAdded) {
                                 requireActivity().runOnUiThread {
-                                    currentPolyline?.let { mapView.overlays.remove(it) }
-                                    currentPolyline = polyline
-                                    mapView.overlays.add(polyline)
+                                    currentPolyline = Polyline()
+                                    currentPolyline!!.setPoints(geoPoints)
+                                    currentPolyline!!.outlinePaint.color = resources.getColor(R.color.mainColor, null)
+                                    currentPolyline!!.outlinePaint.strokeWidth = 5f
+
+                                    mapView.overlays.add(currentPolyline)
                                     mapView.invalidate()
                                 }
                             }
-                        } else {
-                            Log.e("API_ERROR", "La clé 'features' est absente de la réponse JSON")
+                        } catch (e: JSONException) {
+                            Log.e("MapsFragment", "Erreur JSON: ${e.message}")
                         }
-                    } catch (e: JSONException) {
-                        Log.e("JSON_ERROR", "Erreur lors du parsing JSON: ${e.message}")
                     }
-                } ?: Log.e("API_ERROR", "Réponse vide de l'API")
+                } else {
+                    Log.e("MapsFragment", "Erreur dans la réponse de l'API de routage")
+                }
             }
         })
     }
@@ -344,8 +422,12 @@ class MapsFragment : Fragment(), LocationListener  {
 
         if (query.isNullOrEmpty()) {
             loadLieux()
+            if (userLocation != null){
+                addMarker(userLocation!!, "Ma position actuelle")
+            }
             return
         }
+
 
         val lowerCaseQuery = query.lowercase()
 
@@ -386,6 +468,9 @@ class MapsFragment : Fragment(), LocationListener  {
         })
 
         removeAllMarkers()
+        if (userLocation != null){
+            addMarker(userLocation!!, "Ma position actuelle")
+        }
         mapView.invalidate()
     }
 
@@ -402,6 +487,7 @@ class MapsFragment : Fragment(), LocationListener  {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        (activity as MainActivity).showSearchBarFragment(this)
     }
 
     override fun onPause() {
@@ -415,14 +501,34 @@ class MapsFragment : Fragment(), LocationListener  {
         editor.putString("latitude", mapCenter.latitude.toString())
         editor.putString("longitude", mapCenter.longitude.toString())
         editor.putFloat("zoom", zoomLevel.toFloat())
+        editor.putBoolean("isNightMode", isNightMode)
 
         editor.apply()
         mapView.onPause()
+        (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        removeAllMarkers()  // Supprime tous les marqueurs
         _binding = null
+    }
+
+    override fun onSearch(query: String) {
+        filterMarkers(query)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initLocationOverlay()
+                initLocationTracking()
+            } else {
+                Toast.makeText(requireContext(), "Permission de localisation refusée.", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
 }

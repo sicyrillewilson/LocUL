@@ -2,4 +2,11 @@
     <string name="app_name">LocUL</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_drawer_open">Ouvrir le menu de navigation</string>
+    <string name="navigation_drawer_close">Fermer le menu de navigation</string>
+    <string name="francais">Français</string>
+    <string name="anglais">Anglais</string>
+    <string name="clair">Clair</string>
+    <string name="sombre">Sombre</string>
+    <string name="systeme">Système</string>
 </resources>
