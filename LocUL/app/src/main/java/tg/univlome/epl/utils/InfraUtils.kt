@@ -84,9 +84,7 @@ object InfraUtils {
             }
             this.filteredList = infrastructures.toMutableList()
 
-            this.adapter = InfraFragmentAdapter(infrastructures) { infrastructure ->
-                ouvrirMapsFragment(infrastructure, fragmentModel.fragmentActivity)
-            }
+            this.adapter = InfraFragmentAdapter(infrastructures)
 
             val recyclerBatiments = fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
             recyclerBatiments?.layoutManager =

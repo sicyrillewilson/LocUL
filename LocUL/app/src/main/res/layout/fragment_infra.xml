@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tout"
+                android:text="@string/tout"
                 android:fontFamily="@font/gotham_medium"
                 android:textSize="16sp" />
 
@@ -48,7 +48,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Campus Nord"
+                android:text="@string/campus_nord"
                 android:fontFamily="@font/gotham_medium"
                 android:textSize="16sp" />
 
@@ -71,7 +71,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Campus Sud"
+                android:text="@string/campus_sud"
                 android:fontFamily="@font/gotham_medium"
                 android:textSize="16sp" />
 

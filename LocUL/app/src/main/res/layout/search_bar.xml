@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="@null"
-        android:hint="Recherche..."
+        android:hint="@string/recherche"
         android:textColorHint="#A0A0A0"
         android:textColor="#000000"
         android:textSize="14sp"

@@ -49,9 +49,7 @@ class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         batimentService = BatimentService()
         batiments = mutableListOf()
         filteredList = mutableListOf()
-        adapter = BatimentFragmentAdapter(batiments) { batiment ->
-            BatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
-        }
+        adapter = BatimentFragmentAdapter(batiments)
 
         fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerSudBatiments, "sud")
         getUserLocation()

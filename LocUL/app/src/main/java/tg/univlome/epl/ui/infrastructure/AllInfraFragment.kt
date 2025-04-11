@@ -10,21 +10,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.adapter.InfraFragmentAdapter
 import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.models.modelsfragments.FragmentModel
-import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
-import tg.univlome.epl.utils.BatimentUtils
 import tg.univlome.epl.utils.InfraUtils
 
 class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
@@ -54,9 +49,7 @@ class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         infraService = InfrastructureService()
         infrasAll = mutableListOf()
         filteredList = mutableListOf()
-        adapter = InfraFragmentAdapter(infrasAll) { infrastructure ->
-            InfraUtils.ouvrirMapsFragment(infrastructure, requireActivity())
-        }
+        adapter = InfraFragmentAdapter(infrasAll)
 
         fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllInfra)
         getUserLocation()

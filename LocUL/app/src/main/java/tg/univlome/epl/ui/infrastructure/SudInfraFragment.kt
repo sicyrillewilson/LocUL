@@ -10,8 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
@@ -51,9 +49,7 @@ class SudInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         infraService = InfrastructureService()
         infrasSud = mutableListOf()
         filteredList = mutableListOf()
-        adapter = InfraFragmentAdapter(infrasSud) { infrastructure ->
-            InfraUtils.ouvrirMapsFragment(infrastructure, requireActivity())
-        }
+        adapter = InfraFragmentAdapter(infrasSud)
 
         fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerSudInfra, "sud")
         getUserLocation()

@@ -1,5 +1,6 @@
 package tg.univlome.epl.adapter
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Infrastructure
+import tg.univlome.epl.ui.infrastructure.InfraActivity
 
 //data class Infra(val nom: String, val situation: String, val distance: String, val icon: Int)
 
@@ -21,7 +23,6 @@ class InfraAdapter(
     private var infras: List<Infrastructure>,
     private val fragmentManager: FragmentManager,
     private val newFragment: Fragment,
-    private val onItemClick: (Infrastructure) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -67,8 +68,18 @@ class InfraAdapter(
             }
 
             holder.itemView.setOnClickListener {
-                onItemClick(infra)
+                val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
+                    putExtra("nom", infra.nom)
+                    putExtra("situation", infra.situation)
+                    putExtra("distance", infra.distance)
+                    putExtra("icon", infra.icon)
+                    putExtra("longitude", infra.longitude)
+                    putExtra("latitude", infra.latitude)
+                    putStringArrayListExtra("images", ArrayList(infra.images))
+                }
+                holder.itemView.context.startActivity(intent)
             }
+
         } else if (holder is ButtonViewHolder) {
             holder.btnVoirTout.setOnClickListener {
                 FragmentUtils.ouvrirFragment(fragmentManager, newFragment)

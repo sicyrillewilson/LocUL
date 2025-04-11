@@ -1,5 +1,6 @@
 package tg.univlome.epl.adapter
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -11,8 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Infrastructure
+import tg.univlome.epl.ui.infrastructure.InfraActivity
 
-class InfraFragmentAdapter(private var infras: List<Infrastructure>, private val onItemClick: (Infrastructure) -> Unit) : RecyclerView.Adapter<InfraFragmentAdapter.InfraViewHolder>() {
+class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerView.Adapter<InfraFragmentAdapter.InfraViewHolder>() {
 
     class InfraViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img: ImageView = view.findViewById(R.id.imgInfra)
@@ -49,7 +51,16 @@ class InfraFragmentAdapter(private var infras: List<Infrastructure>, private val
         }
 
         holder.itemView.setOnClickListener {
-            onItemClick(infra)
+            val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
+                putExtra("nom", infra.nom)
+                putExtra("situation", infra.situation)
+                putExtra("distance", infra.distance)
+                putExtra("icon", infra.icon)
+                putExtra("longitude", infra.longitude)
+                putExtra("latitude", infra.latitude)
+                putStringArrayListExtra("images", ArrayList(infra.images))
+            }
+            holder.itemView.context.startActivity(intent)
         }
     }
 

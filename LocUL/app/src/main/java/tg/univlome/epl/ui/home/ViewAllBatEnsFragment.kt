@@ -10,8 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
@@ -47,9 +45,7 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
         batimentService = BatimentService()
         batimentsEns = mutableListOf()
         filteredList = mutableListOf()
-        adapter = BatimentFragmentAdapter(batimentsEns) { batimentEns ->
-            BatimentUtils.ouvrirMapsFragment(batimentEns, requireActivity())
-        }
+        adapter = BatimentFragmentAdapter(batimentsEns)
 
         fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatimentsEns)
         getUserLocation()

@@ -69,9 +69,7 @@ object HomeSalleUtils {
             }
             this.filteredList = salles.toMutableList()
 
-            this.adapter = SalleAdapter(salles, homeFragmentModel.fragmentManager, homeFragmentModel.newFragment) { salle ->
-                ouvrirMapsFragment(salle, homeFragmentModel.fragmentActivity)
-            }
+            this.adapter = SalleAdapter(salles, homeFragmentModel.fragmentManager, homeFragmentModel.newFragment)
 
             val recyclerBatiments = homeFragmentModel.view?.findViewById<RecyclerView>(homeFragmentModel.recyclerViewId)
             recyclerBatiments?.layoutManager =

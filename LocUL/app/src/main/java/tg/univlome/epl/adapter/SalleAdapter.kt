@@ -1,5 +1,6 @@
 package tg.univlome.epl.adapter
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -11,8 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import tg.univlome.epl.R
 import tg.univlome.epl.FragmentUtils
+import tg.univlome.epl.R
 import tg.univlome.epl.models.Salle
 
 //data class Salle(val nom: String, val distance: String, val icon: Int)
@@ -21,7 +22,6 @@ class SalleAdapter(
     private var salles: List<Salle>,
     private val fragmentManager: FragmentManager,
     private val newFragment: Fragment,
-    private val onItemClick: (Salle) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -67,8 +67,18 @@ class SalleAdapter(
             }
 
             holder.itemView.setOnClickListener {
-                onItemClick(salle)
+                val intent = Intent(holder.itemView.context, Salle::class.java).apply {
+                    putExtra("nom", salle.nom)
+                    putExtra("situation", salle.situation)
+                    putExtra("distance", salle.distance)
+                    putExtra("icon", salle.icon)
+                    putExtra("longitude", salle.longitude)
+                    putExtra("latitude", salle.latitude)
+                    putStringArrayListExtra("images", ArrayList(salle.images))
+                }
+                holder.itemView.context.startActivity(intent)
             }
+
         } else if (holder is ButtonViewHolder) {
             holder.btnVoirTout.setOnClickListener {
                 FragmentUtils.ouvrirFragment(fragmentManager, newFragment)

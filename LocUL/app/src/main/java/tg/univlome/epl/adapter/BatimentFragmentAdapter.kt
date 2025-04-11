@@ -1,5 +1,6 @@
 package tg.univlome.epl.adapter
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -11,8 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.ui.batiment.BatimentActivity
 
-class BatimentFragmentAdapter(private var batiments: List<Batiment>,  private val onItemClick: (Batiment) -> Unit) : RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
+class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img = view.findViewById<ImageView>(R.id.imgBatiment)
@@ -47,9 +49,18 @@ class BatimentFragmentAdapter(private var batiments: List<Batiment>,  private va
         } else {
             holder.img.setImageResource(batiment.icon)
         }
-        
+
         holder.itemView.setOnClickListener {
-            onItemClick(batiment)
+            val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {
+                putExtra("nom", batiment.nom)
+                putExtra("situation", batiment.situation)
+                putExtra("distance", batiment.distance)
+                putExtra("icon", batiment.icon)
+                putExtra("longitude", batiment.longitude)
+                putExtra("latitude", batiment.latitude)
+                putStringArrayListExtra("images", ArrayList(batiment.images))
+            }
+            holder.itemView.context.startActivity(intent)
         }
     }
 

@@ -2,6 +2,7 @@
 
 package tg.univlome.epl
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
 import android.graphics.Color
@@ -36,6 +37,7 @@ import tg.univlome.epl.ui.maps.MapsFragment
 import java.util.Locale
 import android.os.Handler
 import android.os.Looper
+import android.view.animation.DecelerateInterpolator
 import tg.univlome.epl.models.NavItem
 
 class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
@@ -181,7 +183,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         defaultItem.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
         defaultItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
 
-        animateItemSelection(defaultItem)
+        //animateItemSelection(defaultItem)
 
         // Charge le fragment par défaut
         loadFragment(defaultItem.fragment)
@@ -189,24 +191,31 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         for (item in navItems) {
             item.layout.setOnClickListener {
                 if (selectedItem == item) {
-                    return@setOnClickListener // Ne rien faire si l'item est déjà sélectionné
+                    return@setOnClickListener
                 }
 
-
-                // Réinitialiser tous les items
+                // Réinitialiser tous les items sauf l'actuel
                 for (otherItem in navItems) {
-                    otherItem.layout.setBackgroundColor(Color.TRANSPARENT)
-                    otherItem.textView.visibility = View.GONE
-                    otherItem.icon.setColorFilter(
-                        ContextCompat.getColor(
-                            this,
-                            R.color.gray
+                    if (otherItem != item) {
+                        otherItem.textView.visibility = View.GONE
+                        otherItem.icon.setColorFilter(
+                            ContextCompat.getColor(this, R.color.gray)
                         )
-                    ) // Couleur inactive
+                        otherItem.layout.setBackgroundColor(Color.TRANSPARENT)
+                        collapseItem(otherItem.layout)
+                    }
                 }
 
-                // Animer l'élément sélectionné
-                animateItemSelection(item)
+                // Animer l'expansion de l'élément sélectionné
+                expandItem(item)
+
+                // Appliquer les changements visuels
+                item.layout.setBackgroundResource(R.drawable.nav_item_bg)
+                item.textView.alpha = 0f
+                item.textView.visibility = View.VISIBLE
+                item.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
+                item.textView.animate().alpha(1f).setDuration(350).start()
+                item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
 
                 // Mettre à jour l'item sélectionné
                 selectedItem = item
@@ -232,6 +241,50 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
     }
 
+    private fun expandItem(item: NavItem) {
+        // Forcer la mesure du texte
+        item.textView.measure(
+            View.MeasureSpec.UNSPECIFIED,
+            View.MeasureSpec.UNSPECIFIED
+        )
+        val textWidth = item.textView.measuredWidth
+
+        // Largeur totale = texte + icône + marges estimées (ex: 40dp)
+        val iconWidth = item.icon.width
+        val padding = 60 // Tu peux ajuster
+        val targetWidth = textWidth + iconWidth + padding
+
+        val startWidth = item.layout.width
+
+        val animator = ValueAnimator.ofInt(startWidth, targetWidth)
+        animator.duration = 300
+        animator.interpolator = DecelerateInterpolator()
+        animator.addUpdateListener { animation ->
+            val value = animation.animatedValue as Int
+            val params = item.layout.layoutParams
+            params.width = value
+            item.layout.layoutParams = params
+        }
+        animator.start()
+    }
+
+
+    private fun collapseItem(view: View) {
+        val targetWidth = 150 // ou ce que tu veux comme largeur réduite
+        val startWidth = view.width
+
+        val animator = ValueAnimator.ofInt(startWidth, targetWidth)
+        animator.duration = 300
+        animator.interpolator = DecelerateInterpolator()
+        animator.addUpdateListener { animation ->
+            val value = animation.animatedValue as Int
+            val params = view.layoutParams
+            params.width = value
+            view.layoutParams = params
+        }
+        animator.start()
+    }
+
     fun showSearchBarFragment(listener: SearchBarFragment.SearchListener?) {
         if (listener != null) {
             // Afficher la barre de recherche et définir le listener du fragment actif
@@ -254,7 +307,6 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         currentFragment = fragment
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             // Si le drawer est ouvert, fermez-le

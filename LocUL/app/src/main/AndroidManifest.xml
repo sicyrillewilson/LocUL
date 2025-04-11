@@ -31,8 +31,16 @@
             android:value="true" />
 
         <activity
+            android:name=".ui.batiment.BatimentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.infrastructure.InfraActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.home.SalleActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustNothing"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

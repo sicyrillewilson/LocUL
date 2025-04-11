@@ -22,12 +22,11 @@ import tg.univlome.epl.adapter.InfraAdapter
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.adapter.SalleAdapter
 import tg.univlome.epl.models.modelsfragments.HomeFragmentModel
-import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.HomeBatimentUtils
 import tg.univlome.epl.utils.HomeInfraUtils
 import tg.univlome.epl.utils.HomeSalleUtils
 
-class HomeFragment : Fragment(), SearchBarFragment.SearchListener {
+class HomeFragment : Fragment() {
 
     private lateinit var batimentsEns: MutableList<Batiment>
     private lateinit var batimentsEnsFilteredList: MutableList<Batiment>
@@ -70,27 +69,19 @@ class HomeFragment : Fragment(), SearchBarFragment.SearchListener {
 
         batimentsEns = mutableListOf()
         batimentsEnsFilteredList = mutableListOf()
-        batimentsEnsAdapter = BatimentAdapter(batimentsEns, fragmentManager, ViewAllBatEnsFragment()) { batiment ->
-            HomeBatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
-        }
+        batimentsEnsAdapter = BatimentAdapter(batimentsEns, fragmentManager, ViewAllBatEnsFragment())
 
         batimentsAdmin = mutableListOf()
         batimentsAdminFilteredList = mutableListOf()
-        batimentsAdminAdapter = BatimentAdapter(batimentsAdmin, fragmentManager, ViewAllBatAdminFragment()) { batiment ->
-            HomeBatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
-        }
+        batimentsAdminAdapter = BatimentAdapter(batimentsAdmin, fragmentManager, ViewAllBatAdminFragment())
 
         infras = mutableListOf()
         infrasFilteredList = mutableListOf()
-        infrasAdapter = InfraAdapter(infras, fragmentManager, ViewAllInfraFragment()) { infrastructure ->
-            HomeInfraUtils.ouvrirMapsFragment(infrastructure, requireActivity())
-        }
+        infrasAdapter = InfraAdapter(infras, fragmentManager, ViewAllInfraFragment())
 
         salles = mutableListOf()
         sallesFilteredList = mutableListOf()
-        sallesAdapter = SalleAdapter(salles, fragmentManager, ViewAllSalleFragment()) { salle ->
-            HomeSalleUtils.ouvrirMapsFragment(salle, requireActivity())
-        }
+        sallesAdapter = SalleAdapter(salles, fragmentManager, ViewAllSalleFragment())
 
         batsEnsHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerBatiments, fragmentManager, ViewAllBatEnsFragment())
         batsAdminHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerBatimentsAdmin, fragmentManager, ViewAllBatAdminFragment())
@@ -120,24 +111,8 @@ class HomeFragment : Fragment(), SearchBarFragment.SearchListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        (activity as MainActivity).showSearchBarFragment(this)
-    }
-
     override fun onPause() {
         super.onPause()
         (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
-    }
-
-    override fun onSearch(query: String) {
-        batimentsEnsFilteredList = batimentsEns.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
-        batimentsEnsAdapter.updateList(batimentsEnsFilteredList)
-        batimentsAdminFilteredList = batimentsAdmin.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
-        batimentsAdminAdapter.updateList(batimentsAdminFilteredList)
-        infrasFilteredList = infras.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
-        infrasAdapter.updateList(infrasFilteredList)
-        sallesFilteredList = salles.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
-        sallesAdapter.updateList(sallesFilteredList)
     }
 }

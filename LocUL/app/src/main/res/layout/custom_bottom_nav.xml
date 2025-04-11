@@ -38,9 +38,9 @@
             <TextView
                 android:id="@+id/text_home"
                 android:layout_width="wrap_content"
-                android:minWidth="60dp"
+                android:minWidth="80dp"
                 android:layout_height="wrap_content"
-                android:text="Accueil"
+                android:text="@string/accueil"
                 android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
@@ -74,14 +74,14 @@
             <TextView
                 android:id="@+id/text_batiment"
                 android:layout_width="wrap_content"
-                android:minWidth="60dp"
+                android:minWidth="100dp"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:text="Batiments"
+                android:text="@string/batiments"
                 android:paddingStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>
@@ -107,19 +107,18 @@
                 android:id="@+id/icon_salle"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/infra_nav_icon" />
+                android:src="@drawable/salle_nav_icon" />
 
             <TextView
                 android:id="@+id/text_salle"
                 android:layout_width="wrap_content"
-                android:minWidth="60dp"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:text="Infrastructures"
+                android:text="@string/infrastructures"
                 android:paddingStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>
@@ -145,7 +144,7 @@
                 android:id="@+id/icon_maps"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/maps_nav_icon" />
+                android:src="@drawable/map_loc" />
 
             <TextView
                 android:id="@+id/text_maps"
@@ -157,7 +156,7 @@
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:text="Maps"
+                android:text="@string/carte"
                 android:paddingStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>

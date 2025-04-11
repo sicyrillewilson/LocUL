@@ -1,5 +1,6 @@
 package tg.univlome.epl.adapter
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.ui.batiment.BatimentActivity
 
 //data class Batiment(val nom: String, val situation: String, val distance: String, val icon: Int)
 
@@ -21,7 +23,6 @@ class BatimentAdapter(
     private var batiments: List<Batiment>,
     private val fragmentManager: FragmentManager,
     private val newFragment: Fragment,
-    private val onItemClick: (Batiment) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -67,8 +68,18 @@ class BatimentAdapter(
             }
 
             holder.itemView.setOnClickListener {
-                onItemClick(batiment)
+                val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {
+                    putExtra("nom", batiment.nom)
+                    putExtra("situation", batiment.situation)
+                    putExtra("distance", batiment.distance)
+                    putExtra("icon", batiment.icon)
+                    putExtra("longitude", batiment.longitude)
+                    putExtra("latitude", batiment.latitude)
+                    putStringArrayListExtra("images", ArrayList(batiment.images))
+                }
+                holder.itemView.context.startActivity(intent)
             }
+
         } else if (holder is ButtonViewHolder) {
             holder.btnVoirTout.setOnClickListener {
                 FragmentUtils.ouvrirFragment(fragmentManager, newFragment)

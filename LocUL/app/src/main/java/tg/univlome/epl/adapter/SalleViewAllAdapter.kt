@@ -1,5 +1,6 @@
 package tg.univlome.epl.adapter
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -49,7 +50,16 @@ class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemCl
         }
 
         holder.itemView.setOnClickListener {
-            onItemClick(salle)
+            val intent = Intent(holder.itemView.context, Salle::class.java).apply {
+                putExtra("nom", salle.nom)
+                putExtra("situation", salle.situation)
+                putExtra("distance", salle.distance)
+                putExtra("icon", salle.icon)
+                putExtra("longitude", salle.longitude)
+                putExtra("latitude", salle.latitude)
+                putStringArrayListExtra("images", ArrayList(salle.images))
+            }
+            holder.itemView.context.startActivity(intent)
         }
     }
 

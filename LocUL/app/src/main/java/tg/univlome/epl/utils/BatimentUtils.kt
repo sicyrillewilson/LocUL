@@ -83,9 +83,7 @@ object BatimentUtils {
             }
             this.filteredList = batiments.toMutableList()
 
-            this.adapter = BatimentFragmentAdapter(batiments) { batiment ->
-                ouvrirMapsFragment(batiment, fragmentModel.fragmentActivity)
-            }
+            this.adapter = BatimentFragmentAdapter(batiments)
 
             val recyclerBatiments = fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
             recyclerBatiments?.layoutManager =
