@@ -107,7 +107,7 @@
                 android:id="@+id/icon_salle"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/salle_nav_icon" />
+                android:src="@drawable/infra_nav_icon" />
 
             <TextView
                 android:id="@+id/text_salle"
@@ -145,7 +145,7 @@
                 android:id="@+id/icon_maps"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/salle_nav_icon" />
+                android:src="@drawable/maps_nav_icon" />
 
             <TextView
                 android:id="@+id/text_maps"

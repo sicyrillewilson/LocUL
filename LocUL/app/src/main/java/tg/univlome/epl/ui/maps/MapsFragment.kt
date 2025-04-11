@@ -511,7 +511,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     override fun onDestroyView() {
         super.onDestroyView()
         removeAllMarkers()  // Supprime tous les marqueurs
-        locationManager.removeUpdates(this)  // Arrêtez la mise à jour de la localisation
         _binding = null
     }
 
