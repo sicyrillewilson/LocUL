@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     private var doubleBackToExitPressedOnce = false // Variable pour gérer le double appui
     private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
     private var currentSubFragment: Fragment? = null // Pour suivre quel fragment est affiché
+    private var navItems = listOf<NavItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     }
 
     private fun chargerItems() {
-        val navItems = listOf(
+        navItems = listOf(
             NavItem(
                 findViewById(R.id.nav_home),
                 findViewById(R.id.text_home),
@@ -192,29 +193,35 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
                     return@setOnClickListener // Ne rien faire si l'item est déjà sélectionné
                 }
 
+                setItem(item, navItems)
 
-                // Réinitialiser tous les items
-                for (otherItem in navItems) {
-                    otherItem.layout.setBackgroundColor(Color.TRANSPARENT)
-                    otherItem.textView.visibility = View.GONE
-                    otherItem.icon.setColorFilter(
-                        ContextCompat.getColor(
-                            this,
-                            R.color.gray
-                        )
-                    ) // Couleur inactive
-                }
-
-                // Animer l'élément sélectionné
-                animateItemSelection(item)
-
-                // Mettre à jour l'item sélectionné
-                selectedItem = item
-
-                // Charger le fragment correspondant
-                loadFragment(item.fragment)
             }
         }
+    }
+
+    fun setItem(item: NavItem, navItems: List<NavItem>) {
+        // Réinitialiser tous les items
+        for (otherItem in navItems) {
+            otherItem.layout.setBackgroundColor(Color.TRANSPARENT)
+            otherItem.textView.visibility = View.GONE
+            otherItem.icon.setColorFilter(
+                ContextCompat.getColor(
+                    this,
+                    R.color.gray
+                )
+            ) // Couleur inactive
+        }
+
+        //loadMapsFragment()
+
+        // Animer l'élément sélectionné
+        animateItemSelection(item)
+
+        // Mettre à jour l'item sélectionné
+        selectedItem = item
+
+        // Charger le fragment correspondant
+        loadFragment(item.fragment)
     }
 
     private fun animateItemSelection(item: NavItem) {
@@ -247,11 +254,20 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         }
     }
 
-    private fun loadFragment(fragment: Fragment) {
+    fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, fragment)
             .commit()
         currentFragment = fragment
+    }
+
+    fun loadMapsFragment() {
+        for (item in navItems) {
+            if (item.fragment is MapsFragment) {
+                setItem(item, navItems)
+                break
+            }
+        }
     }
 
     @Deprecated("Deprecated in Java")

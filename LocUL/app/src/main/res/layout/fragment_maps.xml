@@ -36,6 +36,16 @@
             android:src="@drawable/focus_location"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/focus_destination"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="15dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toTopOf="@id/focus_location"
+            app:layout_constraintRight_toRightOf="parent"
+            android:src="@drawable/maps_and_flags"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/recharger"
             android:layout_width="42dp"
             android:layout_height="42dp"

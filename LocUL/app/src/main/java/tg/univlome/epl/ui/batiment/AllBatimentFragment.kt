@@ -50,7 +50,8 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         batiments = mutableListOf()
         filteredList = mutableListOf()
         adapter = BatimentFragmentAdapter(batiments) { batiment ->
-            BatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
+            //BatimentUtils.ouvrirMapsFragment(batiment, requireActivity())
+            BatimentUtils.ouvrirMapsFragment(batiment, requireActivity(), requireContext())
         }
 
         fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatiments)

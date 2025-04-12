@@ -35,15 +35,16 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
 import android.annotation.SuppressLint
+import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Handler
 import android.os.Looper
+import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import de.hdodenhof.circleimageview.CircleImageView
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
@@ -72,6 +73,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     private var destination: GeoPoint? = null
 
     private val markerList = mutableListOf<Marker>()
+    private var currentUserMarker: Marker? = null
+    private var currentDestinationMarker: Marker? = null
+    private var preDestinationIcon: Drawable? = null
     private var isNightMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,6 +96,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     }
 
     private fun loadMapData(view: View){
+
+        destination = MapsUtils.loadDestination(requireContext())
 
         Configuration.getInstance().load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
         Configuration.getInstance().userAgentValue = requireActivity().packageName
@@ -143,6 +149,16 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             } ?: Toast.makeText(requireContext(), "Position actuelle inconnue", Toast.LENGTH_SHORT).show()
         }
 
+        binding.focusDestination.setOnClickListener {
+            if (destination != null && destination != GeoPoint(0.0, 0.0)) {
+                destination?.let {
+                    mapView.controller.animateTo(it)
+                } ?: Toast.makeText(requireContext(), "Destination inconnue", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Destination inconnue", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         binding.themeIcon.setOnClickListener {
             isNightMode = !isNightMode
             mapView.setTileSource(
@@ -152,6 +168,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         }
 
         binding.recharger.setOnClickListener {
+            reloadPreDestinationIcon()
             destination = null
             MapsUtils.clearDestination(requireContext())
             currentPolyline?.let { mapView.overlays.remove(it) }
@@ -195,12 +212,15 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         }
 
         userLocation = GeoPoint(location.latitude, location.longitude)
-        addMarker(userLocation!!, "Ma position  actuelle")
+        //addMarker(userLocation!!, "Ma position actuelle")
+        addMarkerUserLocation()
 
         if (userLocation != null && (lastLocation == null || location.distanceTo(lastLocation!!) > 3)) {
             lastLocation = location
             if (destination != null && destination != GeoPoint(0.0, 0.0)) {
-                updateRoute(userLocation!!, destination!!)
+                if (markerList.isNotEmpty()) {
+                    updateRoute(userLocation!!, destination!!)
+                }
             }
         }
     }
@@ -243,7 +263,16 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 val lat = lieu.latitude.toDouble()
                 val lon = lieu.longitude.toDouble()
                 val position = GeoPoint(lat, lon)
-                addMarker(position, lieu.nom, lieu.image)  // Store the marker in the list
+
+                // Déterminer l'image à afficher selon le type de lieu
+                val icon = when (lieu) {
+                    is tg.univlome.epl.models.Batiment -> R.drawable.batiment_nav_icon
+                    is tg.univlome.epl.models.Infrastructure -> R.drawable.infra_nav_icon
+                    is Salle -> R.drawable.salle_nav_icon
+                    else -> R.drawable.maps_and_flags
+                }
+
+                addMarker(position, lieu.nom, icon, lieu.image)  // Store the marker in the list
             } catch (e: NumberFormatException) {
                 Log.e("MapsFragment", "Coordonnées invalides pour ${lieu.nom}")
             }
@@ -262,7 +291,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 requireActivity().runOnUiThread {
                     if (userLocation != null) {
                         mapView.controller.setCenter(userLocation)
-                        addMarker(userLocation!!, "Ma position actuelle")
+                        //addMarker(userLocation!!, "Ma position actuelle")
+                        addMarkerUserLocation()
 
                         destination = MapsUtils.loadDestination(requireContext())
                         // Définition de la destination
@@ -281,8 +311,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint ) {
 
-        addMarker(userLocation!!, "Ma position actuelle")
-        addMarker(userDestination!!, "Ma destination")
+        //addMarker(userLocation!!, "Ma position actuelle")
+        addMarkerUserLocation(userLocation!!)
+        //addMarker(userDestination!!, "Ma destination")
 
         if (userDestination == null || userDestination == GeoPoint(0.0, 0.0)) {
             Log.e("MapsFragment", "Destination is null or {0,0} , cannot update route")
@@ -292,16 +323,17 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         // Vérifier currentPolyline
         currentPolyline?.let { mapView.overlays.remove(it) }
 
+        updateDestination(userDestination!!)
         // Récupérer le nouvel itinéraire
-        getRoute(userLocation, userDestination!!)
+        getRoute(userLocation, userDestination)
     }
 
-    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker? {
+    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.maps_and_flags, imageUrl: String? = null): Marker? {
 
         if (mapView == null) {
             Log.w("MapsFragment", "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms...")
             Handler(Looper.getMainLooper()).postDelayed({
-                addMarker(position, title, imageUrl)
+                addMarker(position, title, icon, imageUrl)
             }, 200)
             return null
         }
@@ -318,6 +350,10 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             markerList.remove(oldMarker)
         }
 
+        if (mapView == null) {
+            Log.e("MapsFragment", "MapView est nul. Impossible d'ajouter un marqueur.");
+            return null
+        }
         Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
         val marker = Marker(mapView)
         marker.position = position
@@ -340,12 +376,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 })
         }
 
-        val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
-        val bitmap = (drawable as BitmapDrawable).bitmap
-
-        // Redimensionner l'image
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 40, 40, false) // Modifier la taille selon le besoin
-        val resizedDrawable = BitmapDrawable(resources, scaledBitmap)
+        val resizedDrawable = resizeIcon(icon)
 
         marker.icon = resizedDrawable
 
@@ -354,6 +385,29 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         markerList.add(marker)
         return marker
+    }
+
+    private fun resizeIcon(icon: Int = R.drawable.maps_and_flags): BitmapDrawable? {
+        /*val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
+        val bitmap = (drawable as BitmapDrawable).bitmap*/
+
+        val drawable = ResourcesCompat.getDrawable(resources, icon, null)
+
+        val bitmap = Bitmap.createBitmap(
+            drawable!!.intrinsicWidth,
+            drawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+
+        // Redimensionner l'image
+        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 75, 75, false) // Modifier la taille selon le besoin
+        val resizedDrawable = BitmapDrawable(resources, scaledBitmap)
+
+        return resizedDrawable
     }
 
     private fun removeAllMarkers() {
@@ -423,7 +477,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         if (query.isNullOrEmpty()) {
             loadLieux()
             if (userLocation != null){
-                addMarker(userLocation!!, "Ma position actuelle")
+                //addMarker(userLocation!!, "Ma position actuelle")
+                addMarkerUserLocation()
             }
             return
         }
@@ -469,7 +524,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         removeAllMarkers()
         if (userLocation != null){
-            addMarker(userLocation!!, "Ma position actuelle")
+            //addMarker(userLocation!!, "Ma position actuelle")
+            addMarkerUserLocation()
         }
         mapView.invalidate()
     }
@@ -483,6 +539,39 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         }
         return i == sub.length
     }
+
+    private fun addMarkerUserLocation(userLocation: GeoPoint? = this.userLocation){
+        // Supprimer l'ancien marqueur s'il existe
+        currentUserMarker?.let {
+            mapView.overlays.remove(it)
+            markerList.remove(it)
+        }
+
+        currentUserMarker = addMarker(userLocation!!, "Ma position actuelle")
+    }
+
+    private fun updateDestination(destination: GeoPoint) {
+        var find = false
+        reloadPreDestinationIcon()
+        if (markerList.isNotEmpty()) {
+            for (marker in markerList) {
+                if (marker.position == destination) {
+                    find = true
+                    preDestinationIcon = marker.icon
+                    marker.icon = resizeIcon(R.drawable.maps_and_flags)
+                    currentDestinationMarker = marker
+                    mapView.invalidate()
+                    break
+                }
+            }
+        }
+    }
+
+    private fun reloadPreDestinationIcon() {
+        currentDestinationMarker?.icon = preDestinationIcon
+        mapView.invalidate()
+    }
+
 
     override fun onResume() {
         super.onResume()

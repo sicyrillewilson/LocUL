@@ -1,12 +1,15 @@
 package tg.univlome.epl.utils
 
+import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.osmdroid.util.GeoPoint
+import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.models.Batiment
@@ -33,7 +36,12 @@ object BatimentUtils {
             .addToBackStack(null)
             .commit()
     }
-    
+
+    fun ouvrirMapsFragment(batiment: Batiment, activity: FragmentActivity, fragmentContext: Context) {
+        MapsUtils.saveDestination(fragmentContext, GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble()))
+        (activity as? MainActivity)?.loadMapsFragment()
+    }
+
     fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentFragmentAdapter, fragmentModel: FragmentModel) {
         batimentService = BatimentService()
         this.filteredList = filteredList
@@ -84,7 +92,7 @@ object BatimentUtils {
             this.filteredList = batiments.toMutableList()
 
             this.adapter = BatimentFragmentAdapter(batiments) { batiment ->
-                ouvrirMapsFragment(batiment, fragmentModel.fragmentActivity)
+                ouvrirMapsFragment(batiment, fragmentModel.fragmentActivity, fragmentModel.fragmentContext)
             }
 
             val recyclerBatiments = fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
