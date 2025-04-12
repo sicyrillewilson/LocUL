@@ -111,6 +111,10 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
     override fun onPause() {
         super.onPause()
         (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte

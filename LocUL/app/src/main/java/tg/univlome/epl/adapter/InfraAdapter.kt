@@ -79,7 +79,6 @@ class InfraAdapter(
                 }
                 holder.itemView.context.startActivity(intent)
             }
-
         } else if (holder is ButtonViewHolder) {
             holder.btnVoirTout.setOnClickListener {
                 FragmentUtils.ouvrirFragment(fragmentManager, newFragment)

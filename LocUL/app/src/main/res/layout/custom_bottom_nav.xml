@@ -107,11 +107,12 @@
                 android:id="@+id/icon_salle"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/salle_nav_icon" />
+                android:src="@drawable/infra_nav_icon" />
 
             <TextView
                 android:id="@+id/text_salle"
                 android:layout_width="wrap_content"
+                android:minWidth="60dp"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
