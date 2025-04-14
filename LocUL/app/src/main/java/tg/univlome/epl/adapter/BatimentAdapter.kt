@@ -67,7 +67,7 @@ class BatimentAdapter(
                 holder.img.setImageResource(batiment.icon)
             }
 
-            holder.itemView.setOnClickListener {
+            /*holder.itemView.setOnClickListener {
                 val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {
                     putExtra("nom", batiment.nom)
                     putExtra("situation", batiment.situation)
@@ -76,6 +76,13 @@ class BatimentAdapter(
                     putExtra("longitude", batiment.longitude)
                     putExtra("latitude", batiment.latitude)
                     putStringArrayListExtra("images", ArrayList(batiment.images))
+                }
+                holder.itemView.context.startActivity(intent)
+            }*/
+
+            holder.itemView.setOnClickListener {
+                val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {
+                    putExtra("batiment", batiment)
                 }
                 holder.itemView.context.startActivity(intent)
             }

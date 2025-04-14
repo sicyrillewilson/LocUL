@@ -50,7 +50,7 @@ class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerV
             holder.img.setImageResource(infra.icon)
         }
 
-        holder.itemView.setOnClickListener {
+        /*holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
                 putExtra("nom", infra.nom)
                 putExtra("situation", infra.situation)
@@ -59,6 +59,13 @@ class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerV
                 putExtra("longitude", infra.longitude)
                 putExtra("latitude", infra.latitude)
                 putStringArrayListExtra("images", ArrayList(infra.images))
+            }
+            holder.itemView.context.startActivity(intent)
+        }*/
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
+                putExtra("infrastructure", infra)
             }
             holder.itemView.context.startActivity(intent)
         }

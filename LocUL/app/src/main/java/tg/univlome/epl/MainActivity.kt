@@ -212,11 +212,11 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
                     R.color.gray
                 )
             ) // Couleur inactive
-            collapseItem(otherItem.layout)
+            //collapseItem(otherItem.layout)
         }
 
         // Animer l'expansion de l'élément sélectionné
-        expandItem(item)
+        //expandItem(item)
 
         //loadMapsFragment()
 

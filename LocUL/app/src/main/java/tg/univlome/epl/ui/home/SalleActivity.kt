@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package tg.univlome.epl.ui.home
 
 import android.os.Bundle

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.home.SalleActivity
 
 class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemClick: (Salle) -> Unit) : RecyclerView.Adapter<SalleViewAllAdapter.SalleViewHolder>() {
 
@@ -49,7 +50,7 @@ class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemCl
             holder.img.setImageResource(salle.icon)
         }
 
-        holder.itemView.setOnClickListener {
+        /*holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, Salle::class.java).apply {
                 putExtra("nom", salle.nom)
                 putExtra("situation", salle.situation)
@@ -58,6 +59,12 @@ class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemCl
                 putExtra("longitude", salle.longitude)
                 putExtra("latitude", salle.latitude)
                 putStringArrayListExtra("images", ArrayList(salle.images))
+            }
+            holder.itemView.context.startActivity(intent)
+        }*/
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, SalleActivity::class.java).apply {
+                putExtra("salle", salle)
             }
             holder.itemView.context.startActivity(intent)
         }

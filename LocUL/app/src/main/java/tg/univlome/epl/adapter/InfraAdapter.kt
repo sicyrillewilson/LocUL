@@ -1,4 +1,4 @@
-package tg.univlome.epl.adapter
+    package tg.univlome.epl.adapter
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Infrastructure
+import tg.univlome.epl.ui.batiment.BatimentActivity
 import tg.univlome.epl.ui.infrastructure.InfraActivity
 
 //data class Infra(val nom: String, val situation: String, val distance: String, val icon: Int)
@@ -67,7 +68,7 @@ class InfraAdapter(
                 holder.img.setImageResource(infra.icon)
             }
 
-            holder.itemView.setOnClickListener {
+            /*holder.itemView.setOnClickListener {
                 val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
                     putExtra("nom", infra.nom)
                     putExtra("situation", infra.situation)
@@ -76,6 +77,13 @@ class InfraAdapter(
                     putExtra("longitude", infra.longitude)
                     putExtra("latitude", infra.latitude)
                     putStringArrayListExtra("images", ArrayList(infra.images))
+                }
+                holder.itemView.context.startActivity(intent)
+            }*/
+
+            holder.itemView.setOnClickListener {
+                val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
+                    putExtra("infrastructure", infra)
                 }
                 holder.itemView.context.startActivity(intent)
             }
