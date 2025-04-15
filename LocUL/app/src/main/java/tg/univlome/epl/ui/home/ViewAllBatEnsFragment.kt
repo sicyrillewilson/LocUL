@@ -48,6 +48,7 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
         adapter = BatimentFragmentAdapter(batimentsEns)
 
         fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatimentsEns)
+        fragmentModel.type = "enseignement"
         getUserLocation()
 
         return view

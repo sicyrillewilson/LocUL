@@ -74,7 +74,9 @@ object BatimentUtils {
                     }
                     when (fragmentModel.situation) {
                         "" -> {
-                            batiments.add(batiment)
+                            if (batiment.type.lowercase() == fragmentModel.type.lowercase()) {
+                                batiments.add(batiment)
+                            }
                         }
                         "sud" -> {
                             if (batiment.situation == "Campus sud") {

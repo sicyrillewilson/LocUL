@@ -15,5 +15,6 @@ data class HomeFragmentModel(
     var viewLifecycleOwner: LifecycleOwner,
     var recyclerViewId: Int,
     var fragmentManager: FragmentManager,
-    var newFragment: Fragment
+    var newFragment: Fragment,
+    var type: String = ""
 ) : Serializable

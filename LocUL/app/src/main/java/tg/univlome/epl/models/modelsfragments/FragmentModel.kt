@@ -12,5 +12,6 @@ data class FragmentModel(
     var fragmentActivity: FragmentActivity,
     var viewLifecycleOwner: LifecycleOwner,
     var recyclerViewId: Int,
-    var situation: String = ""
+    var situation: String = "",
+    var type: String = ""
 ) : Serializable

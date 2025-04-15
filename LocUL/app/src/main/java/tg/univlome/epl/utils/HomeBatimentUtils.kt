@@ -10,7 +10,6 @@ import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.BatimentAdapter
 import tg.univlome.epl.models.Batiment
-import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.models.modelsfragments.HomeFragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.maps.MapsFragment
@@ -46,26 +45,28 @@ object HomeBatimentUtils {
         batimentService.getBatiments().observe(homeFragmentModel.viewLifecycleOwner, Observer { bats ->
             if (bats != null) {
                 for (batiment in bats) {
-                    try {
-                        val batimentLocation = GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble())
-                        val distance = MapsUtils.calculateDistance(userLocation, batimentLocation)
-                        Log.d("HomeBatimentUtils", "Distance calculée pour ${batiment.nom}: $distance mètres")
+                    if (batiment.type.lowercase() == homeFragmentModel.type.lowercase()) {
+                        try {
+                            val batimentLocation = GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble())
+                            val distance = MapsUtils.calculateDistance(userLocation, batimentLocation)
+                            Log.d("HomeBatimentUtils", "Distance calculée pour ${batiment.nom}: $distance mètres")
 
-                        // Conversion en km si la distance dépasse 1000 m
-                        val formattedDistance = if (distance >= 1000) {
-                            String.format("%.2f km", distance / 1000)
-                        } else {
-                            String.format("%.2f m", distance)
+                            // Conversion en km si la distance dépasse 1000 m
+                            val formattedDistance = if (distance >= 1000) {
+                                String.format("%.2f km", distance / 1000)
+                            } else {
+                                String.format("%.2f m", distance)
+                            }
+
+                            batiment.distance = formattedDistance
+
+                            Log.d("HomeBatimentUtils", "Distance mise à jour pour ${batiment.nom}: ${batiment.distance}")
+
+                        } catch (e: Exception) {
+                            Log.e("HomeBatimentUtils", "Erreur lors de la mise à jour de la distance pour ${batiment.nom}", e)
                         }
-
-                        batiment.distance = formattedDistance
-
-                        Log.d("HomeBatimentUtils", "Distance mise à jour pour ${batiment.nom}: ${batiment.distance}")
-
-                    } catch (e: Exception) {
-                        Log.e("HomeBatimentUtils", "Erreur lors de la mise à jour de la distance pour ${batiment.nom}", e)
+                        batiments.add(batiment)
                     }
-                    batiments.add(batiment)
                 }
             }
             this.filteredList = batiments.toMutableList()

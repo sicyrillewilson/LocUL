@@ -48,6 +48,7 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
         adapter = BatimentFragmentAdapter(batimentsAdmin)
 
         fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatimentsAdmin)
+        fragmentModel.type = "administratif"
         getUserLocation()
 
         return view

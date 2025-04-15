@@ -2,9 +2,15 @@ package tg.univlome.epl.utils
 
 import org.osmdroid.util.GeoPoint
 import android.content.Context
+import android.view.MotionEvent
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Overlay
+import tg.univlome.epl.R
 
 object MapsUtils {
     fun calculateDistance(start: GeoPoint, end: GeoPoint): Double {
@@ -84,5 +90,35 @@ object MapsUtils {
 
     fun saveMapState(context: Context, latitude: Double, longitude: Double, zoom: Float, isNightMode: Boolean) {
 
+    }
+
+    fun setMiniMap(miniMap: MapView, context: Context){
+        miniMap.setTileSource(TileSourceFactory.MAPNIK)
+        miniMap.setMultiTouchControls(false)
+        // Rendre la carte totalement statique
+        miniMap.setBuiltInZoomControls(false) // désactiver les boutons zoom
+        miniMap.isTilesScaledToDpi = false
+        miniMap.controller.setZoom(14.0)
+        miniMap.controller.setCenter(GeoPoint(6.1935, 1.2087)) // ou une autre coordonnée
+
+        // Désactiver le toucher utilisateur
+        miniMap.isFocusable = false
+        miniMap.isEnabled = false
+
+        // Bloquer tous les gestes de l'utilisateur
+        val touchInterceptor = object : Overlay() {
+            override fun onTouchEvent(event: MotionEvent?, mapView: MapView?): Boolean {
+                return true // bloque tous les touch events
+            }
+        }
+        miniMap.overlays.add(touchInterceptor)
+
+        val marker = Marker(miniMap).apply {
+            position = GeoPoint(6.1935, 1.2087)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            icon = ContextCompat.getDrawable(context, R.drawable.maps_and_flags)
+        }
+        miniMap.overlays.add(marker)
+        miniMap.invalidate()
     }
 }
