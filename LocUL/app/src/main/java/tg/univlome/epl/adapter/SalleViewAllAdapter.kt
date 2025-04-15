@@ -1,18 +1,25 @@
 package tg.univlome.epl.adapter
 
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import tg.univlome.epl.R
+import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.home.SalleActivity
 
-class SalleViewAllAdapter(private var salles: List<Salle>) : RecyclerView.Adapter<SalleViewAllAdapter.SalleViewHolder>() {
+class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemClick: (Salle) -> Unit) : RecyclerView.Adapter<SalleViewAllAdapter.SalleViewHolder>() {
 
     class SalleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val icone: ImageView = view.findViewById(R.id.imgSalle)
+        val img: ImageView = view.findViewById(R.id.imgSalle)
         val nom: TextView = view.findViewById(R.id.txtNomSalle)
+        val situation = view.findViewById<TextView>(R.id.situationSalle)
         val distance: TextView = view.findViewById(R.id.txtDistanceSalle)
     }
 
@@ -23,9 +30,31 @@ class SalleViewAllAdapter(private var salles: List<Salle>) : RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: SalleViewHolder, position: Int) {
         val salle = salles[position]
-        holder.icone.setImageResource(salle.icon)
         holder.nom.text = salle.nom
+        holder.situation.text = salle.situation
         holder.distance.text = salle.distance
+        if (!salle.image.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .asBitmap()
+                .load(salle.image)
+                .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                        val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                        holder.img.setImageDrawable(drawable)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+        } else {
+            holder.img.setImageResource(salle.icon)
+        }
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, SalleActivity::class.java).apply {
+                putExtra("salle", salle)
+            }
+            holder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int = salles.size

@@ -1,23 +1,38 @@
+@file:Suppress("DEPRECATION")
+
 package tg.univlome.epl.ui.batiment
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.Batiment
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
+import tg.univlome.epl.models.modelsfragments.FragmentModel
+import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
+import tg.univlome.epl.utils.BatimentUtils
 
 class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
-    private lateinit var batiments: List<Batiment>
+    private lateinit var batiments: MutableList<Batiment>
     private lateinit var filteredList: MutableList<Batiment>
     private lateinit var adapter: BatimentFragmentAdapter
+
+    private lateinit var batimentService: BatimentService
+
+    private lateinit var fragmentModel: FragmentModel
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,24 +44,32 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_nord_batiment, container, false)
 
-        batiments = listOf(
-            Batiment("Bâtiment enseignement A", "Campus Nord", "500m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-            Batiment("Bâtiment enseignement B", "Campus Sud", "300m", R.drawable.img),
-        )
-        filteredList = batiments.toMutableList()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
+        batimentService = BatimentService()
+        batiments = mutableListOf()
+        filteredList = mutableListOf()
         adapter = BatimentFragmentAdapter(batiments)
-        val recyclerNordBatiments = view.findViewById<RecyclerView>(R.id.recyclerNordBatiments)
-        recyclerNordBatiments.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerNordBatiments.adapter = adapter
 
-        // Inflate the layout for this fragment
+        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerNordBatiments, "nord")
+        getUserLocation()
         return view
+    }
+
+    private fun getUserLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            location?.let {
+                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
+                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, fragmentModel)
+            }
+        }
     }
 
     override fun onResume() {

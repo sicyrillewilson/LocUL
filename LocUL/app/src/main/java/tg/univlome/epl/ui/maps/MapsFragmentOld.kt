@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package tg.univlome.epl.fragments
+package tg.univlome.epl.ui.maps
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -35,13 +35,18 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
 import android.annotation.SuppressLint
+import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import tg.univlome.epl.MainActivity
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.SearchBarFragment
 
-class MapsFragment : Fragment(), LocationListener  {
+class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationListener {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -64,6 +69,10 @@ class MapsFragment : Fragment(), LocationListener  {
 
     private val markerList = mutableListOf<Marker>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -71,7 +80,6 @@ class MapsFragment : Fragment(), LocationListener  {
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,10 +95,6 @@ class MapsFragment : Fragment(), LocationListener  {
         mapView = binding.mapView
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
-
-        /*mapView.controller.setZoom(17.0)
-        val defaultPoint = GeoPoint(6.1375, 1.2123)
-        mapView.controller.setCenter(defaultPoint)*/
 
         val prefs = requireActivity().getSharedPreferences("map_state", 0)
         val latitude = prefs.getString("latitude", "6.1375")!!.toDouble()
@@ -111,7 +115,7 @@ class MapsFragment : Fragment(), LocationListener  {
         scaleBarOverlay.setScaleBarOffset(130, 20) // Ajuster la position sur l'écran
         mapView.overlays.add(scaleBarOverlay)
 
-        // Charger les bâtiments depuis Firebase et les afficher sur la carte
+        // Charger les données depuis Firebase et les afficher sur la carte
         loadLieux()
 
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -123,19 +127,15 @@ class MapsFragment : Fragment(), LocationListener  {
             }
         }
 
-        /*val searchView = binding.searchView // Récupération du SearchView
-        // Écouteur pour la recherche
-        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                filterMarkers(query)
-                return true
-            }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterMarkers(newText)
-                return true
+        arguments?.let {
+            val lat = it.getDouble("latitude", 0.0)
+            val lon = it.getDouble("longitude", 0.0)
+            if (lat != 0.0 && lon != 0.0) {
+                destination = GeoPoint(lat, lon)
+                Log.e("MapsFragment", "Destination changée: $destination")
             }
-        })*/
+        }
 
     }
 
@@ -152,7 +152,7 @@ class MapsFragment : Fragment(), LocationListener  {
 
         if (userLocation != null && (lastLocation == null || location.distanceTo(lastLocation!!) > 3)) {
             lastLocation = location
-            updateRoute(userLocation!!)
+            updateRoute(userLocation!!, destination!!)
         }
     }
 
@@ -212,11 +212,13 @@ class MapsFragment : Fragment(), LocationListener  {
                 requireActivity().runOnUiThread {
                     if (userLocation != null) {
                         mapView.controller.setCenter(userLocation)
-                        addMarker(userLocation!!, "Ma position actuelle")
 
                         // Définition de la destination
-                        destination = GeoPoint(userLocation!!.latitude + 0.009, userLocation!!.longitude)
-                        addMarker(destination!!, "Destination à 1 km")
+                        if (destination == null) {
+                            destination = GeoPoint(userLocation!!.latitude + 0.009, userLocation!!.longitude)
+                        } else {
+                            updateRoute(userLocation!!, destination!!)
+                        }
 
                         // getRoute(userLocation!!, destination!!)
                     } else {
@@ -228,10 +230,15 @@ class MapsFragment : Fragment(), LocationListener  {
         mapView.overlays.add(locationOverlay)
     }
 
-    private fun updateRoute(userLocation: GeoPoint) {
+    private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint ) {
+
+        addMarker(userLocation!!, "Ma position actuelle")
+        addMarker(userDestination!!, "Ma destination")
+
         //val destination = GeoPoint(userLocation.latitude + 0.009, userLocation.longitude) // Ex. Destination fixe
 
-        if (destination == null) {
+        //if (destination == null) {
+        if (userDestination == null) {
             Log.e("MapsFragment", "Destination is null, cannot update route")
             return
         }
@@ -240,10 +247,21 @@ class MapsFragment : Fragment(), LocationListener  {
         currentPolyline?.let { mapView.overlays.remove(it) }
 
         // Récupérer le nouvel itinéraire
-        getRoute(userLocation, destination!!)
+        //getRoute(userLocation, destination!!)
+        getRoute(userLocation, userDestination!!)
     }
 
     private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker {
+        var oldMarker = Marker(mapView)
+        for (marker in markerList) {
+            if (marker.position == position && marker.title == title) {
+                oldMarker = marker
+                mapView.overlays.remove(oldMarker)
+                //return marker
+            }
+        }
+        markerList.remove(oldMarker)
+
         Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
         val marker = Marker(mapView)
         marker.position = position
@@ -253,9 +271,9 @@ class MapsFragment : Fragment(), LocationListener  {
             Glide.with(this)
                 .asBitmap()
                 .load(imageUrl)
-                .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val drawable = android.graphics.drawable.BitmapDrawable(resources, resource)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        val drawable = BitmapDrawable(resources, resource)
                         marker.image = drawable
                         mapView.invalidate() // Rafraîchir la carte après chargement
                     }
@@ -265,11 +283,11 @@ class MapsFragment : Fragment(), LocationListener  {
         }
 
         val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
-        val bitmap = (drawable as android.graphics.drawable.BitmapDrawable).bitmap
+        val bitmap = (drawable as BitmapDrawable).bitmap
 
         // Redimensionner l'image
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 40, 40, false) // Modifier la taille selon le besoin
-        val resizedDrawable = android.graphics.drawable.BitmapDrawable(resources, scaledBitmap)
+        val resizedDrawable = BitmapDrawable(resources, scaledBitmap)
 
         marker.icon = resizedDrawable
 
@@ -310,7 +328,8 @@ class MapsFragment : Fragment(), LocationListener  {
 
                             val polyline = Polyline()
                             if (isAdded) {
-                                polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                //polyline.color = resources.getColor(android.R.color.holo_blue_dark, null)
+                                polyline.color = resources.getColor(R.color.mainColor, null)
                             }
 
                             for (i in 0 until coordinates.length()) {
@@ -402,6 +421,7 @@ class MapsFragment : Fragment(), LocationListener  {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        (activity as MainActivity).showSearchBarFragment(this)
     }
 
     override fun onPause() {
@@ -418,11 +438,16 @@ class MapsFragment : Fragment(), LocationListener  {
 
         editor.apply()
         mapView.onPause()
+        (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onSearch(query: String) {
+        filterMarkers(query)
     }
 
 }

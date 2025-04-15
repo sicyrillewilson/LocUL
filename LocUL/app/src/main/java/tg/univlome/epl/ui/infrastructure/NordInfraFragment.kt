@@ -1,23 +1,38 @@
+@file:Suppress("DEPRECATION")
+
 package tg.univlome.epl.ui.infrastructure
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.Infra
 import tg.univlome.epl.adapter.InfraFragmentAdapter
+import tg.univlome.epl.models.Infrastructure
+import tg.univlome.epl.models.modelsfragments.FragmentModel
+import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
+import tg.univlome.epl.utils.InfraUtils
 
 class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
 
-    private lateinit var infrasNord: List<Infra>
-    private lateinit var filteredList: MutableList<Infra>
+    private lateinit var infrasNord: MutableList<Infrastructure>
+    private lateinit var filteredList: MutableList<Infrastructure>
     private lateinit var adapter: InfraFragmentAdapter
+
+    private lateinit var infraService: InfrastructureService
+
+    private lateinit var fragmentModel: FragmentModel
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,26 +44,32 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_nord_infra, container, false)
 
-        val recyclerNordInfra = view.findViewById<RecyclerView>(R.id.recyclerNordInfra)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        infrasNord = listOf(
-            Infra("Infra A", "Campus Nord", "500m", R.drawable.img),
-            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
-            Infra("Infra B", "Campus Sud", "300m", R.drawable.img),
-        )
-        filteredList = infrasNord.toMutableList()
-
+        infraService = InfrastructureService()
+        infrasNord = mutableListOf()
+        filteredList = mutableListOf()
         adapter = InfraFragmentAdapter(infrasNord)
-        recyclerNordInfra.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerNordInfra.adapter = adapter
 
+        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerNordInfra, "nord")
+        getUserLocation()
         return view
+    }
+
+    private fun getUserLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            location?.let {
+                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
+                InfraUtils.updateInfrastructures(userGeoPoint, infrasNord, filteredList, adapter, fragmentModel)
+            }
+        }
     }
 
     override fun onResume() {
@@ -65,4 +86,5 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = infrasNord.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
+
 }

@@ -18,13 +18,16 @@ class BatimentService {
                 val batimentsList = mutableListOf<Batiment>()
                 for (document in result) {
                     val id = document.id
-                    val nom = document.getString("name") ?: ""
+                    val nom = document.getString("nom") ?: ""
                     val description = document.getString("description") ?: ""
                     val longitude = document.getString("longitude") ?: ""
                     val latitude = document.getString("latitude") ?: ""
-                    val image = document.getString("image") ?: ""
+                    val images = document.get("images") as? List<String> ?: emptyList()
+                    val image = images.firstOrNull() ?: ""
+                    val situation = document.getString("situation") ?: ""
+                    val type = document.getString("type") ?: ""
 
-                    batimentsList.add(Batiment(id, nom, description, longitude, latitude, image))
+                    batimentsList.add(Batiment(id, nom, description, longitude, latitude, image, situation, type, images))
                 }
                 batimentsLiveData.value = batimentsList
             }
