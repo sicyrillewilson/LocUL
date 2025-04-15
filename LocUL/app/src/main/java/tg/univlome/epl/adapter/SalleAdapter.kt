@@ -25,13 +25,15 @@ class SalleAdapter(
     private val newFragment: Fragment,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private var min: Int = 3
+
     companion object {
         private const val VIEW_TYPE_SALLE = 0
         private const val VIEW_TYPE_BUTTON = 1
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < salles.size) VIEW_TYPE_SALLE else VIEW_TYPE_BUTTON
+        return if (position < minOf(salles.size, min)) VIEW_TYPE_SALLE else VIEW_TYPE_BUTTON
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -45,9 +47,8 @@ class SalleAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is SalleViewHolder) {
+        if (holder is SalleViewHolder && position < minOf(salles.size, min)) {
             val salle = salles[position]
-            //holder.img.setImageResource(salle.icon)
             holder.nom.text = salle.nom
             holder.situation.text = salle.situation
             holder.distance.text = salle.distance
@@ -67,19 +68,6 @@ class SalleAdapter(
                 holder.img.setImageResource(salle.icon)
             }
 
-            /*holder.itemView.setOnClickListener {
-                val intent = Intent(holder.itemView.context, Salle::class.java).apply {
-                    putExtra("nom", salle.nom)
-                    putExtra("situation", salle.situation)
-                    putExtra("distance", salle.distance)
-                    putExtra("icon", salle.icon)
-                    putExtra("longitude", salle.longitude)
-                    putExtra("latitude", salle.latitude)
-                    putStringArrayListExtra("images", ArrayList(salle.images))
-                }
-                holder.itemView.context.startActivity(intent)
-            }*/
-
             holder.itemView.setOnClickListener {
                 val intent = Intent(holder.itemView.context, SalleActivity::class.java).apply {
                     putExtra("salle", salle)
@@ -94,7 +82,7 @@ class SalleAdapter(
     }
 
     override fun getItemCount(): Int {
-        return salles.size + 1 // +1 pour le bouton "Voir Tout"
+        return minOf(salles.size, min) + 1 // +1 pour le bouton "Voir Tout"
     }
 
     class SalleViewHolder(view: View) : RecyclerView.ViewHolder(view) {

@@ -30,7 +30,6 @@ class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemCl
 
     override fun onBindViewHolder(holder: SalleViewHolder, position: Int) {
         val salle = salles[position]
-        //holder.img.setImageResource(salle.icon)
         holder.nom.text = salle.nom
         holder.situation.text = salle.situation
         holder.distance.text = salle.distance
@@ -50,18 +49,6 @@ class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemCl
             holder.img.setImageResource(salle.icon)
         }
 
-        /*holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, Salle::class.java).apply {
-                putExtra("nom", salle.nom)
-                putExtra("situation", salle.situation)
-                putExtra("distance", salle.distance)
-                putExtra("icon", salle.icon)
-                putExtra("longitude", salle.longitude)
-                putExtra("latitude", salle.latitude)
-                putStringArrayListExtra("images", ArrayList(salle.images))
-            }
-            holder.itemView.context.startActivity(intent)
-        }*/
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, SalleActivity::class.java).apply {
                 putExtra("salle", salle)

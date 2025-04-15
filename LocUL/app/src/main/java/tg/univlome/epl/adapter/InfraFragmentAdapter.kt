@@ -30,7 +30,6 @@ class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerV
 
     override fun onBindViewHolder(holder: InfraViewHolder, position: Int) {
         val infra = infras[position]
-        //holder.img.setImageResource(salle.icon)
         holder.nom.text = infra.nom
         holder.situation.text = infra.situation
         holder.distance.text = infra.distance
@@ -49,19 +48,6 @@ class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerV
         } else {
             holder.img.setImageResource(infra.icon)
         }
-
-        /*holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
-                putExtra("nom", infra.nom)
-                putExtra("situation", infra.situation)
-                putExtra("distance", infra.distance)
-                putExtra("icon", infra.icon)
-                putExtra("longitude", infra.longitude)
-                putExtra("latitude", infra.latitude)
-                putStringArrayListExtra("images", ArrayList(infra.images))
-            }
-            holder.itemView.context.startActivity(intent)
-        }*/
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {

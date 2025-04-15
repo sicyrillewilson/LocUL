@@ -30,7 +30,6 @@ class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerV
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val batiment = batiments[position]
-        //holder.img.setImageResource(batiment.icon)
         holder.nom.text = batiment.nom
         holder.situation.text = batiment.situation
         holder.distance.text = batiment.distance
@@ -49,19 +48,6 @@ class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerV
         } else {
             holder.img.setImageResource(batiment.icon)
         }
-
-        /*holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {
-                putExtra("nom", batiment.nom)
-                putExtra("situation", batiment.situation)
-                putExtra("distance", batiment.distance)
-                putExtra("icon", batiment.icon)
-                putExtra("longitude", batiment.longitude)
-                putExtra("latitude", batiment.latitude)
-                putStringArrayListExtra("images", ArrayList(batiment.images))
-            }
-            holder.itemView.context.startActivity(intent)
-        }*/
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {

@@ -1,8 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 package tg.univlome.epl.utils
 
 import org.osmdroid.util.GeoPoint
 import android.content.Context
 import android.view.MotionEvent
+import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken

@@ -26,13 +26,15 @@ class InfraAdapter(
     private val newFragment: Fragment,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private var min: Int = 3
+
     companion object {
         private const val VIEW_TYPE_INFRA = 0
         private const val VIEW_TYPE_BUTTON = 1
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < infras.size) VIEW_TYPE_INFRA else VIEW_TYPE_BUTTON
+        return if (position < minOf(infras.size, min)) VIEW_TYPE_INFRA else VIEW_TYPE_BUTTON
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -46,9 +48,8 @@ class InfraAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is InfraViewHolder) {
+        if (holder is InfraViewHolder && position < minOf(infras.size, min)) {
             val infra = infras[position]
-            //holder.img.setImageResource(infra.icon)
             holder.nom.text = infra.nom
             holder.situation.text = infra.situation
             holder.distance.text = infra.distance
@@ -68,19 +69,6 @@ class InfraAdapter(
                 holder.img.setImageResource(infra.icon)
             }
 
-            /*holder.itemView.setOnClickListener {
-                val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
-                    putExtra("nom", infra.nom)
-                    putExtra("situation", infra.situation)
-                    putExtra("distance", infra.distance)
-                    putExtra("icon", infra.icon)
-                    putExtra("longitude", infra.longitude)
-                    putExtra("latitude", infra.latitude)
-                    putStringArrayListExtra("images", ArrayList(infra.images))
-                }
-                holder.itemView.context.startActivity(intent)
-            }*/
-
             holder.itemView.setOnClickListener {
                 val intent = Intent(holder.itemView.context, InfraActivity::class.java).apply {
                     putExtra("infrastructure", infra)
@@ -95,7 +83,7 @@ class InfraAdapter(
     }
 
     override fun getItemCount(): Int {
-        return infras.size + 1 // +1 pour le bouton "Voir Tout"
+        return minOf(infras.size, min) + 1 // +1 pour le bouton "Voir Tout"
     }
 
     class InfraViewHolder(view: View) : RecyclerView.ViewHolder(view) {

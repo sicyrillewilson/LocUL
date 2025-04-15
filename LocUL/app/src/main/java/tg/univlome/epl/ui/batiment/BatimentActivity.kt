@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import tg.univlome.epl.R
 import tg.univlome.epl.databinding.ActivityBatimentBinding
 import tg.univlome.epl.models.Batiment
@@ -22,6 +24,7 @@ import tg.univlome.epl.utils.MapsUtils
 
 class BatimentActivity : AppCompatActivity() {
     lateinit var ui: ActivityBatimentBinding
+    private lateinit var miniMap: MapView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityBatimentBinding.inflate(layoutInflater)
@@ -67,5 +70,8 @@ class BatimentActivity : AppCompatActivity() {
         ui.btnRetour.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+
+        miniMap = ui.miniMap
+        MapsUtils.setMiniMap(miniMap, this)
     }
 }

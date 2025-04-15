@@ -17,13 +17,13 @@ import tg.univlome.epl.R
 import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.ui.batiment.BatimentActivity
 
-//data class Batiment(val nom: String, val situation: String, val distance: String, val icon: Int)
-
 class BatimentAdapter(
     private var batiments: List<Batiment>,
     private val fragmentManager: FragmentManager,
     private val newFragment: Fragment,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var min: Int = 3
 
     companion object {
         private const val VIEW_TYPE_BATIMENT = 0
@@ -31,7 +31,7 @@ class BatimentAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < batiments.size) VIEW_TYPE_BATIMENT else VIEW_TYPE_BUTTON
+        return if (position < minOf(batiments.size, min))VIEW_TYPE_BATIMENT else VIEW_TYPE_BUTTON
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -45,9 +45,8 @@ class BatimentAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is BatimentViewHolder) {
+        if (holder is BatimentViewHolder && position < minOf(batiments.size, min)) {
             val batiment = batiments[position]
-            //holder.img.setImageResource(batiment.icon)
             holder.nom.text = batiment.nom
             holder.situation.text = batiment.situation
             holder.distance.text = batiment.distance
@@ -67,19 +66,6 @@ class BatimentAdapter(
                 holder.img.setImageResource(batiment.icon)
             }
 
-            /*holder.itemView.setOnClickListener {
-                val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {
-                    putExtra("nom", batiment.nom)
-                    putExtra("situation", batiment.situation)
-                    putExtra("distance", batiment.distance)
-                    putExtra("icon", batiment.icon)
-                    putExtra("longitude", batiment.longitude)
-                    putExtra("latitude", batiment.latitude)
-                    putStringArrayListExtra("images", ArrayList(batiment.images))
-                }
-                holder.itemView.context.startActivity(intent)
-            }*/
-
             holder.itemView.setOnClickListener {
                 val intent = Intent(holder.itemView.context, BatimentActivity::class.java).apply {
                     putExtra("batiment", batiment)
@@ -94,7 +80,7 @@ class BatimentAdapter(
     }
 
     override fun getItemCount(): Int {
-        return batiments.size + 1
+        return minOf(batiments.size, min) + 1 // 3 batiments max + 1 bouton "voir tout"
     }
 
     class BatimentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
