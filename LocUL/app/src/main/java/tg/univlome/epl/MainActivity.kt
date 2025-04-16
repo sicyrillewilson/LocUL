@@ -5,6 +5,7 @@ package tg.univlome.epl
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -38,6 +39,7 @@ import java.util.Locale
 import android.os.Handler
 import android.os.Looper
 import android.view.animation.DecelerateInterpolator
+import androidx.core.os.LocaleListCompat
 import tg.univlome.epl.models.NavItem
 
 class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
@@ -184,7 +186,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         defaultItem.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
         defaultItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
 
-        animateItemSelection(defaultItem)
+        //animateItemSelection(defaultItem)
 
         // Charge le fragment par défaut
         loadFragment(defaultItem.fragment)
@@ -212,16 +214,25 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
                     R.color.gray
                 )
             ) // Couleur inactive
-            //collapseItem(otherItem.layout)
+            collapseItem(otherItem.layout)
+            if (otherItem.textView.text == this.getString(R.string.infrastructures)) {
+                item.textView.minWidth = 0
+            }
         }
 
         // Animer l'expansion de l'élément sélectionné
-        //expandItem(item)
+        expandItem(item)
 
-        //loadMapsFragment()
+        // Appliquer les changements visuels
+        item.layout.setBackgroundResource(R.drawable.nav_item_bg)
+        item.textView.alpha = 0f
+        item.textView.visibility = View.VISIBLE
+        item.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
+        item.textView.animate().alpha(1f).setDuration(350).start()
+        item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
 
         // Animer l'élément sélectionné
-        animateItemSelection(item)
+        //animateItemSelection(item)
 
         // Mettre à jour l'item sélectionné
         selectedItem = item
@@ -252,6 +263,11 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
             View.MeasureSpec.UNSPECIFIED
         )
         val textWidth = item.textView.measuredWidth
+        if (item.textView.text == this.getString(R.string.infrastructures)) {
+            item.textView.minWidth = textWidth + 100
+        }
+        //item.textView.minWidth = textWidth + 100
+        println("${item.textView.text}, ${item.textView.minWidth}")
 
         // Largeur totale = texte + icône + marges estimées (ex: 40dp)
         val iconWidth = item.icon.width
@@ -268,6 +284,10 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
             val params = item.layout.layoutParams
             params.width = value
             item.layout.layoutParams = params
+            if (item.textView.text == this.getString(R.string.infrastructures)) {
+                item.textView.minWidth = textWidth + 60
+                item.layout.layoutParams.width += 100
+            }
         }
         animator.start()
     }
@@ -288,6 +308,9 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         }
         animator.start()
     }
+
+    fun Int.dpToPx(context: Context): Int =
+        (this * context.resources.displayMetrics.density).toInt()
 
     fun showSearchBarFragment(listener: SearchBarFragment.SearchListener?) {
         if (listener != null) {
@@ -424,7 +447,8 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
                 1 -> "en" // Anglais
                 else -> "fr"
             }
-            setLocale(activity, selectedLanguageCode)
+            val appLocale = LocaleListCompat.forLanguageTags(selectedLanguageCode)
+            AppCompatDelegate.setApplicationLocales(appLocale)
 
             // Appliquer le thème
             val selectedThemeMode = when (selectedThemePosition) {
@@ -442,7 +466,14 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
             editor.apply()
 
             dialog.dismiss()
-            activity.recreate() // Recréer l'activité pour appliquer les changements
+            val fragmentManager = (activity as AppCompatActivity).supportFragmentManager
+            fragmentManager.fragments.forEach {
+                fragmentManager.beginTransaction().remove(it).commitAllowingStateLoss()
+            }
+
+            //activity.recreate() // Recréer l'activité pour appliquer les changements
+            activity.finish()
+            activity.startActivity(activity.intent)
         }
 
         // Personnaliser l'apparence du Dialog
