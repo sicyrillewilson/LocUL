@@ -181,15 +181,6 @@ class MapsActivity : AppCompatActivity(), LocationListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        intent.extras?.let {
-            val lat = it.getDouble("latitude", 0.0)
-            val lon = it.getDouble("longitude", 0.0)
-            if (lat != 0.0 && lon != 0.0) {
-                destination = GeoPoint(lat, lon)
-                MapsUtils.saveDestination(this, destination!!)
-                Log.e("MapsActivity", "Destination changée: $destination")
-            }
-        }
     }
 
     @SuppressLint("MissingPermission")
@@ -367,7 +358,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 })
         }
 
-        val resizedDrawable = resizeIcon(icon)
+        val resizedDrawable = MapsUtils.resizeIcon(icon, resources)
         marker.icon = resizedDrawable
 
         mapView.overlays.add(marker)
@@ -498,7 +489,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 if (marker.position == destination) {
                     find = true
                     preDestinationIcon = marker.icon
-                    marker.icon = resizeIcon(R.drawable.maps_and_flags)
+                    marker.icon = MapsUtils.resizeIcon(R.drawable.maps_and_flags, resources)
                     currentDestinationMarker = marker
                     mapView.invalidate()
                     break

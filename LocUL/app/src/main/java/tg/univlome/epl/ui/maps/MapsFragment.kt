@@ -187,17 +187,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             mapView.invalidate()
             loadMapData(view)
         }
-
-
-        arguments?.let {
-            val lat = it.getDouble("latitude", 0.0)
-            val lon = it.getDouble("longitude", 0.0)
-            if (lat != 0.0 && lon != 0.0) {
-                destination = GeoPoint(lat, lon)
-                MapsUtils.saveDestination(requireContext(), destination!!)
-                Log.e("MapsFragment", "Destination changée: $destination")
-            }
-        }
     }
 
     @SuppressLint("MissingPermission")
@@ -327,9 +316,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint ) {
 
-        //addMarker(userLocation!!, "Ma position actuelle")
         addMarkerUserLocation(userLocation!!)
-        //addMarker(userDestination!!, "Ma destination")
 
         if (userDestination == null || userDestination == GeoPoint(0.0, 0.0)) {
             Log.e("MapsFragment", "Destination is null or {0,0} , cannot update route")
@@ -397,7 +384,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 })
         }
 
-        val resizedDrawable = resizeIcon(icon)
+        val resizedDrawable = MapsUtils.resizeIcon(icon, resources)
 
         marker.icon = resizedDrawable
 
@@ -406,29 +393,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         markerList.add(marker)
         return marker
-    }
-
-    private fun resizeIcon(icon: Int = R.drawable.maps_and_flags): BitmapDrawable? {
-        /*val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
-        val bitmap = (drawable as BitmapDrawable).bitmap*/
-
-        val drawable = ResourcesCompat.getDrawable(resources, icon, null)
-
-        val bitmap = Bitmap.createBitmap(
-            drawable!!.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        // Redimensionner l'image
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 75, 75, false) // Modifier la taille selon le besoin
-        val resizedDrawable = BitmapDrawable(resources, scaledBitmap)
-
-        return resizedDrawable
     }
 
     private fun removeAllMarkers() {
@@ -520,7 +484,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         if (query.isNullOrEmpty()) {
             loadLieux()
             if (userLocation != null){
-                //addMarker(userLocation!!, "Ma position actuelle")
                 addMarkerUserLocation()
             }
             return
@@ -567,7 +530,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         removeAllMarkers()
         if (userLocation != null){
-            //addMarker(userLocation!!, "Ma position actuelle")
             addMarkerUserLocation()
         }
         mapView.invalidate()
@@ -606,7 +568,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 if (marker.position == destination) {
                     find = true
                     preDestinationIcon = marker.icon
-                    marker.icon = resizeIcon(R.drawable.maps_and_flags)
+                    //marker.icon = resizeIcon(R.drawable.maps_and_flags)
+                    marker.icon = MapsUtils.resizeIcon(R.drawable.maps_and_flags, resources)
                     currentDestinationMarker = marker
                     mapView.invalidate()
                     break
@@ -673,5 +636,4 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             }
         }
     }
-
 }
