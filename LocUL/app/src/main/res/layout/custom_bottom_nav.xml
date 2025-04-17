@@ -45,6 +45,7 @@
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
                 android:textStyle="bold"
+                android:visibility="gone"
                 android:textColor="@color/black" />
         </LinearLayout>
     </LinearLayout>
