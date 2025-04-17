@@ -16,5 +16,12 @@
         <item name="android:layout_marginBottom">5dp</item>
     </style>
 
+    <style name="CustomTabDots" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorHeight">0dp</item>
+        <item name="tabPaddingStart">6dp</item>
+        <item name="tabPaddingEnd">6dp</item>
+        <item name="tabMinWidth">8dp</item>
+    </style>
+
     <style name="Theme.LocUL" parent="Base.Theme.LocUL" />
 </resources>

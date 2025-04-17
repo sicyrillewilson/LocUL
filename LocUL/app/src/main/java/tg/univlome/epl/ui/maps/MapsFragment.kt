@@ -568,7 +568,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 if (marker.position == destination) {
                     find = true
                     preDestinationIcon = marker.icon
-                    //marker.icon = resizeIcon(R.drawable.maps_and_flags)
                     marker.icon = MapsUtils.resizeIcon(R.drawable.maps_and_flags, resources)
                     currentDestinationMarker = marker
                     mapView.invalidate()

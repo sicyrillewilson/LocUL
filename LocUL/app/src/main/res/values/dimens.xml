@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="custom_dot_width">10dp</dimen>
+    <dimen name="custom_dot_height">10dp</dimen>
+    <dimen name="custom_dot_margin_horizontal">4dp</dimen>
+</resources>
