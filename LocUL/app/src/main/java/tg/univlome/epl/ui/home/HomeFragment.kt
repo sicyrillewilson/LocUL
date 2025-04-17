@@ -80,7 +80,7 @@ class HomeFragment : Fragment() {
         infrasAdapter = InfraAdapter(infras, fragmentManager, ViewAllInfraFragment())
 
         salles = mutableListOf()
-        val salles = listOf(
+        /*val salles = listOf(
             Salle(
                 id = "1",
                 infrastructureId = "infra_1",
@@ -126,7 +126,7 @@ class HomeFragment : Fragment() {
                 distance = "90m",
                 icon = R.drawable.img
             )
-        )
+        )*/
 
         sallesFilteredList = mutableListOf()
         sallesAdapter = SalleAdapter(salles, fragmentManager, ViewAllSalleFragment())

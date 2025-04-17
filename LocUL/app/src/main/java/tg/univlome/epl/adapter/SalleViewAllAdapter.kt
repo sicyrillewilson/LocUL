@@ -14,7 +14,7 @@ import tg.univlome.epl.R
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.home.SalleActivity
 
-class SalleViewAllAdapter(private var salles: List<Salle>,  private val onItemClick: (Salle) -> Unit) : RecyclerView.Adapter<SalleViewAllAdapter.SalleViewHolder>() {
+class SalleViewAllAdapter(private var salles: List<Salle>) : RecyclerView.Adapter<SalleViewAllAdapter.SalleViewHolder>() {
 
     class SalleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img: ImageView = view.findViewById(R.id.imgSalle)
