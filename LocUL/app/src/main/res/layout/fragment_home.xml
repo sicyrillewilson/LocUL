@@ -55,16 +55,16 @@
             android:layout_marginTop="25dp"
             android:layout_marginBottom="20dp"/>
 
+        <!-- Titre des salles -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerBatimentsAdmin"
             android:layout_width="match_parent"
             android:layout_height="125dp"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal"
-            tools:listitem="@layout/item_batiment"
             android:overScrollMode="never"
-            android:layout_marginBottom="16dp" />
+            tools:listitem="@layout/item_batiment" />
 
-        <!-- Titre des salles -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

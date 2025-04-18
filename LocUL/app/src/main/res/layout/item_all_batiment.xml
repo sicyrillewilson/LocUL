@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="360dp"
-    android:layout_height="110dp"
+    android:layout_width="match_parent"
+    android:layout_height="125dp"
     android:background="@drawable/rounded_frame"
     android:orientation="horizontal"
     android:layout_gravity="center"
-    android:layout_marginBottom="20dp"
+    android:layout_marginBottom="10dp"
     android:padding="3dp"
     android:paddingEnd="6dp">
 
     <!-- Icône du bâtiment -->
     <LinearLayout
-        android:layout_width="180dp"
+        android:layout_width="150dp"
         android:layout_height="match_parent"
         android:background="@drawable/rounded_frame"
         android:layout_marginEnd="10dp" >
@@ -41,6 +41,7 @@
             android:maxLines="2"
             android:gravity="center_vertical"
             android:ellipsize="end"
+            android:layout_gravity="center"
             android:layout_marginTop="2dp"
             android:fontFamily="@font/gotham_book"
             android:text="Nom Bâtiment"
@@ -48,13 +49,21 @@
             android:textSize="15sp"
             android:textStyle="bold"/>
 
+        <!-- Ligne de séparation -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="5dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="6dp"/>
+
         <TextView
             android:id="@+id/situationBat"
             android:layout_width="wrap_content"
             android:fontFamily="@font/gotham_book"
             android:layout_height="wrap_content"
             android:text="Campus Nord"
-            android:visibility="gone"
             android:textSize="14sp"/>
 
         <LinearLayout
