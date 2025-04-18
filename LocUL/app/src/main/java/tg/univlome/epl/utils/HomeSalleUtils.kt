@@ -35,7 +35,8 @@ object HomeSalleUtils {
     }
     
     fun updateSalles(userLocation: GeoPoint, salles: MutableList<Salle>, filteredList: MutableList<Salle>, adapter: SalleAdapter, homeFragmentModel: HomeFragmentModel) {
-        salleService = SalleService()
+        //salleService = SalleService()
+        salleService = SalleService(homeFragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.salles = salles
         this.adapter = adapter

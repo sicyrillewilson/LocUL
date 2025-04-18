@@ -96,7 +96,8 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         // Initialisation du service Firebase
         batimentService = BatimentService()
         infrastructureService = InfrastructureService()
-        salleService = SalleService()
+        //salleService = SalleService()
+        salleService = SalleService(this)
 
         //mapView = binding.mapView
         mapView.setTileSource(TileSourceFactory.MAPNIK)

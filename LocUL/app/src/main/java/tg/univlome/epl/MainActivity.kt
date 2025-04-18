@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -39,8 +40,10 @@ import java.util.Locale
 import android.os.Handler
 import android.os.Looper
 import android.view.animation.DecelerateInterpolator
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.LocaleListCompat
 import tg.univlome.epl.models.NavItem
+import android.Manifest
 
 class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     lateinit var ui: ActivityMainBinding
@@ -54,6 +57,15 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
     private var currentSubFragment: Fragment? = null // Pour suivre quel fragment est affiché
     private var navItems = listOf<NavItem>()
+    private val locationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission accordée, on recharge les données si HomeFragment est actif
+                (currentFragment as? HomeFragment)?.rechargerDonnees()
+            } else {
+                Toast.makeText(this, "Permission localisation refusée", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,6 +150,15 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         }, true) // "true" permet de surveiller même les fragments imbriqués
 
         chargerItems()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            locationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            // Si déjà accordée, on recharge immédiatement les données du HomeFragment
+            (currentFragment as? HomeFragment)?.rechargerDonnees()
+        }
     }
 
     private fun chargerItems() {

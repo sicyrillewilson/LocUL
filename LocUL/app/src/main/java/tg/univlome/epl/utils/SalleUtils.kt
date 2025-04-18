@@ -1,11 +1,14 @@
 package tg.univlome.epl.utils
 
+import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.SalleViewAllAdapter
@@ -35,7 +38,8 @@ object SalleUtils {
     }
     
     fun updateSalles(userLocation: GeoPoint, salles: MutableList<Salle>, filteredList: MutableList<Salle>, adapter: SalleViewAllAdapter, fragmentModel: FragmentModel) {
-        salleService = SalleService()
+        //salleService = SalleService()
+        salleService = SalleService(fragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.salles = salles
         this.adapter = adapter
@@ -91,4 +95,29 @@ object SalleUtils {
             recyclerBatiments?.adapter = adapter
         })
     }
+
+    fun saveSalles(context: Context, salles: MutableList<Salle>) {
+        val sharedPreferences = context.getSharedPreferences("SallePrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(salles)
+        editor.putString("salle", json)
+        editor.apply()
+    }
+
+    fun loadSalles(context: Context): MutableList<Salle>? {
+        val sharedPreferences = context.getSharedPreferences("SallePrefs", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = sharedPreferences.getString("salle", null)
+        val type = object : TypeToken<MutableList<Salle>>() {}.type
+        return gson.fromJson(json, type)
+    }
+
+    fun clearSalles(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("SallePrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.remove("salle")
+        editor.apply()
+    }
+
 }

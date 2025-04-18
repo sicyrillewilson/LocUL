@@ -90,7 +90,8 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         // Initialisation du service Firebase
         batimentService = BatimentService()
         infrastructureService = InfrastructureService()
-        salleService = SalleService()
+        //salleService = SalleService()
+        salleService = SalleService(requireContext())
 
         mapView = binding.mapView
         mapView.setTileSource(TileSourceFactory.MAPNIK)

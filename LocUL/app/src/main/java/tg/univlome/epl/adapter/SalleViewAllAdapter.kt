@@ -19,7 +19,7 @@ class SalleViewAllAdapter(private var salles: List<Salle>) : RecyclerView.Adapte
     class SalleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img: ImageView = view.findViewById(R.id.imgSalle)
         val nom: TextView = view.findViewById(R.id.txtNomSalle)
-        val situation = view.findViewById<TextView>(R.id.situationSalle)
+        val situation = view.findViewById<TextView>(R.id.batimentSalle)
         val distance: TextView = view.findViewById(R.id.txtDistanceSalle)
     }
 
