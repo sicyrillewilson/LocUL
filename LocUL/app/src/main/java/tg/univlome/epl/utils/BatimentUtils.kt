@@ -79,6 +79,8 @@ object BatimentUtils {
                         "" -> {
                             if (fragmentModel.type != "" && batiment.type.lowercase() == fragmentModel.type.lowercase()) {
                                 batiments.add(batiment)
+                            } else if (fragmentModel.type == "") {
+                                batiments.add(batiment)
                             }
                         }
                         "sud" -> {
