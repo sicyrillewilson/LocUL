@@ -77,6 +77,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     private var preDestinationIcon: Drawable? = null
     private var isNightMode = false
     private var isOtherMarkersHidden = false
+    private val tousLesLieux = mutableListOf<Lieu>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -230,7 +231,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         }
     }
 
-    private fun loadLieux() {
+    /*private fun loadLieux() {
         removeAllMarkers() // Évite les doublons de marqueurs
 
         // Charger les bâtiments
@@ -259,6 +260,48 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 }
             }
         })
+    }*/
+
+    private fun loadLieux() {
+        removeAllMarkers()
+        tousLesLieux.clear()
+
+        batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
+            batiments?.let { tousLesLieux.addAll(it) }
+            filtrerLieux("") // Affiche tout au départ
+        })
+
+        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
+            infrastructures?.let { tousLesLieux.addAll(it) }
+            filtrerLieux("")
+        })
+
+        salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
+            salles?.let { tousLesLieux.addAll(it) }
+            filtrerLieux("")
+        })
+    }
+
+    fun filtrerLieux(query: String) {
+        removeAllMarkers()
+
+        val recherche = query.lowercase().trim()
+
+        val lieuxFiltres = if (recherche.isEmpty()) {
+            tousLesLieux
+        } else {
+            tousLesLieux.filter { lieu ->
+                lieu.nom.lowercase().contains(recherche)
+            }
+        }
+
+        for (lieu in lieuxFiltres) {
+            ajouterLieuSurCarte(lieu)
+        }
+
+        if (userLocation != null){
+            addMarkerUserLocation()
+        }
     }
 
     // Nouvelle méthode pour ajouter un lieu sur la carte
@@ -619,7 +662,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     }
 
     override fun onSearch(query: String) {
-        filterMarkers(query)
+        filtrerLieux(query)
+        //filterMarkers(query)
     }
 
     @Deprecated("Deprecated in Java")
