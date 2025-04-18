@@ -42,7 +42,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Handler
 import android.os.Looper
-import androidx.core.content.res.ResourcesCompat
+import android.view.animation.DecelerateInterpolator
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import tg.univlome.epl.MainActivity
@@ -108,10 +108,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         // Initialisation du service Firebase
         batimentService = BatimentService(requireContext())
         infrastructureService = InfrastructureService(requireContext())
-        //salleService = SalleService()
         salleService = SalleService(requireContext())
 
-        //mapView = binding.mapView
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
 
@@ -183,6 +181,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             reloadPreDestinationIcon()
             destination = null
             MapsUtils.clearDestination(requireContext())
+            hideDestinationLayout()
+            removeAllMarkers()
+            reloadOtherMarker()
             currentPolyline?.let { mapView.overlays.remove(it) }
             currentPolyline = null
             mapView.controller.setCenter(userLocation ?: GeoPoint(6.1375, 1.2123))
@@ -230,37 +231,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             }
         }
     }
-
-    /*private fun loadLieux() {
-        removeAllMarkers() // Évite les doublons de marqueurs
-
-        // Charger les bâtiments
-        batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
-            if (batiments != null) {
-                for (batiment in batiments) {
-                    ajouterLieuSurCarte(batiment)
-                }
-            }
-        })
-
-        // Charger les infrastructures
-        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
-            if (infrastructures != null) {
-                for (infrastructure in infrastructures) {
-                    ajouterLieuSurCarte(infrastructure)
-                }
-            }
-        })
-
-        // Charger les salles
-        salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
-            if (salles != null) {
-                for (salle in salles) {
-                    ajouterLieuSurCarte(salle)
-                }
-            }
-        })
-    }*/
 
     private fun loadLieux() {
         removeAllMarkers()
@@ -429,12 +399,59 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         val resizedDrawable = MapsUtils.resizeIcon(icon, resources)
 
         marker.icon = resizedDrawable
+        marker.setOnMarkerClickListener{ clickedMarker, _ ->
+            if (clickedMarker.title != binding.destinationText.text && clickedMarker.position != userLocation && clickedMarker.position != destination){
+                binding.destinationText.text = clickedMarker.title
+                //binding.destinationLayout.visibility = View.VISIBLE
+                showDestinationLayout()
+                clickedMarker.showInfoWindow()
+                binding.valider.setOnClickListener {
+                    destination = clickedMarker.position
+                    MapsUtils.saveDestination(requireContext(), destination!!)
+                    updateRoute(userLocation!!, destination!!)
+                    hideOtherMarkers()
+                }
+                binding.annuler.setOnClickListener {
+                    hideDestinationLayout()
+                }
+            } else {
+                clickedMarker.showInfoWindow()
+            }
+            true
+        }
 
         mapView.overlays.add(marker)
         mapView.invalidate()
 
         markerList.add(marker)
         return marker
+    }
+
+    fun showDestinationLayout() {
+        if (binding.destinationLayout.visibility != View.VISIBLE){
+            binding.destinationLayout.apply {
+                visibility = View.VISIBLE
+                translationX = -width.toFloat()  // commence hors de l'écran à gauche
+                animate()
+                    .translationX(0f)  // revient à sa position normale
+                    .setDuration(300)
+                    .setInterpolator(DecelerateInterpolator())
+                    .start()
+            }
+        }
+    }
+
+    fun hideDestinationLayout() {
+        if (binding.destinationLayout.visibility != View.INVISIBLE) {
+            binding.destinationLayout.apply {
+                translationX = width.toFloat()
+                animate()
+                    .setDuration(300)
+                    .setInterpolator(DecelerateInterpolator())
+                    .start()
+            }
+            binding.destinationLayout.visibility = View.INVISIBLE
+        }
     }
 
     private fun removeAllMarkers() {
@@ -520,73 +537,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         })
     }
 
-    private fun filterMarkers(query: String?) {
-        removeAllMarkers()
-
-        if (query.isNullOrEmpty()) {
-            loadLieux()
-            if (userLocation != null){
-                addMarkerUserLocation()
-            }
-            return
-        }
-
-
-        val lowerCaseQuery = query.lowercase()
-
-        batimentService.getBatiments().observe(viewLifecycleOwner, Observer { batiments ->
-            if (batiments != null) {
-                val batiments = batiments.filter { batiment ->
-                    val name = batiment.nom?.lowercase() ?: ""
-                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
-                }
-                for (batiment in batiments) {
-                    ajouterLieuSurCarte(batiment)
-                }
-            }
-        })
-
-        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
-            if (infrastructures != null) {
-                val infrastructures = infrastructures.filter { infrastructure ->
-                    val name = infrastructure.nom?.lowercase() ?: ""
-                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
-                }
-                for (infrastructure in infrastructures) {
-                    ajouterLieuSurCarte(infrastructure)
-                }
-            }
-        })
-
-        salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
-            if (salles != null) {
-                val salles = salles.filter { salle ->
-                    val name = salle.nom?.lowercase() ?: ""
-                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
-                }
-                for (salle in salles) {
-                    ajouterLieuSurCarte(salle)
-                }
-            }
-        })
-
-        removeAllMarkers()
-        if (userLocation != null){
-            addMarkerUserLocation()
-        }
-        mapView.invalidate()
-    }
-
-    private fun isSubsequence(sub: String, word: String): Boolean {
-        var i = 0
-        var j = 0
-        while (i < sub.length && j < word.length) {
-            if (sub[i] == word[j]) i++
-            j++
-        }
-        return i == sub.length
-    }
-
     private fun addMarkerUserLocation(userLocation: GeoPoint? = this.userLocation){
         if (!isAdded || mapView == null || userLocation == null) {
             Log.w("MapsFragment", "Conditions non remplies pour ajouter le marqueur de position")
@@ -663,7 +613,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     override fun onSearch(query: String) {
         filtrerLieux(query)
-        //filterMarkers(query)
     }
 
     @Deprecated("Deprecated in Java")
