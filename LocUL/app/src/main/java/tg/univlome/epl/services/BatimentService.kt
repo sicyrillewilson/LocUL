@@ -1,30 +1,51 @@
 package tg.univlome.epl.services
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.utils.BatimentUtils
 
-class BatimentService {
+class BatimentService(private val context: Context) {
     private val db = FirebaseFirestore.getInstance()
     private val batimentsCollection = db.collection("batiments")
 
     fun getBatiments(): LiveData<List<Batiment>> {
         val batimentsLiveData = MutableLiveData<List<Batiment>>()
 
-        batimentsCollection.get()
-            .addOnSuccessListener { result ->
-                val batimentsList = mutableListOf<Batiment>()
-                for (document in result) {
-                    batimentsList.add(createBatimentFromDocument(document))
+        val loadBatiments = BatimentUtils.loadBatiments(context)
+        if (loadBatiments != null) {
+            batimentsLiveData.value = loadBatiments!!
+            batimentsCollection.get()
+                .addOnSuccessListener { result ->
+                    val batimentsList = mutableListOf<Batiment>()
+                    for (document in result) {
+                        batimentsList.add(createBatimentFromDocument(document))
+                    }
+                    BatimentUtils.saveBatiments(context, batimentsList)
+                    //batimentsLiveData.value = batimentsList
                 }
-                batimentsLiveData.value = batimentsList
-            }
-            .addOnFailureListener { exception ->
-                Log.e("BatimentService", "Erreur lors de la récupération des bâtiments", exception)
-            }
+                .addOnFailureListener { exception ->
+                    Log.e("BatimentService", "Erreur lors de la récupération des bâtiments", exception)
+                }
+        } else {
+            batimentsCollection.get()
+                .addOnSuccessListener { result ->
+                    val batimentsList = mutableListOf<Batiment>()
+                    for (document in result) {
+                        batimentsList.add(createBatimentFromDocument(document))
+                    }
+                    BatimentUtils.saveBatiments(context, batimentsList)
+
+                    batimentsLiveData.value = batimentsList
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("BatimentService", "Erreur lors de la récupération des bâtiments", exception)
+                }
+        }
 
         return batimentsLiveData
     }

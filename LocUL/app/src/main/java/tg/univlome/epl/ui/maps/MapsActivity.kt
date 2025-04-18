@@ -94,8 +94,8 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         destination = MapsUtils.loadDestination(this)
 
         // Initialisation du service Firebase
-        batimentService = BatimentService()
-        infrastructureService = InfrastructureService()
+        batimentService = BatimentService(this)
+        infrastructureService = InfrastructureService(this)
         //salleService = SalleService()
         salleService = SalleService(this)
 

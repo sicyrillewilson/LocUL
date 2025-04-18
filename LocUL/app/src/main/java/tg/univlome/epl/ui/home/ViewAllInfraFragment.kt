@@ -46,7 +46,7 @@ class ViewAllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        infraService = InfrastructureService()
+        infraService = InfrastructureService(requireContext())
         infras = mutableListOf()
         filteredList = mutableListOf()
         adapter = InfraFragmentAdapter(infras)

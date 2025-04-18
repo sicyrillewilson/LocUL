@@ -35,7 +35,7 @@ object HomeBatimentUtils {
     }
     
     fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentAdapter, homeFragmentModel: HomeFragmentModel) {
-        batimentService = BatimentService()
+        batimentService = BatimentService(homeFragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.batiments = batiments
         this.adapter = adapter

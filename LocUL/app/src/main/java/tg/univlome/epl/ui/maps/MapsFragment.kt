@@ -106,8 +106,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         destination = MapsUtils.loadDestination(requireContext())
 
         // Initialisation du service Firebase
-        batimentService = BatimentService()
-        infrastructureService = InfrastructureService()
+        batimentService = BatimentService(requireContext())
+        infrastructureService = InfrastructureService(requireContext())
         //salleService = SalleService()
         salleService = SalleService(requireContext())
 

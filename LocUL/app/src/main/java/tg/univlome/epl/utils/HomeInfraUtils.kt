@@ -35,7 +35,7 @@ object HomeInfraUtils {
     }
     
     fun updateInfrastructures(userLocation: GeoPoint, infrastructures: MutableList<Infrastructure>, filteredList: MutableList<Infrastructure>, adapter: InfraAdapter, homeFragmentModel: HomeFragmentModel) {
-        infrastructureService = InfrastructureService()
+        infrastructureService = InfrastructureService(homeFragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.infrastructures = infrastructures
         this.adapter = adapter

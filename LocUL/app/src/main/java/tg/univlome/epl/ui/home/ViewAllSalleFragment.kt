@@ -46,7 +46,7 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        infraService = InfrastructureService()
+        infraService = InfrastructureService(requireContext())
         salles = mutableListOf()
         filteredList = mutableListOf()
         adapter = SalleViewAllAdapter(salles)

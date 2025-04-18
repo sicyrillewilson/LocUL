@@ -88,8 +88,8 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         Configuration.getInstance().userAgentValue = requireActivity().packageName
 
         // Initialisation du service Firebase
-        batimentService = BatimentService()
-        infrastructureService = InfrastructureService()
+        batimentService = BatimentService(requireContext())
+        infrastructureService = InfrastructureService(requireContext())
         //salleService = SalleService()
         salleService = SalleService(requireContext())
 

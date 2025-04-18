@@ -46,7 +46,7 @@ class SudInfraFragment : Fragment(), SearchBarFragment.SearchListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        infraService = InfrastructureService()
+        infraService = InfrastructureService(requireContext())
         infrasSud = mutableListOf()
         filteredList = mutableListOf()
         adapter = InfraFragmentAdapter(infrasSud)

@@ -8,11 +8,14 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.maps.MapsFragment
@@ -43,7 +46,7 @@ object BatimentUtils {
     }
 
     fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentFragmentAdapter, fragmentModel: FragmentModel) {
-        batimentService = BatimentService()
+        batimentService = BatimentService(fragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.batiments = batiments
         this.adapter = adapter
@@ -103,4 +106,22 @@ object BatimentUtils {
             recyclerBatiments?.adapter = adapter
         })
     }
+    
+    fun saveBatiments(context: Context, batiments: MutableList<Batiment>) {
+        val sharedPreferences = context.getSharedPreferences("BatimentsPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(batiments)
+        editor.putString("batiment", json)
+        editor.apply()
+    }
+
+    fun loadBatiments(context: Context): MutableList<Batiment>? {
+        val sharedPreferences = context.getSharedPreferences("BatimentsPrefs", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = sharedPreferences.getString("batiment", null)
+        val type = object : TypeToken<MutableList<Batiment>>() {}.type
+        return gson.fromJson(json, type)
+    }
+
 }

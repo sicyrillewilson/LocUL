@@ -20,43 +20,75 @@ class SalleService(private val context: Context) {
         val batimentMap = mutableMapOf<String, String>()
 
         // 1. Charger les salles depuis SharedPreferences (cache rapide)
-        /*val loadSalles = SalleUtils.loadSalles(context)
+        val loadSalles = SalleUtils.loadSalles(context)
         if (loadSalles != null) {
             sallesLiveData.value = loadSalles!!
-        }*/
+            // 2. Charger les bâtiments depuis Firebase (plus lent)
+            batimentsCollection.get()
+                .addOnSuccessListener { batimentResult ->
+                    for (document in batimentResult) {
+                        val id = document.id
+                        val nom = document.getString("nom") ?: ""
+                        batimentMap[id] = nom
+                    }
 
-        // 2. Charger les bâtiments depuis Firebase (plus lent)
-        batimentsCollection.get()
-            .addOnSuccessListener { batimentResult ->
-                for (document in batimentResult) {
-                    val id = document.id
-                    val nom = document.getString("nom") ?: ""
-                    batimentMap[id] = nom
-                }
+                    // 3. Puis les salles
+                    sallesCollection.get()
+                        .addOnSuccessListener { result ->
+                            val sallesList = mutableListOf<Salle>()
+                            for (document in result) {
+                                sallesList.add(createSalleFromDocument(document, batimentMap))
+                            }
 
-                // 3. Puis les salles
-                sallesCollection.get()
-                    .addOnSuccessListener { result ->
-                        val sallesList = mutableListOf<Salle>()
-                        for (document in result) {
-                            sallesList.add(createSalleFromDocument(document, batimentMap))
+                            // Sauvegarde UNE SEULE FOIS après avoir tout ajouté
+                            SalleUtils.saveSalles(context, sallesList)
+
+                            //sallesLiveData.value = sallesList
+                            //sallesLiveData.postValue(sallesList)
+
+
                         }
-
-                        // Sauvegarde UNE SEULE FOIS après avoir tout ajouté
-                        SalleUtils.saveSalles(context, sallesList)
-
-                        sallesLiveData.value = sallesList
-                        //sallesLiveData.postValue(sallesList)
-
-
+                        .addOnFailureListener { exception ->
+                            Log.e("SalleService", "Erreur lors de la récupération des salles", exception)
+                        }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("SalleService", "Erreur lors de la récupération des bâtiments", exception)
+                }
+        } else {
+            // 2. Charger les bâtiments depuis Firebase (plus lent)
+            batimentsCollection.get()
+                .addOnSuccessListener { batimentResult ->
+                    for (document in batimentResult) {
+                        val id = document.id
+                        val nom = document.getString("nom") ?: ""
+                        batimentMap[id] = nom
                     }
-                    .addOnFailureListener { exception ->
-                        Log.e("SalleService", "Erreur lors de la récupération des salles", exception)
-                    }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("SalleService", "Erreur lors de la récupération des bâtiments", exception)
-            }
+
+                    // 3. Puis les salles
+                    sallesCollection.get()
+                        .addOnSuccessListener { result ->
+                            val sallesList = mutableListOf<Salle>()
+                            for (document in result) {
+                                sallesList.add(createSalleFromDocument(document, batimentMap))
+                            }
+
+                            // Sauvegarde UNE SEULE FOIS après avoir tout ajouté
+                            SalleUtils.saveSalles(context, sallesList)
+
+                            sallesLiveData.value = sallesList
+                            //sallesLiveData.postValue(sallesList)
+
+
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("SalleService", "Erreur lors de la récupération des salles", exception)
+                        }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("SalleService", "Erreur lors de la récupération des bâtiments", exception)
+                }
+        }
 
         return sallesLiveData
     }
