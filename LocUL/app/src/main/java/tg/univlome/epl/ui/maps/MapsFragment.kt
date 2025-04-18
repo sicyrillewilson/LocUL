@@ -214,7 +214,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         activity?.runOnUiThread {
             try {
                 userLocation = GeoPoint(location.latitude, location.longitude)
-                //addMarker(userLocation!!, "Ma position actuelle")
                 addMarkerUserLocation()
 
                 if (userLocation != null && (lastLocation == null || location.distanceTo(lastLocation!!) > 3)) {
@@ -275,7 +274,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                     is tg.univlome.epl.models.Batiment -> R.drawable.batiment_nav_icon
                     is tg.univlome.epl.models.Infrastructure -> R.drawable.infra_nav_icon
                     is Salle -> R.drawable.salle_nav_icon
-                    else -> R.drawable.maps_and_flags
+                    else -> R.drawable.default_marker
                 }
 
                 addMarker(position, lieu.nom, icon, lieu.image)  // Store the marker in the list
@@ -297,7 +296,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 requireActivity().runOnUiThread {
                     if (userLocation != null) {
                         mapView.controller.setCenter(userLocation)
-                        //addMarker(userLocation!!, "Ma position actuelle")
                         addMarkerUserLocation()
 
                         destination = MapsUtils.loadDestination(requireContext())
@@ -332,7 +330,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         getRoute(userLocation, userDestination)
     }
 
-    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.maps_and_flags, imageUrl: String? = null): Marker? {
+    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.default_marker, imageUrl: String? = null): Marker? {
 
         if (!isAdded || mapView == null) {
             Log.w("MapsFragment", "Fragment non attaché ou MapView null, impossible d'ajouter le marqueur")
@@ -558,7 +556,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             markerList.remove(it)
         }
 
-        currentUserMarker = addMarker(userLocation!!, "Ma position actuelle")
+        currentUserMarker = addMarker(userLocation!!, "Ma position actuelle",  R.drawable.maps_and_flags)
     }
 
     private fun updateDestination(destination: GeoPoint) {
@@ -569,7 +567,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 if (marker.position == destination) {
                     find = true
                     preDestinationIcon = marker.icon
-                    marker.icon = MapsUtils.resizeIcon(R.drawable.maps_and_flags, resources)
+                    marker.icon = MapsUtils.resizeIcon(R.drawable.destination, resources)
                     currentDestinationMarker = marker
                     mapView.invalidate()
                     break

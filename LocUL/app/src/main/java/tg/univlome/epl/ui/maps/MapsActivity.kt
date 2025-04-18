@@ -258,7 +258,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                     is tg.univlome.epl.models.Batiment -> R.drawable.batiment_nav_icon
                     is tg.univlome.epl.models.Infrastructure -> R.drawable.infra_nav_icon
                     is Salle -> R.drawable.salle_nav_icon
-                    else -> R.drawable.maps_and_flags
+                    else -> R.drawable.default_marker
                 }
 
                 //addMarker(position, lieu.nom, icon, lieu.image)
@@ -312,7 +312,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         getRoute(userLocation, userDestination)
     }
 
-    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.maps_and_flags, imageUrl: String? = null): Marker? {
+    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.default_marker, imageUrl: String? = null): Marker? {
         if (mapView == null) {
             Log.w("MapsActivity", "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms...")
             Handler(Looper.getMainLooper()).postDelayed({
@@ -369,7 +369,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         return marker
     }
 
-    private fun resizeIcon(icon: Int = R.drawable.maps_and_flags): BitmapDrawable? {
+    private fun resizeIcon(icon: Int = R.drawable.default_marker): BitmapDrawable? {
         val drawable = ResourcesCompat.getDrawable(resources, icon, null)
         val bitmap = Bitmap.createBitmap(
             drawable!!.intrinsicWidth,
@@ -479,7 +479,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
             markerList.remove(it)
         }
 
-        currentUserMarker = addMarker(userLocation, "Ma position actuelle")
+        currentUserMarker = addMarker(userLocation, "Ma position actuelle", R.drawable.maps_and_flags)
     }
 
     private fun updateDestination(destination: GeoPoint) {
@@ -490,7 +490,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 if (marker.position == destination) {
                     find = true
                     preDestinationIcon = marker.icon
-                    marker.icon = MapsUtils.resizeIcon(R.drawable.maps_and_flags, resources)
+                    marker.icon = MapsUtils.resizeIcon(R.drawable.destination, resources)
                     currentDestinationMarker = marker
                     mapView.invalidate()
                     break

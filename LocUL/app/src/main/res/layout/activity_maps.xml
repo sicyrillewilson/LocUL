@@ -70,7 +70,7 @@
             android:background="@android:color/transparent"
             app:layout_constraintBottom_toTopOf="@id/focus_location"
             app:layout_constraintRight_toRightOf="parent"
-            android:src="@drawable/maps_and_flags"/>
+            android:src="@drawable/destination"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/recharger"

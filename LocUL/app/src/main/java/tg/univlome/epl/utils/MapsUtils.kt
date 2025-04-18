@@ -123,7 +123,7 @@ object MapsUtils {
 
     }
 
-    fun resizeIcon(icon: Int = R.drawable.maps_and_flags, resources: Resources): BitmapDrawable? {
+    fun resizeIcon(icon: Int = R.drawable.default_marker, resources: Resources): BitmapDrawable? {
         val drawable = ResourcesCompat.getDrawable(resources, icon, null)
         val bitmap = Bitmap.createBitmap(
             drawable!!.intrinsicWidth,
@@ -178,7 +178,7 @@ object MapsUtils {
             val endMarker = Marker(miniMap).apply {
                 position = end
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = resizeIcon(R.drawable.maps_and_flags, resources)
+                icon = resizeIcon(R.drawable.destination, resources)
             }
 
             miniMap.overlays.clear()

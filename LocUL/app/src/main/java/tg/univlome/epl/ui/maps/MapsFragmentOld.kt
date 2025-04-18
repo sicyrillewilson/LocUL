@@ -283,7 +283,7 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
                 })
         }
 
-        val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
+        val drawable = resources.getDrawable(R.drawable.default_marker, null)
         val bitmap = (drawable as BitmapDrawable).bitmap
 
         // Redimensionner l'image
