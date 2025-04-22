@@ -46,6 +46,8 @@ import android.view.animation.DecelerateInterpolator
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import tg.univlome.epl.MainActivity
+import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.SearchBarFragment
@@ -284,8 +286,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
                 // Déterminer l'image à afficher selon le type de lieu
                 val icon = when (lieu) {
-                    is tg.univlome.epl.models.Batiment -> R.drawable.batiment_nav_icon
-                    is tg.univlome.epl.models.Infrastructure -> R.drawable.infra_nav_icon
+                    is Batiment -> R.drawable.batiment_nav_icon
+                    is Infrastructure -> R.drawable.infra_nav_icon
                     is Salle -> R.drawable.salle_nav_icon
                     else -> R.drawable.default_marker
                 }

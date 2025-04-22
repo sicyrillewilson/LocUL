@@ -43,6 +43,7 @@ import kotlin.math.*
 object MapsUtils {
 
     private val client = OkHttpClient()
+    private val iconCache = mutableMapOf<Int, BitmapDrawable>()
 
     fun calculateDistance(start: GeoPoint, end: GeoPoint): Double {
         val results = FloatArray(1)
@@ -124,19 +125,22 @@ object MapsUtils {
     }
 
     fun resizeIcon(icon: Int = R.drawable.default_marker, resources: Resources): BitmapDrawable? {
-        val drawable = ResourcesCompat.getDrawable(resources, icon, null)
-        val bitmap = Bitmap.createBitmap(
-            drawable!!.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
+        return iconCache[icon] ?: run {
+            val drawable = ResourcesCompat.getDrawable(resources, icon, null) ?: return null
+            val bitmap = Bitmap.createBitmap(
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
 
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 75, 75, false)
-        return BitmapDrawable(resources, scaledBitmap)
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 75, 75, false)
+            val scaledDrawable = BitmapDrawable(resources, scaledBitmap)
+            iconCache[icon] = scaledDrawable
+            scaledDrawable
+        }
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
