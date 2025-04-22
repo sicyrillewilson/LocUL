@@ -35,6 +35,7 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.location.Location
@@ -43,8 +44,12 @@ import android.location.LocationManager
 import android.os.Handler
 import android.os.Looper
 import android.view.animation.DecelerateInterpolator
+import androidx.annotation.RequiresPermission
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.Infrastructure
@@ -58,7 +63,6 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     private val binding get() = _binding!!
 
     private lateinit var mapView: MapView
-    private lateinit var locationOverlay: MyLocationNewOverlay
     private val client = OkHttpClient()
 
     private lateinit var batimentService: BatimentService
@@ -80,6 +84,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     private var isNightMode = false
     private var isOtherMarkersHidden = false
     private val tousLesLieux = mutableListOf<Lieu>()
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -196,7 +201,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             currentPolyline = null
             mapView.controller.setCenter(userLocation ?: GeoPoint(6.1375, 1.2123))
             mapView.invalidate()
-            loadMapData(view)
+            binding.destinationText.text = ""
+            loadLieux()
         }
     }
 
@@ -306,35 +312,73 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     }
 
     private fun initLocationOverlay() {
-        locationOverlay = MyLocationNewOverlay(mapView)
-        locationOverlay.enableMyLocation()
-        locationOverlay.enableFollowLocation() // Pour suivre la position en temps réel
-        mapView.overlays.add(locationOverlay)
+        binding.locationProgressBar.visibility = View.VISIBLE
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
-        locationOverlay.runOnFirstFix {
-            userLocation = locationOverlay.myLocation
-            if (isAdded && isVisible && context != null && activity != null) { // Ajout de vérifs
-                // Vérifie si le fragment est toujours attaché de manière sûre
-                activity?.runOnUiThread {
-                    context?.let { ctx ->
-                        if (userLocation != null) {
-                            mapView.controller.setCenter(userLocation)
-                            addMarkerUserLocation()
+        // Vérification de la permission
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
 
-                            destination = MapsUtils.loadDestination(ctx)
-                            // Définition de la destination
-                            if (destination != null && destination != GeoPoint(0.0, 0.0)) {
-                                updateRoute(userLocation!!, destination!!)
-                            }
+            // Essai rapide via FusedLocationProviderClient
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    if (location != null) {
+                        val userGeoPoint = GeoPoint(location.latitude, location.longitude)
+                        userLocation = userGeoPoint
 
-                        } else {
-                            Toast.makeText(ctx, "Localisation non trouvée !", Toast.LENGTH_LONG).show()
+                        mapView.controller.setCenter(userLocation)
+                        addMarkerUserLocation()
+
+                        destination = MapsUtils.loadDestination(requireContext())
+                        if (destination != null && destination != GeoPoint(0.0, 0.0)) {
+                            updateRoute(userLocation!!, destination!!)
                         }
+
+                        binding.locationProgressBar.visibility = View.GONE
+
+                    } else {
+                        // Fallback GPS si lastLocation est null
+                        startGPSLocation()
                     }
                 }
-            }
+                .addOnFailureListener { e ->
+                    Toast.makeText(requireContext(), "Erreur de localisation : ${e.message}", Toast.LENGTH_LONG).show()
+                    binding.locationProgressBar.visibility = View.GONE
+                }
+
+        } else {
+            // Demande de permission si elle n'est pas accordée
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
         }
-        mapView.overlays.add(locationOverlay)
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun startGPSLocation() {
+        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val provider = LocationManager.GPS_PROVIDER
+
+        locationManager.requestSingleUpdate(provider, object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                val userGeoPoint = GeoPoint(location.latitude, location.longitude)
+                userLocation = userGeoPoint
+
+                mapView.controller.setCenter(userLocation)
+                addMarkerUserLocation()
+
+                destination = MapsUtils.loadDestination(requireContext())
+                if (destination != null && destination != GeoPoint(0.0, 0.0)) {
+                    updateRoute(userLocation!!, destination!!)
+                }
+
+                binding.locationProgressBar.visibility = View.GONE
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+
+            override fun onProviderEnabled(provider: String) {}
+            override fun onProviderDisabled(provider: String) {}
+        }, null)
     }
 
     private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint ) {
