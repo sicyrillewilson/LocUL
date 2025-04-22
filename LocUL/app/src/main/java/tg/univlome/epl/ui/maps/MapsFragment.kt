@@ -105,7 +105,13 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         Configuration.getInstance().load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
         Configuration.getInstance().userAgentValue = requireActivity().packageName
 
-        destination = MapsUtils.loadDestination(requireContext())
+        if (isAdded && isVisible && context != null && activity != null) { // Ajout de vérifs
+            activity?.runOnUiThread {
+                context?.let { ctx ->
+                    destination = MapsUtils.loadDestination(requireContext())
+                }
+            }
+        }
 
         // Initialisation du service Firebase
         batimentService = BatimentService(requireContext())
@@ -307,20 +313,23 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
         locationOverlay.runOnFirstFix {
             userLocation = locationOverlay.myLocation
-            if (isAdded) {
-                requireActivity().runOnUiThread {
-                    if (userLocation != null) {
-                        mapView.controller.setCenter(userLocation)
-                        addMarkerUserLocation()
+            if (isAdded && isVisible && context != null && activity != null) { // Ajout de vérifs
+                // Vérifie si le fragment est toujours attaché de manière sûre
+                activity?.runOnUiThread {
+                    context?.let { ctx ->
+                        if (userLocation != null) {
+                            mapView.controller.setCenter(userLocation)
+                            addMarkerUserLocation()
 
-                        destination = MapsUtils.loadDestination(requireContext())
-                        // Définition de la destination
-                        if (!(destination == null || destination == GeoPoint(0.0, 0.0))) {
-                            updateRoute(userLocation!!, destination!!)
+                            destination = MapsUtils.loadDestination(ctx)
+                            // Définition de la destination
+                            if (destination != null && destination != GeoPoint(0.0, 0.0)) {
+                                updateRoute(userLocation!!, destination!!)
+                            }
+
+                        } else {
+                            Toast.makeText(ctx, "Localisation non trouvée !", Toast.LENGTH_LONG).show()
                         }
-
-                    } else {
-                        Toast.makeText(requireContext(), "Localisation non trouvée !", Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -518,14 +527,16 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                                     geoPoints.add(GeoPoint(lat, lon))
                                 }
 
-                                requireActivity().runOnUiThread {
-                                    currentPolyline = Polyline()
-                                    currentPolyline!!.setPoints(geoPoints)
-                                    currentPolyline!!.outlinePaint.color = resources.getColor(R.color.mainColor, null)
-                                    currentPolyline!!.outlinePaint.strokeWidth = 5f
+                                if (isAdded) {
+                                    requireActivity().runOnUiThread {
+                                        currentPolyline = Polyline()
+                                        currentPolyline!!.setPoints(geoPoints)
+                                        currentPolyline!!.outlinePaint.color = resources.getColor(R.color.mainColor, null)
+                                        currentPolyline!!.outlinePaint.strokeWidth = 5f
 
-                                    mapView.overlays.add(currentPolyline)
-                                    mapView.invalidate()
+                                        mapView.overlays.add(currentPolyline)
+                                        mapView.invalidate()
+                                    }
                                 }
                             }
                         } catch (e: JSONException) {
