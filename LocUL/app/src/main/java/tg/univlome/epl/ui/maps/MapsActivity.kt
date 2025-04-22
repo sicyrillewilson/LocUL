@@ -421,22 +421,6 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         return marker
     }
 
-    private fun resizeIcon(icon: Int = R.drawable.default_marker): BitmapDrawable? {
-        val drawable = ResourcesCompat.getDrawable(resources, icon, null)
-        val bitmap = Bitmap.createBitmap(
-            drawable!!.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 75, 75, false)
-        return BitmapDrawable(resources, scaledBitmap)
-    }
-
     private fun removeAllMarkers() {
         for (marker in markerList) {
             mapView.overlays.remove(marker)
