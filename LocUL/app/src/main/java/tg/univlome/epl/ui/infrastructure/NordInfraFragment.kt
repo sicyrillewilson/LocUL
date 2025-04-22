@@ -46,7 +46,7 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        infraService = InfrastructureService()
+        infraService = InfrastructureService(requireContext())
         infrasNord = mutableListOf()
         filteredList = mutableListOf()
         adapter = InfraFragmentAdapter(infrasNord)

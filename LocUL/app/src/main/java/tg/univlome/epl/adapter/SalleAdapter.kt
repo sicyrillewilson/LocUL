@@ -17,8 +17,6 @@ import tg.univlome.epl.R
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.home.SalleActivity
 
-//data class Salle(val nom: String, val distance: String, val icon: Int)
-
 class SalleAdapter(
     private var salles: List<Salle>,
     private val fragmentManager: FragmentManager,
@@ -88,7 +86,7 @@ class SalleAdapter(
     class SalleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img: ImageView = view.findViewById(R.id.imgSalle)
         val nom: TextView = view.findViewById(R.id.txtNomSalle)
-        val situation = view.findViewById<TextView>(R.id.situationSalle)
+        val situation = view.findViewById<TextView>(R.id.batimentSalle)
         val distance: TextView = view.findViewById(R.id.txtDistanceSalle)
     }
 

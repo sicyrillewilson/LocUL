@@ -52,7 +52,7 @@
 
         <!-- Ligne de séparation -->
         <View
-            android:layout_width="130dp"
+            android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_gravity="center"
             android:layout_marginEnd="5dp"

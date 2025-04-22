@@ -127,12 +127,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/miniMapLayout"
                 android:layout_width="match_parent"
                 android:layout_height="210dp"
                 android:layout_marginTop="25dp"
                 android:layout_marginHorizontal="6dp"
                 android:padding="1dp"
-                android:background="@drawable/mini_map_bg">
+                android:background="@drawable/mini_map_bg"
+                android:visibility="gone">
 
                     <!-- res/layout/minimap_layout.xml -->
                     <org.osmdroid.views.MapView

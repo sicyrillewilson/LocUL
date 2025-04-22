@@ -46,7 +46,7 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        batimentService = BatimentService()
+        batimentService = BatimentService(requireContext())
         batiments = mutableListOf()
         filteredList = mutableListOf()
         adapter = BatimentFragmentAdapter(batiments)

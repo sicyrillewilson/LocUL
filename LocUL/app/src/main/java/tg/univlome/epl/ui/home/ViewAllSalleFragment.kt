@@ -1,22 +1,42 @@
+@file:Suppress("DEPRECATION")
+
 package tg.univlome.epl.ui.home
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
+import tg.univlome.epl.adapter.InfraFragmentAdapter
 import tg.univlome.epl.adapter.SalleViewAllAdapter
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.models.modelsfragments.FragmentModel
+import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
+import tg.univlome.epl.utils.HomeSalleUtils
+import tg.univlome.epl.utils.InfraUtils
+import tg.univlome.epl.utils.SalleUtils
 
 class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
 
-    private lateinit var salles: List<Salle>
+    private lateinit var salles: MutableList<Salle>
     private lateinit var filteredList: MutableList<Salle>
     private lateinit var adapter: SalleViewAllAdapter
+
+    private lateinit var infraService: InfrastructureService
+
+    private lateinit var fragmentModel: FragmentModel
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,24 +44,33 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_view_all_salle, container, false)
 
-        val recyclerSalle = view.findViewById<RecyclerView>(R.id.recyclerAllSalle)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        /*salles = listOf(
-            Salle("Salle A", "500m", R.drawable.img),
-            Salle("Salle B", "300m", R.drawable.img),
-            Salle("Salle B", "300m", R.drawable.img),
-            Salle("Salle B", "300m", R.drawable.img),
-            Salle("Salle B", "300m", R.drawable.img),
-            Salle("Salle B", "300m", R.drawable.img),
-        )
-        filteredList = salles.toMutableList()
-
+        infraService = InfrastructureService(requireContext())
+        salles = mutableListOf()
+        filteredList = mutableListOf()
         adapter = SalleViewAllAdapter(salles)
-        recyclerSalle.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerSalle.adapter = adapter*/
+
+        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllSalle)
+        getUserLocation()
 
         return view
+    }
+
+    private fun getUserLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            location?.let {
+                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
+                SalleUtils.updateSalles(userGeoPoint, salles, filteredList, adapter, fragmentModel)
+            }
+        }
     }
 
     override fun onResume() {

@@ -1,16 +1,20 @@
 package tg.univlome.epl.utils
 
+import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.adapter.InfraFragmentAdapter
 import tg.univlome.epl.models.Infrastructure
+import tg.univlome.epl.models.Salle
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.maps.MapsFragment
@@ -36,7 +40,7 @@ object InfraUtils {
     }
     
     fun updateInfrastructures(userLocation: GeoPoint, infrastructures: MutableList<Infrastructure>, filteredList: MutableList<Infrastructure>, adapter: InfraFragmentAdapter, fragmentModel: FragmentModel) {
-        infraService = InfrastructureService()
+        infraService = InfrastructureService(fragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.infras = infrastructures
         this.adapter = adapter
@@ -91,5 +95,22 @@ object InfraUtils {
                 LinearLayoutManager(fragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
             recyclerBatiments?.adapter = adapter
         })
+    }
+
+    fun saveInfras(context: Context, infras: MutableList<Infrastructure>) {
+        val sharedPreferences = context.getSharedPreferences("InfrasPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(infras)
+        editor.putString("infrastructure", json)
+        editor.apply()
+    }
+
+    fun loadInfras(context: Context): MutableList<Infrastructure>? {
+        val sharedPreferences = context.getSharedPreferences("InfrasPrefs", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = sharedPreferences.getString("infrastructure", null)
+        val type = object : TypeToken<MutableList<Infrastructure>>() {}.type
+        return gson.fromJson(json, type)
     }
 }

@@ -88,9 +88,10 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         Configuration.getInstance().userAgentValue = requireActivity().packageName
 
         // Initialisation du service Firebase
-        batimentService = BatimentService()
-        infrastructureService = InfrastructureService()
-        salleService = SalleService()
+        batimentService = BatimentService(requireContext())
+        infrastructureService = InfrastructureService(requireContext())
+        //salleService = SalleService()
+        salleService = SalleService(requireContext())
 
         mapView = binding.mapView
         mapView.setTileSource(TileSourceFactory.MAPNIK)
@@ -282,7 +283,7 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
                 })
         }
 
-        val drawable = resources.getDrawable(R.drawable.maps_and_flags, null)
+        val drawable = resources.getDrawable(R.drawable.default_marker, null)
         val bitmap = (drawable as BitmapDrawable).bitmap
 
         // Redimensionner l'image

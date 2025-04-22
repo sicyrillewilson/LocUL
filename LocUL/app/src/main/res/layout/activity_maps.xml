@@ -18,6 +18,18 @@
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />
 
+        <ProgressBar
+            android:id="@+id/locationProgressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
         <LinearLayout
             android:id="@+id/btnRetour"
             android:layout_width="42dp"
@@ -70,7 +82,7 @@
             android:background="@android:color/transparent"
             app:layout_constraintBottom_toTopOf="@id/focus_location"
             app:layout_constraintRight_toRightOf="parent"
-            android:src="@drawable/maps_and_flags"/>
+            android:src="@drawable/destination"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/recharger"

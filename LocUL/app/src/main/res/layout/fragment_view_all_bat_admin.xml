@@ -12,7 +12,7 @@ tools:context=".ui.home.ViewAllBatAdminFragment">
 
 <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/recyclerAllBatimentsAdmin"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:overScrollMode="never"

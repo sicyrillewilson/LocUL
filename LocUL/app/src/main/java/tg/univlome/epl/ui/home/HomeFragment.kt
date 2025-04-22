@@ -52,6 +52,8 @@ class HomeFragment : Fragment() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private var rootView: View? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,7 +63,12 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        rootView = inflater.inflate(R.layout.fragment_home, container, false)
+        loadData(rootView!!)
+        return rootView
+    }
+
+    fun loadData(view: View) {
 
         val fragmentManager = requireActivity().supportFragmentManager
 
@@ -80,53 +87,6 @@ class HomeFragment : Fragment() {
         infrasAdapter = InfraAdapter(infras, fragmentManager, ViewAllInfraFragment())
 
         salles = mutableListOf()
-        val salles = listOf(
-            Salle(
-                id = "1",
-                infrastructureId = "infra_1",
-                nom = "Salle Polyvalente",
-                description = "Grande salle adaptée aux conférences et réunions.",
-                capacite = "200",
-                longitude = "1.2178",
-                latitude = "6.1345",
-                image = "salle_polyvalente.jpg",
-                situation = "Bâtiment A, 1er étage",
-                type = "Polyvalente",
-                images = listOf("salle1.jpg", "salle1_2.jpg"),
-                distance = "150m",
-                icon = R.drawable.img
-            ),
-            Salle(
-                id = "2",
-                infrastructureId = "infra_2",
-                nom = "Salle Informatique",
-                description = "Salle équipée pour les travaux pratiques en informatique.",
-                capacite = "40",
-                longitude = "1.2190",
-                latitude = "6.1360",
-                image = "salle_info.jpg",
-                situation = "Bâtiment B, RDC",
-                type = "Informatique",
-                images = listOf("salle2.jpg", "salle2_2.jpg"),
-                distance = "250m",
-                icon = R.drawable.img
-            ),
-            Salle(
-                id = "3",
-                infrastructureId = "infra_3",
-                nom = "Salle de Réunion",
-                description = "Petite salle pour les réunions administratives.",
-                capacite = "15",
-                longitude = "1.2201",
-                latitude = "6.1377",
-                image = "salle_reunion.jpg",
-                situation = "Bâtiment C, 2e étage",
-                type = "Réunion",
-                images = listOf("salle3.jpg"),
-                distance = "90m",
-                icon = R.drawable.img
-            )
-        )
 
         sallesFilteredList = mutableListOf()
         sallesAdapter = SalleAdapter(salles, fragmentManager, ViewAllSalleFragment())
@@ -137,7 +97,10 @@ class HomeFragment : Fragment() {
         infrasHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerInfra, fragmentManager, ViewAllInfraFragment())
 
         getUserLocation()
-        return view
+    }
+
+    fun rechargerDonnees() {
+        rootView?.let { loadData(it) }
     }
 
     private fun getUserLocation() {

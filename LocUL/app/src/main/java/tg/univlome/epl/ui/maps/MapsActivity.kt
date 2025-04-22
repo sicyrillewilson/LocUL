@@ -37,6 +37,7 @@ import tg.univlome.epl.models.Salle
 import tg.univlome.epl.utils.MapsUtils
 import java.io.IOException
 import android.Manifest
+import android.content.Context
 import androidx.core.app.ActivityCompat
 import okhttp3.*
 import org.osmdroid.config.Configuration
@@ -48,6 +49,11 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
 import android.location.LocationListener
+import android.view.View
+import androidx.annotation.RequiresPermission
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 class MapsActivity : AppCompatActivity(), LocationListener {
 
@@ -75,6 +81,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
     private var preDestinationIcon: Drawable? = null
     private var isNightMode = false
     private var isOtherMarkersHidden = true
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,9 +101,10 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         destination = MapsUtils.loadDestination(this)
 
         // Initialisation du service Firebase
-        batimentService = BatimentService()
-        infrastructureService = InfrastructureService()
-        salleService = SalleService()
+        batimentService = BatimentService(this)
+        infrastructureService = InfrastructureService(this)
+        //salleService = SalleService()
+        salleService = SalleService(this)
 
         //mapView = binding.mapView
         mapView.setTileSource(TileSourceFactory.MAPNIK)
@@ -174,22 +182,13 @@ class MapsActivity : AppCompatActivity(), LocationListener {
             currentPolyline = null
             mapView.controller.setCenter(userLocation ?: GeoPoint(6.1375, 1.2123))
             mapView.invalidate()
-            loadMapData()
+            loadLieux()
         }
 
         binding.btnRetour.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        intent.extras?.let {
-            val lat = it.getDouble("latitude", 0.0)
-            val lon = it.getDouble("longitude", 0.0)
-            if (lat != 0.0 && lon != 0.0) {
-                destination = GeoPoint(lat, lon)
-                MapsUtils.saveDestination(this, destination!!)
-                Log.e("MapsActivity", "Destination changée: $destination")
-            }
-        }
     }
 
     @SuppressLint("MissingPermission")
@@ -266,7 +265,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                     is tg.univlome.epl.models.Batiment -> R.drawable.batiment_nav_icon
                     is tg.univlome.epl.models.Infrastructure -> R.drawable.infra_nav_icon
                     is Salle -> R.drawable.salle_nav_icon
-                    else -> R.drawable.maps_and_flags
+                    else -> R.drawable.default_marker
                 }
 
                 //addMarker(position, lieu.nom, icon, lieu.image)
@@ -282,28 +281,73 @@ class MapsActivity : AppCompatActivity(), LocationListener {
     }
 
     private fun initLocationOverlay() {
-        locationOverlay = MyLocationNewOverlay(mapView)
-        locationOverlay.enableMyLocation()
-        locationOverlay.enableFollowLocation()
-        mapView.overlays.add(locationOverlay)
+        binding.locationProgressBar.visibility = View.VISIBLE
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        locationOverlay.runOnFirstFix {
-            userLocation = locationOverlay.myLocation
-            runOnUiThread {
-                if (userLocation != null) {
-                    mapView.controller.setCenter(userLocation)
-                    addMarkerUserLocation()
+        // Vérification de la permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
 
-                    destination = MapsUtils.loadDestination(this)
-                    if (!(destination == null || destination == GeoPoint(0.0, 0.0))) {
-                        updateRoute(userLocation!!, destination!!)
+            // Essai rapide via FusedLocationProviderClient
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    if (location != null) {
+                        val userGeoPoint = GeoPoint(location.latitude, location.longitude)
+                        userLocation = userGeoPoint
+
+                        mapView.controller.setCenter(userLocation)
+                        addMarkerUserLocation()
+
+                        destination = MapsUtils.loadDestination(this)
+                        if (destination != null && destination != GeoPoint(0.0, 0.0)) {
+                            updateRoute(userLocation!!, destination!!)
+                        }
+
+                        binding.locationProgressBar.visibility = View.GONE
+
+                    } else {
+                        // Fallback GPS si lastLocation est null
+                        startGPSLocation()
                     }
-                } else {
-                    Toast.makeText(this, "Localisation non trouvée !", Toast.LENGTH_LONG).show()
                 }
-            }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Erreur de localisation : ${e.message}", Toast.LENGTH_LONG).show()
+                    binding.locationProgressBar.visibility = View.GONE
+                }
+
+        } else {
+            // Demande de permission si elle n'est pas accordée
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
         }
-        mapView.overlays.add(locationOverlay)
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun startGPSLocation() {
+        val locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val provider = LocationManager.GPS_PROVIDER
+
+        locationManager.requestSingleUpdate(provider, object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                val userGeoPoint = GeoPoint(location.latitude, location.longitude)
+                userLocation = userGeoPoint
+
+                mapView.controller.setCenter(userLocation)
+                addMarkerUserLocation()
+
+                destination = MapsUtils.loadDestination(this@MapsActivity)
+                if (destination != null && destination != GeoPoint(0.0, 0.0)) {
+                    updateRoute(userLocation!!, destination!!)
+                }
+
+                binding.locationProgressBar.visibility = View.GONE
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+
+            override fun onProviderEnabled(provider: String) {}
+            override fun onProviderDisabled(provider: String) {}
+        }, null)
     }
 
     private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint) {
@@ -320,7 +364,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         getRoute(userLocation, userDestination)
     }
 
-    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.maps_and_flags, imageUrl: String? = null): Marker? {
+    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.default_marker, imageUrl: String? = null): Marker? {
         if (mapView == null) {
             Log.w("MapsActivity", "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms...")
             Handler(Looper.getMainLooper()).postDelayed({
@@ -367,7 +411,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 })
         }
 
-        val resizedDrawable = resizeIcon(icon)
+        val resizedDrawable = MapsUtils.resizeIcon(icon, resources)
         marker.icon = resizedDrawable
 
         mapView.overlays.add(marker)
@@ -375,22 +419,6 @@ class MapsActivity : AppCompatActivity(), LocationListener {
 
         markerList.add(marker)
         return marker
-    }
-
-    private fun resizeIcon(icon: Int = R.drawable.maps_and_flags): BitmapDrawable? {
-        val drawable = ResourcesCompat.getDrawable(resources, icon, null)
-        val bitmap = Bitmap.createBitmap(
-            drawable!!.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 75, 75, false)
-        return BitmapDrawable(resources, scaledBitmap)
     }
 
     private fun removeAllMarkers() {
@@ -487,7 +515,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
             markerList.remove(it)
         }
 
-        currentUserMarker = addMarker(userLocation, "Ma position actuelle")
+        currentUserMarker = addMarker(userLocation, "Ma position actuelle", R.drawable.maps_and_flags)
     }
 
     private fun updateDestination(destination: GeoPoint) {
@@ -498,7 +526,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 if (marker.position == destination) {
                     find = true
                     preDestinationIcon = marker.icon
-                    marker.icon = resizeIcon(R.drawable.maps_and_flags)
+                    marker.icon = MapsUtils.resizeIcon(R.drawable.destination, resources)
                     currentDestinationMarker = marker
                     mapView.invalidate()
                     break

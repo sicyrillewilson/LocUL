@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -39,8 +40,10 @@ import java.util.Locale
 import android.os.Handler
 import android.os.Looper
 import android.view.animation.DecelerateInterpolator
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.LocaleListCompat
 import tg.univlome.epl.models.NavItem
+import android.Manifest
 
 class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     lateinit var ui: ActivityMainBinding
@@ -54,6 +57,15 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
     private var currentSubFragment: Fragment? = null // Pour suivre quel fragment est affiché
     private var navItems = listOf<NavItem>()
+    private val locationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission accordée, on recharge les données si HomeFragment est actif
+                (currentFragment as? HomeFragment)?.rechargerDonnees()
+            } else {
+                Toast.makeText(this, "Permission localisation refusée", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,6 +150,15 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         }, true) // "true" permet de surveiller même les fragments imbriqués
 
         chargerItems()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            locationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            // Si déjà accordée, on recharge immédiatement les données du HomeFragment
+            (currentFragment as? HomeFragment)?.rechargerDonnees()
+        }
     }
 
     private fun chargerItems() {
@@ -186,7 +207,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         defaultItem.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
         defaultItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
 
-        //animateItemSelection(defaultItem)
+        animateItemSelection(defaultItem)
 
         // Charge le fragment par défaut
         loadFragment(defaultItem.fragment)
@@ -214,25 +235,27 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
                     R.color.gray
                 )
             ) // Couleur inactive
-            collapseItem(otherItem.layout)
-            if (otherItem.textView.text == this.getString(R.string.infrastructures)) {
+            //collapseItem(otherItem.layout)
+            /*if (otherItem.textView.text == this.getString(R.string.infrastructures)) {
                 item.textView.minWidth = 0
-            }
+            }*/
         }
 
         // Animer l'expansion de l'élément sélectionné
-        expandItem(item)
+        //expandItem(item)
 
         // Appliquer les changements visuels
-        item.layout.setBackgroundResource(R.drawable.nav_item_bg)
+        /*item.layout.setBackgroundResource(R.drawable.nav_item_bg)
         item.textView.alpha = 0f
         item.textView.visibility = View.VISIBLE
         item.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
         item.textView.animate().alpha(1f).setDuration(350).start()
-        item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
+        item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))*/
+
+        //loadMapsFragment()
 
         // Animer l'élément sélectionné
-        //animateItemSelection(item)
+        animateItemSelection(item)
 
         // Mettre à jour l'item sélectionné
         selectedItem = item

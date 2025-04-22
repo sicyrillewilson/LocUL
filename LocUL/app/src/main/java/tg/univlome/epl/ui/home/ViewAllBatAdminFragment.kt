@@ -42,7 +42,7 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        batimentService = BatimentService()
+        batimentService = BatimentService(requireContext())
         batimentsAdmin = mutableListOf()
         filteredList = mutableListOf()
         adapter = BatimentFragmentAdapter(batimentsAdmin)
