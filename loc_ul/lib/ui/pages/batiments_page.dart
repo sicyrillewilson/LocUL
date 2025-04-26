@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/batiment_vm.dart';
 import '../../data/models/batiment.dart';
+import 'dart:io';
 
 class BatimentsPage extends StatefulWidget {
   const BatimentsPage({super.key});
@@ -49,12 +50,17 @@ class _BatimentTile extends StatelessWidget {
       leading:
           b.image.isEmpty
               ? const Icon(Icons.apartment)
-              : Image.network(b.image, width: 56, fit: BoxFit.cover),
+              : File(b.image).existsSync()
+              ? Image.file(File(b.image), width: 56, fit: BoxFit.cover)
+              : const Icon(Icons.broken_image),
       title: Text(b.nom),
       subtitle: Text(b.situation),
       onTap: () {
         // navigation vers une page détail si besoin
-        print('Tap sur ${b}');
+        print('Tap sur $b');
+        print(
+          'Chemin image: ${b.image}  Existe: ${File(b.image).existsSync()}',
+        );
       },
     );
   }
