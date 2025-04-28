@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'ui/main_scaffold.dart';
 import 'data/repositories/batiment_repo.dart';
 import 'viewmodels/batiment_vm.dart';
+import 'data/repositories/infrastructure_repo.dart';
+import 'viewmodels/infrastructure_vm.dart';
 
 /// ---------- 1. point d’entrée ----------
 void main() {
@@ -48,6 +50,11 @@ class LocUL extends StatelessWidget {
         Provider(create: (_) => BatimentRepo()),
         ChangeNotifierProvider(
           create: (c) => BatimentVM(c.read<BatimentRepo>()),
+        ),
+
+        Provider(create: (_) => InfrastructureRepo()),
+        ChangeNotifierProvider(
+          create: (c) => InfrastructureVM(c.read<InfrastructureRepo>()),
         ),
         // Ajoute ici d’autres Repos / VMs (Infrastructures, Salles)
       ],
