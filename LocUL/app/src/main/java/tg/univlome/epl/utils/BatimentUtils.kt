@@ -45,7 +45,7 @@ object BatimentUtils {
         (activity as? MainActivity)?.loadMapsFragment()
     }
 
-    fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentFragmentAdapter, fragmentModel: FragmentModel) {
+    fun updateBatiments(userLocation: GeoPoint, batiments: MutableList<Batiment>, filteredList: MutableList<Batiment>, adapter: BatimentFragmentAdapter, fragmentModel: FragmentModel, onDataLoaded: () -> Unit = {}) {
         batimentService = BatimentService(fragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.batiments = batiments
@@ -105,6 +105,7 @@ object BatimentUtils {
                 LinearLayoutManager(fragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
             recyclerBatiments?.adapter = adapter
         })
+        onDataLoaded()
     }
     
     fun saveBatiments(context: Context, batiments: MutableList<Batiment>) {

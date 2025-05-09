@@ -100,28 +100,28 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/route_icon"
+                    android:layout_marginEnd="15dp"
                     android:contentDescription="Icône bâtiment"
-                    android:layout_marginEnd="15dp"/>
+                    android:src="@drawable/route_icon" />
 
                 <TextView
                     android:id="@+id/txtDistance"
                     android:layout_width="wrap_content"
-                    android:fontFamily="@font/gotham_book"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginEnd="20dp"
+                    android:fontFamily="@font/gotham_book"
                     android:text="200m"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/situationSalle"
                     android:layout_width="wrap_content"
-                    android:fontFamily="@font/gotham_bold"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:fontFamily="@font/gotham_bold"
                     android:text="Campus Nord"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -130,7 +130,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="210dp"
                 android:layout_marginTop="25dp"
-                android:layout_marginHorizontal="6dp"
                 android:background="@drawable/mini_map_bg">
 
                 <androidx.viewpager2.widget.ViewPager2

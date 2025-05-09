@@ -34,7 +34,7 @@ object HomeInfraUtils {
             .commit()
     }
     
-    fun updateInfrastructures(userLocation: GeoPoint, infrastructures: MutableList<Infrastructure>, filteredList: MutableList<Infrastructure>, adapter: InfraAdapter, homeFragmentModel: HomeFragmentModel) {
+    fun updateInfrastructures(userLocation: GeoPoint, infrastructures: MutableList<Infrastructure>, filteredList: MutableList<Infrastructure>, adapter: InfraAdapter, homeFragmentModel: HomeFragmentModel, onDataLoaded: () -> Unit = {}) {
         infrastructureService = InfrastructureService(homeFragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.infrastructures = infrastructures
@@ -76,5 +76,6 @@ object HomeInfraUtils {
                 LinearLayoutManager(homeFragmentModel.fragmentContext, LinearLayoutManager.HORIZONTAL, false)
             recyclerBatiments?.adapter = adapter
         })
+        onDataLoaded()
     }
 }

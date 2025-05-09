@@ -9,6 +9,10 @@
     android:paddingHorizontal="16dp"
     tools:context=".ui.batiment.AllBatimentFragment">
 
+    <include
+        android:id="@+id/shimmerAllBatiments"
+        layout="@layout/shimmer_all_bat_container" />
+
     <!-- Liste horizontale des bâtiments -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAllBatiments"
@@ -16,6 +20,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:overScrollMode="never"
+        android:visibility="gone"
         tools:listitem="@layout/item_all_batiment" />
 
 </LinearLayout>

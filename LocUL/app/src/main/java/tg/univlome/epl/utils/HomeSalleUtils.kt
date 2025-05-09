@@ -34,7 +34,7 @@ object HomeSalleUtils {
             .commit()
     }
     
-    fun updateSalles(userLocation: GeoPoint, salles: MutableList<Salle>, filteredList: MutableList<Salle>, adapter: SalleAdapter, homeFragmentModel: HomeFragmentModel) {
+    fun updateSalles(userLocation: GeoPoint, salles: MutableList<Salle>, filteredList: MutableList<Salle>, adapter: SalleAdapter, homeFragmentModel: HomeFragmentModel, onDataLoaded: () -> Unit = {}) {
         //salleService = SalleService()
         salleService = SalleService(homeFragmentModel.fragmentContext)
         this.filteredList = filteredList
@@ -77,5 +77,6 @@ object HomeSalleUtils {
                 LinearLayoutManager(homeFragmentModel.fragmentContext, LinearLayoutManager.HORIZONTAL, false)
             recyclerBatiments?.adapter = adapter
         })
+        onDataLoaded()
     }
 }

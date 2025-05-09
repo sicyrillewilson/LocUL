@@ -9,11 +9,16 @@
     android:paddingHorizontal="16dp"
     tools:context=".ui.infrastructure.AllInfraFragment">
 
+    <include
+        android:id="@+id/shimmerAllInfra"
+        layout="@layout/shimmer_all_bat_container" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAllInfra"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:visibility="gone"
         android:overScrollMode="never"
         tools:listitem="@layout/item_all_infra" />
 

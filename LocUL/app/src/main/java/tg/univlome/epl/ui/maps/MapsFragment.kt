@@ -55,10 +55,11 @@ import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.LogoFragment
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.MapsUtils
 
-class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationListener  {
+class MapsFragment : Fragment(), LogoFragment.LogoListener , LocationListener  {
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
 
@@ -635,7 +636,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-        (activity as MainActivity).showSearchBarFragment(this)
+//        (activity as MainActivity).showSearchBarFragment(this)
     }
 
     override fun onPause() {
@@ -668,9 +669,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         _binding = null
     }
 
-    override fun onSearch(query: String) {
-        filtrerLieux(query)
-    }
+//    override fun onSearch(query: String) {
+//        filtrerLieux(query)
+//    }
 
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

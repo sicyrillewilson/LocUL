@@ -22,6 +22,10 @@ class SearchBarFragment : Fragment() {
         searchListener = listener
     }
 
+    fun getSearchListener(): SearchBarFragment.SearchListener? {
+        return this.searchListener
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

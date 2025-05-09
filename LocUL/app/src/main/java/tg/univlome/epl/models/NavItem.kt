@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 
 data class NavItem(
     val layout: LinearLayout,
+    val minLayout: LinearLayout,
     val textView: TextView,
     val icon: ImageView,
     val fragment: Fragment

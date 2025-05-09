@@ -39,7 +39,7 @@ object InfraUtils {
             .commit()
     }
     
-    fun updateInfrastructures(userLocation: GeoPoint, infrastructures: MutableList<Infrastructure>, filteredList: MutableList<Infrastructure>, adapter: InfraFragmentAdapter, fragmentModel: FragmentModel) {
+    fun updateInfrastructures(userLocation: GeoPoint, infrastructures: MutableList<Infrastructure>, filteredList: MutableList<Infrastructure>, adapter: InfraFragmentAdapter, fragmentModel: FragmentModel, onDataLoaded: () -> Unit = {}) {
         infraService = InfrastructureService(fragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.infras = infrastructures
@@ -95,6 +95,7 @@ object InfraUtils {
                 LinearLayoutManager(fragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
             recyclerBatiments?.adapter = adapter
         })
+        onDataLoaded()
     }
 
     fun saveInfras(context: Context, infras: MutableList<Infrastructure>) {

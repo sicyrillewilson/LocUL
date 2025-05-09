@@ -9,12 +9,17 @@
     android:paddingHorizontal="16dp"
     tools:context=".ui.infrastructure.NordInfraFragment">
 
+    <include
+        android:id="@+id/shimmerNordInfra"
+        layout="@layout/shimmer_all_bat_container" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerNordInfra"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:overScrollMode="never"
+        android:visibility="gone"
         tools:listitem="@layout/item_all_infra" />
 
 </LinearLayout>

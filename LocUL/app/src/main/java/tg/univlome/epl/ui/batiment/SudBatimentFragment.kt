@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
@@ -27,12 +29,11 @@ class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
     private lateinit var batiments: MutableList<Batiment>
     private lateinit var filteredList: MutableList<Batiment>
     private lateinit var adapter: BatimentFragmentAdapter
-
     private lateinit var batimentService: BatimentService
-
     private lateinit var fragmentModel: FragmentModel
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var shimmerSudBatiments: ShimmerFrameLayout
+    private lateinit var recyclerSudBatiments: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +44,10 @@ class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_sud_batiment, container, false)
+
+        shimmerSudBatiments = view.findViewById(R.id.shimmerSudBatiments)
+        recyclerSudBatiments = view.findViewById(R.id.recyclerSudBatiments)
+        shimmerSudBatiments.startShimmer()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -67,7 +72,15 @@ class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, fragmentModel)
+                val onDataLoadedCallback = {
+                    shimmerSudBatiments.stopShimmer()
+                    shimmerSudBatiments.visibility = View.GONE
+                    recyclerSudBatiments.visibility = View.VISIBLE
+                }
+
+                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, fragmentModel) {
+                    onDataLoadedCallback()
+                }
             }
         }
     }

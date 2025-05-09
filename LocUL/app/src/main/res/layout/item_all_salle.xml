@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="125dp"
+    android:layout_height="115dp"
     android:background="@drawable/rounded_frame"
     android:orientation="horizontal"
     android:layout_gravity="center"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="20dp"
     android:padding="3dp"
     android:paddingEnd="6dp">
 
     <!-- Icône de la salle -->
     <LinearLayout
-        android:layout_width="150dp"
+        android:layout_width="165dp"
         android:layout_height="match_parent"
         android:background="@drawable/rounded_frame"
-        android:layout_marginEnd="8dp" >
+        android:layout_marginEnd="10dp" >
 
         <ImageView
             android:id="@+id/imgSalle"
@@ -40,10 +40,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/gotham_book"
+            android:maxLines="1"
             android:layout_gravity="center"
             android:ellipsize="end"
             android:layout_marginTop="2dp"
-            android:maxLines="2"
             android:text="Nom Salle"
             android:layout_marginBottom="5dp"
             android:textSize="15sp"
@@ -70,19 +70,20 @@
         <TextView
             android:id="@+id/batimentSalle"
             android:layout_width="wrap_content"
-            android:fontFamily="@font/gotham_book"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:ellipsize="end"
             android:layout_marginTop="2dp"
+            android:gravity="center_horizontal"
+            android:ellipsize="end"
+            android:fontFamily="@font/gotham_book"
             android:maxLines="2"
-            android:text="Batiment A"
-            android:textSize="14sp"/>
+            android:text="EPL (Ecole Polytechnique de Lome---)"
+            android:textSize="13sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <ImageView

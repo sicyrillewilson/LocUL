@@ -63,9 +63,9 @@
         android:background="@drawable/drawer_nav_bg"
         android:layout_gravity="start"
         android:clipChildren="true"
-        app:itemIconTint="@color/mainColor"
+        app:itemIconTint="@color/logo_color"
         app:itemTextAppearance="@style/NavigationDrawerText"
-        app:itemTextColor="@color/black"
+        app:itemTextColor="@color/logo_color"
         app:itemIconSize="30dp"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu" />

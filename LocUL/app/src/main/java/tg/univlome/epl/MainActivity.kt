@@ -44,18 +44,24 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.LocaleListCompat
 import tg.univlome.epl.models.NavItem
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.content.Intent
+import android.view.ViewGroup
+import tg.univlome.epl.ui.LogoFragment
 
-class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
+class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, LogoFragment.LogoListener {
     lateinit var ui: ActivityMainBinding
     private var selectedItem: NavItem? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
     private lateinit var searchBarFragment: SearchBarFragment
+    private lateinit var logoFragment: LogoFragment
+    private var currentLanguageCode: String? = null
 
     private var doubleBackToExitPressedOnce = false // Variable pour gérer le double appui
     private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
-    private var currentSubFragment: Fragment? = null // Pour suivre quel fragment est affiché
     private var navItems = listOf<NavItem>()
     private val locationPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -67,10 +73,26 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
             }
         }
 
+    // Modifiez la méthode onCreate dans MainActivity.kt en ajoutant
+// une vérification explicite du fragment actuel après l'application du thème
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityMainBinding.inflate(layoutInflater)
         setContentView(ui.root)
+
+        // Charger les paramètres sauvegardés
+        val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+
+        // Appliquer la langue
+        currentLanguageCode = sharedPreferences.getString("language_code", Locale.getDefault().language)
+        if (currentLanguageCode != null) {
+            setLocale(this, currentLanguageCode!!)
+        }
+
+        // Appliquer le thème
+        val savedTheme = sharedPreferences.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_NO)
+        AppCompatDelegate.setDefaultNightMode(savedTheme)
 
         window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
 
@@ -131,23 +153,36 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         }
 
         searchBarFragment = SearchBarFragment()
-        // Ajouter la barre de recherche à l'activité, mais la cacher au début
-        supportFragmentManager.beginTransaction()
-            .add(R.id.search_bar_container, searchBarFragment)
-            .hide(searchBarFragment)
-            .commit()
+        logoFragment = LogoFragment()
 
+        // Ajouter la barre de recherche à l'activité, mais la cacher au début
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .add(R.id.search_bar_container, searchBarFragment)
+                .hide(searchBarFragment)
+                .add(R.id.search_bar_container, logoFragment)
+                .show(logoFragment)
+                .commit()
+        }
+
+        // Ensuite tu fais registerFragmentLifecycleCallbacks + verification immédiate
         supportFragmentManager.registerFragmentLifecycleCallbacks(object :
             FragmentManager.FragmentLifecycleCallbacks() {
             override fun onFragmentResumed(fm: FragmentManager, fragment: Fragment) {
                 super.onFragmentResumed(fm, fragment)
-                if (fragment is SearchBarFragment.SearchListener) {
-                    showSearchBarFragment(fragment)
-                } else {
-                    showSearchBarFragment(null)
+
+                when (fragment) {
+                    is SearchBarFragment.SearchListener -> {
+                        showSearchBarFragment(fragment)
+                        showLogo(null)
+                    }
+                    is LogoFragment.LogoListener -> {
+                        showLogo(fragment)
+                        showSearchBarFragment(null)
+                    }
                 }
             }
-        }, true) // "true" permet de surveiller même les fragments imbriqués
+        }, true)
 
         chargerItems()
 
@@ -164,24 +199,28 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
     private fun chargerItems() {
         navItems = listOf(
             NavItem(
+                findViewById(R.id.container_home),
                 findViewById(R.id.nav_home),
                 findViewById(R.id.text_home),
                 findViewById(R.id.icon_home),
                 HomeFragment()
             ),
             NavItem(
+                findViewById(R.id.container_batiment),
                 findViewById(R.id.nav_batiment),
                 findViewById(R.id.text_batiment),
                 findViewById(R.id.icon_batiment),
                 BatimentFragment()
             ),
             NavItem(
+                findViewById(R.id.container_salle),
                 findViewById(R.id.nav_salle),
                 findViewById(R.id.text_salle),
                 findViewById(R.id.icon_salle),
                 InfraFragment()
             ),
             NavItem(
+                findViewById(R.id.container_maps),
                 findViewById(R.id.nav_maps),
                 findViewById(R.id.text_maps),
                 findViewById(R.id.icon_maps),
@@ -190,7 +229,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         )
 
         for (item in navItems) {
-            item.layout.setBackgroundColor(Color.TRANSPARENT)
+            item.minLayout.setBackgroundColor(Color.TRANSPARENT)
             item.textView.visibility = View.GONE
             item.icon.setColorFilter(
                 ContextCompat.getColor(
@@ -204,8 +243,8 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         selectedItem = defaultItem
         defaultItem.layout.setBackgroundResource(R.drawable.nav_item_bg)
         defaultItem.textView.visibility = View.VISIBLE
-        defaultItem.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
-        defaultItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
+        defaultItem.textView.setTextColor(ContextCompat.getColor(this, R.color.mainColor))
+        defaultItem.icon.setColorFilter(ContextCompat.getColor(this, R.color.mainColor))
 
         animateItemSelection(defaultItem)
 
@@ -236,26 +275,13 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
                 )
             ) // Couleur inactive
             //collapseItem(otherItem.layout)
-            /*if (otherItem.textView.text == this.getString(R.string.infrastructures)) {
+            if (otherItem.textView.text == this.getString(R.string.infrastructures)) {
                 item.textView.minWidth = 0
-            }*/
+            }
         }
 
-        // Animer l'expansion de l'élément sélectionné
-        //expandItem(item)
-
-        // Appliquer les changements visuels
-        /*item.layout.setBackgroundResource(R.drawable.nav_item_bg)
-        item.textView.alpha = 0f
-        item.textView.visibility = View.VISIBLE
-        item.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
-        item.textView.animate().alpha(1f).setDuration(350).start()
-        item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))*/
-
-        //loadMapsFragment()
-
         // Animer l'élément sélectionné
-        animateItemSelection(item)
+        _animateItemSelection(item)
 
         // Mettre à jour l'item sélectionné
         selectedItem = item
@@ -279,61 +305,58 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
     }
 
-    private fun expandItem(item: NavItem) {
-        // Forcer la mesure du texte
-        item.textView.measure(
-            View.MeasureSpec.UNSPECIFIED,
-            View.MeasureSpec.UNSPECIFIED
-        )
-        val textWidth = item.textView.measuredWidth
-        if (item.textView.text == this.getString(R.string.infrastructures)) {
-            item.textView.minWidth = textWidth + 100
-        }
-        //item.textView.minWidth = textWidth + 100
-        println("${item.textView.text}, ${item.textView.minWidth}")
+    private fun _animateItemSelection(item: NavItem) {
+        // Appliquer le style de fond
+        item.layout.setBackgroundResource(R.drawable.nav_item_bg)
 
-        // Largeur totale = texte + icône + marges estimées (ex: 40dp)
-        val iconWidth = item.icon.width
-        val padding = 60 // Tu peux ajuster
-        val targetWidth = textWidth + iconWidth + padding
+        // Colorier l'icône
+        item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
 
+        // Préparer le texte pour l'animation
+        item.textView.alpha = 0f
+        item.textView.visibility = View.VISIBLE
+        item.textView.setTextColor(ContextCompat.getColor(this, R.color.black))
+
+        // Mesurer la largeur que devrait avoir le layout en mode wrap_content
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+
+        // Garder la largeur actuelle (avant expansion)
         val startWidth = item.layout.width
 
+        // Mesurer la largeur cible avec le texte visible
+        item.layout.measure(widthSpec, heightSpec)
+        val targetWidth = item.layout.measuredWidth
+
+        // Animation d'expansion horizontale
+        val layoutParams = item.layout.layoutParams
         val animator = ValueAnimator.ofInt(startWidth, targetWidth)
-        animator.duration = 300
+        animator.duration = 500
         animator.interpolator = DecelerateInterpolator()
+
         animator.addUpdateListener { animation ->
             val value = animation.animatedValue as Int
-            val params = item.layout.layoutParams
-            params.width = value
-            item.layout.layoutParams = params
-            if (item.textView.text == this.getString(R.string.infrastructures)) {
-                item.textView.minWidth = textWidth + 60
-                item.layout.layoutParams.width += 100
+            layoutParams.width = value
+            item.layout.layoutParams = layoutParams
+        }
+
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // Quand l'animation est terminée, définir en wrap_content
+                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                item.layout.layoutParams = layoutParams
             }
-        }
+        })
+
+        // Démarrer l'animation d'expansion
         animator.start()
+
+        // Animation d'apparition progressive du texte
+        item.textView.animate()
+            .alpha(1f)
+            .setDuration(350)
+            .start()
     }
-
-
-    private fun collapseItem(view: View) {
-        val targetWidth = 150
-        val startWidth = view.width
-
-        val animator = ValueAnimator.ofInt(startWidth, targetWidth)
-        animator.duration = 300
-        animator.interpolator = DecelerateInterpolator()
-        animator.addUpdateListener { animation ->
-            val value = animation.animatedValue as Int
-            val params = view.layoutParams
-            params.width = value
-            view.layoutParams = params
-        }
-        animator.start()
-    }
-
-    fun Int.dpToPx(context: Context): Int =
-        (this * context.resources.displayMetrics.density).toInt()
 
     fun showSearchBarFragment(listener: SearchBarFragment.SearchListener?) {
         if (listener != null) {
@@ -346,6 +369,19 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
             // Cacher la barre de recherche
             supportFragmentManager.beginTransaction()
                 .hide(searchBarFragment)
+                .commit()
+        }
+    }
+
+    fun showLogo(listener: LogoFragment.LogoListener?) {
+        if (listener != null) {
+            logoFragment.setLogoListener(listener)
+            supportFragmentManager.beginTransaction()
+                .show(logoFragment)
+                .commit()
+        } else {
+            supportFragmentManager.beginTransaction()
+                .hide(logoFragment)
                 .commit()
         }
     }
@@ -521,7 +557,5 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener {
         activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
     }
 
-    override fun onSearch(query: String) {
-
-    }
+    override fun onSearch(query: String) {}
 }

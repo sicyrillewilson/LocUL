@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
@@ -27,12 +29,11 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
     private lateinit var infrasNord: MutableList<Infrastructure>
     private lateinit var filteredList: MutableList<Infrastructure>
     private lateinit var adapter: InfraFragmentAdapter
-
     private lateinit var infraService: InfrastructureService
-
     private lateinit var fragmentModel: FragmentModel
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var shimmerNordInfra: ShimmerFrameLayout
+    private lateinit var recyclerNordInfra: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +44,10 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_nord_infra, container, false)
+
+        shimmerNordInfra = view.findViewById(R.id.shimmerNordInfra)
+        recyclerNordInfra = view.findViewById(R.id.recyclerNordInfra)
+        shimmerNordInfra.startShimmer()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -67,7 +72,15 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                InfraUtils.updateInfrastructures(userGeoPoint, infrasNord, filteredList, adapter, fragmentModel)
+                val onDataLoadedCallback = {
+                    shimmerNordInfra.stopShimmer()
+                    shimmerNordInfra.visibility = View.GONE
+                    recyclerNordInfra.visibility = View.VISIBLE
+                }
+
+                InfraUtils.updateInfrastructures(userGeoPoint, infrasNord, filteredList, adapter, fragmentModel) {
+                    onDataLoadedCallback()
+                }
             }
         }
     }

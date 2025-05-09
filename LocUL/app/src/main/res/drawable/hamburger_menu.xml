@@ -2,7 +2,7 @@
       
     <path android:fillColor="@color/mainColor" android:fillType="nonZero" android:pathData="M7.971,43.925l16.031,0l0,5.992l-16.031,0z"/>
       
-    <path android:fillColor="#B7A0D8" android:fillType="nonZero" android:pathData="M8.181,29.004l31.821,0l0,5.992l-31.821,0z"/>
+    <path android:fillColor="@color/mainColor" android:fillType="nonZero" android:pathData="M8.181,29.004l31.821,0l0,5.992l-31.821,0z"/>
       
     <path android:fillColor="@color/mainColor" android:fillType="nonZero" android:pathData="M8.181,14.082l47.821,0l0,5.992l-47.821,0z"/>
     

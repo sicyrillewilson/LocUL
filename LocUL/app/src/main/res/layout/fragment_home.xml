@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".ui.home.HomeFragment"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -16,7 +15,6 @@
         android:paddingEnd="8dp"
         android:paddingVertical="16dp">
 
-        <!-- Titre des bâtiments -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,22 +25,18 @@
             android:textColor="@color/mainColor"
             android:layout_marginBottom="20dp"/>
 
-        <LinearLayout
+        <include
+            android:id="@+id/shimmerBatimentsEnsContainer"
+            layout="@layout/shimmer_batiments_container" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerBatiments"
             android:layout_width="match_parent"
             android:layout_height="125dp"
-            android:layout_marginBottom="16dp"
-            android:orientation="horizontal">
-
-            <!-- Liste horizontale des bâtiments -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerBatiments"
-                android:layout_width="match_parent"
-                android:layout_height="125dp"
-                android:orientation="horizontal"
-                android:overScrollMode="never"
-                tools:listitem="@layout/item_batiment" />
-
-        </LinearLayout>
+            android:orientation="horizontal"
+            android:overScrollMode="never"
+            android:visibility="gone"
+            tools:listitem="@layout/item_batiment" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -55,14 +49,17 @@
             android:layout_marginTop="25dp"
             android:layout_marginBottom="20dp"/>
 
-        <!-- Titre des salles -->
+        <include
+            android:id="@+id/shimmerBatimentsAdminContainer"
+            layout="@layout/shimmer_batiments_container" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerBatimentsAdmin"
             android:layout_width="match_parent"
             android:layout_height="125dp"
-            android:layout_marginBottom="16dp"
             android:orientation="horizontal"
             android:overScrollMode="never"
+            android:visibility="gone"
             tools:listitem="@layout/item_batiment" />
 
         <TextView
@@ -76,14 +73,18 @@
             android:layout_marginTop="25dp"
             android:layout_marginBottom="20dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerSalles"
-            android:layout_width="match_parent"
-            android:layout_height="125dp"
-            android:orientation="horizontal"
-            tools:listitem="@layout/item_all_salle"
-            android:overScrollMode="never"
-            android:layout_marginBottom="16dp"/>
+            <include
+                android:id="@+id/shimmerSalleContainer"
+                layout="@layout/shimmer_batiments_container" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSalles"
+                android:layout_width="match_parent"
+                android:layout_height="125dp"
+                android:orientation="horizontal"
+                android:overScrollMode="never"
+                android:visibility="gone"
+                tools:listitem="@layout/item_salle"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -96,14 +97,19 @@
             android:layout_marginTop="25dp"
             android:layout_marginBottom="20dp"/>
 
+        <include
+            android:id="@+id/shimmerInfraContainer"
+            layout="@layout/shimmer_batiments_container" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerInfra"
             android:layout_width="match_parent"
             android:layout_height="125dp"
             android:orientation="horizontal"
-            tools:listitem="@layout/item_infra"
             android:overScrollMode="never"
-            android:layout_marginBottom="16dp"/>
+            android:visibility="gone"
+            tools:listitem="@layout/item_infra"/>
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
