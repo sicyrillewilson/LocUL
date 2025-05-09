@@ -8,6 +8,8 @@ import 'data/repositories/batiment_repo.dart';
 import 'viewmodels/batiment_vm.dart';
 import 'data/repositories/infrastructure_repo.dart';
 import 'viewmodels/infrastructure_vm.dart';
+import 'data/repositories/salle_repo.dart';
+import 'viewmodels/map_vm.dart';
 
 /// ---------- 1. point d’entrée ----------
 void main() {
@@ -56,6 +58,9 @@ class LocUL extends StatelessWidget {
         ChangeNotifierProvider(
           create: (c) => InfrastructureVM(c.read<InfrastructureRepo>()),
         ),
+
+        Provider(create: (_) => SalleRepo()),
+        ChangeNotifierProvider(create: (c) => MapVM(c.read<SalleRepo>())),
         // Ajoute ici d’autres Repos / VMs (Infrastructures, Salles)
       ],
       child: MaterialApp(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../viewmodels/batiment_vm.dart';
 import '../../data/models/batiment.dart';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class BatimentsPage extends StatefulWidget {
   const BatimentsPage({super.key});
@@ -48,11 +49,25 @@ class _BatimentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading:
-          b.image.isEmpty
+          /*b.image.isEmpty
               ? const Icon(Icons.apartment)
               : File(b.image).existsSync()
               ? Image.file(File(b.image), width: 56, fit: BoxFit.cover)
-              : const Icon(Icons.broken_image),
+              : const Icon(Icons.broken_image),*/
+          b.image.isEmpty
+              ? const Icon(Icons.apartment)
+              : CachedNetworkImage(
+                imageUrl: b.image,
+                width: 56,
+                height: 56,
+                fit: BoxFit.cover,
+                placeholder:
+                    (context, url) =>
+                        const CircularProgressIndicator(), // En attendant le chargement
+                errorWidget:
+                    (context, url, error) =>
+                        const Icon(Icons.broken_image), // Si erreur
+              ),
       title: Text(b.nom),
       subtitle: Text(b.situation),
       onTap: () {

@@ -52,6 +52,8 @@ class BatimentRepo {
         data['image'] = '';
       }
 
+      /*data['image'] = List<String>.from(data['images'] ?? []).first;*/
+
       bats.add(Batiment.fromJson(data));
     }
 
