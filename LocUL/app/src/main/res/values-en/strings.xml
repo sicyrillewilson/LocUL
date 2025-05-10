@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LocUL</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_drawer_open">Open navigation menu</string>
+    <string name="navigation_drawer_close">Close navigation menu</string>
+    <string name="francais">French</string>
+    <string name="anglais">English</string>
+    <string name="clair">Light</string>
+    <string name="sombre">Dark</string>
+    <string name="systeme">System</string>
+    <string name="infrastructures">Facilities</string>
+    <string name="accueil">Home</string>
+    <string name="carte">Map</string>
+    <string name="batiments_d_enseignement">Teaching buildings</string>
+    <string name="batiment_administratifs">Administrative buildings</string>
+    <string name="batiments">Buildings</string>
+    <string name="salles">Rooms</string>
+    <string name="autres_infrastructures">Other facilities</string>
+    <string name="tout">All</string>
+    <string name="campus_nord">North Campus</string>
+    <string name="campus_sud">South Campus</string>
+    <string name="reglages">Settings</string>
+    <string name="langage">Language</string>
+    <string name="theme">Theme</string>
+    <string name="appliquer">Apply</string>
+    <string name="recherche">Search...</string>
+    <string name="app_desc">Find your way at the University of Lomé</string>
+</resources>

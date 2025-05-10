@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId = "tg.univlome.epl"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -49,9 +49,13 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.animation.graphics.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.drawerlayout:drawerlayout:1.2.0")
 
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
 
@@ -65,4 +69,17 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.6.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.6.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.5.0")
+
+    // CircleImageView
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("com.airbnb.android:lottie:+")
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
 }

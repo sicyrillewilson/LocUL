@@ -3,6 +3,7 @@ package tg.univlome.epl.services
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import tg.univlome.epl.models.Admin
 
@@ -17,9 +18,7 @@ class AdminService {
             .addOnSuccessListener { result ->
                 val adminsList = mutableListOf<Admin>()
                 for (document in result) {
-                    val username = document.getString("username") ?: ""
-                    val password = document.getString("password") ?: ""
-                    adminsList.add(Admin(username, password))
+                    adminsList.add(createAdminFromDocument(document))
                 }
                 adminsLiveData.value = adminsList
             }
@@ -28,5 +27,11 @@ class AdminService {
             }
 
         return adminsLiveData
+    }
+
+    private fun createAdminFromDocument(document: DocumentSnapshot): Admin {
+        val username = document.getString("username") ?: ""
+        val password = document.getString("password") ?: ""
+        return Admin(username, password)
     }
 }
