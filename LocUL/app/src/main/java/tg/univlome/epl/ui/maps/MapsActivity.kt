@@ -2,58 +2,56 @@
 
 package tg.univlome.epl.ui.maps
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import org.osmdroid.views.overlay.ScaleBarOverlay
+import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import tg.univlome.epl.R
 import tg.univlome.epl.databinding.ActivityMapsBinding
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
-import tg.univlome.epl.utils.MapsUtils
-import java.io.IOException
-import android.Manifest
-import android.content.Context
-import androidx.core.app.ActivityCompat
-import okhttp3.*
-import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.ScaleBarOverlay
-import org.osmdroid.views.overlay.compass.CompassOverlay
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
-import android.location.LocationListener
-import android.view.View
-import androidx.annotation.RequiresPermission
-import androidx.core.content.ContextCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import tg.univlome.epl.utils.MapsUtils
+import java.io.IOException
 
 class MapsActivity : AppCompatActivity(), LocationListener {
 
@@ -133,7 +131,11 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         // Charger les données depuis Firebase et les afficher sur la carte
         loadLieux()
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
             binding.root.post {
@@ -208,7 +210,10 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 userLocation = GeoPoint(location.latitude, location.longitude)
                 addMarkerUserLocation()
 
-                if (userLocation != null && (lastLocation == null || location.distanceTo(lastLocation!!) > 3)) {
+                if (userLocation != null && (lastLocation == null || location.distanceTo(
+                        lastLocation!!
+                    ) > 3)
+                ) {
                     lastLocation = location
                     if (destination != null && destination != GeoPoint(0.0, 0.0)) {
                         if (markerList.isNotEmpty()) {
@@ -271,7 +276,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 //addMarker(position, lieu.nom, icon, lieu.image)
                 // CACHER LES MARQUEURS A CE NIVEAU
                 var marker = addMarker(position, lieu.nom, icon, lieu.image)
-                if (marker!!.position != userLocation && marker!!.position != destination){
+                if (marker!!.position != userLocation && marker!!.position != destination) {
                     mapView.overlays.remove(marker)
                 }
             } catch (e: NumberFormatException) {
@@ -286,7 +291,8 @@ class MapsActivity : AppCompatActivity(), LocationListener {
 
         // Vérification de la permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
 
             // Essai rapide via FusedLocationProviderClient
             fusedLocationClient.lastLocation
@@ -311,7 +317,8 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                     }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Erreur de localisation : ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Erreur de localisation : ${e.message}", Toast.LENGTH_LONG)
+                        .show()
                     binding.locationProgressBar.visibility = View.GONE
                 }
 
@@ -323,7 +330,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun startGPSLocation() {
-        val locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager = this.getSystemService(LOCATION_SERVICE) as LocationManager
         val provider = LocationManager.GPS_PROVIDER
 
         locationManager.requestSingleUpdate(provider, object : LocationListener {
@@ -343,7 +350,8 @@ class MapsActivity : AppCompatActivity(), LocationListener {
             }
 
             @Deprecated("Deprecated in Java")
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+            }
 
             override fun onProviderEnabled(provider: String) {}
             override fun onProviderDisabled(provider: String) {}
@@ -364,9 +372,17 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         getRoute(userLocation, userDestination)
     }
 
-    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.default_marker, imageUrl: String? = null): Marker? {
+    private fun addMarker(
+        position: GeoPoint,
+        title: String,
+        icon: Int = R.drawable.default_marker,
+        imageUrl: String? = null
+    ): Marker? {
         if (mapView == null) {
-            Log.w("MapsActivity", "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms...")
+            Log.w(
+                "MapsActivity",
+                "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms..."
+            )
             Handler(Looper.getMainLooper()).postDelayed({
                 addMarker(position, title, icon, imageUrl)
             }, 200)
@@ -401,7 +417,10 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                 .asBitmap()
                 .load(imageUrl)
                 .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
                         val drawable = BitmapDrawable(resources, resource)
                         marker.image = drawable
                         mapView.invalidate()
@@ -431,7 +450,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
 
     private fun hideOtherMarkers() {
         for (marker in markerList) {
-            if (marker.position != userLocation && marker.position != destination){
+            if (marker.position != userLocation && marker.position != destination) {
                 mapView.overlays.remove(marker)
             }
         }
@@ -442,7 +461,7 @@ class MapsActivity : AppCompatActivity(), LocationListener {
 
     private fun reloadOtherMarker() {
         for (marker in markerList) {
-            if (marker.position != userLocation && marker.position != destination){
+            if (marker.position != userLocation && marker.position != destination) {
                 mapView.overlays.add(marker)
             }
         }
@@ -453,15 +472,23 @@ class MapsActivity : AppCompatActivity(), LocationListener {
 
     private fun getRoute(start: GeoPoint, end: GeoPoint) {
         val apiKey = "5b3ce3597851110001cf62480894b05967b24b268cf8fa5b6a5166f7"
-        val url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
+        val url =
+            "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
 
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("MapsActivity", "Erreur lors de la récupération de l'itinéraire : ${e.message}")
+                Log.e(
+                    "MapsActivity",
+                    "Erreur lors de la récupération de l'itinéraire : ${e.message}"
+                )
                 runOnUiThread {
-                    Toast.makeText(this@MapsActivity, "Impossible de récupérer l'itinéraire", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@MapsActivity,
+                        "Impossible de récupérer l'itinéraire",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
@@ -486,7 +513,8 @@ class MapsActivity : AppCompatActivity(), LocationListener {
                                 runOnUiThread {
                                     currentPolyline = Polyline()
                                     currentPolyline!!.setPoints(geoPoints)
-                                    currentPolyline!!.outlinePaint.color = resources.getColor(R.color.mainColor, null)
+                                    currentPolyline!!.outlinePaint.color =
+                                        resources.getColor(R.color.mainColor, null)
                                     currentPolyline!!.outlinePaint.strokeWidth = 5f
 
                                     mapView.overlays.add(currentPolyline)
@@ -515,7 +543,8 @@ class MapsActivity : AppCompatActivity(), LocationListener {
             markerList.remove(it)
         }
 
-        currentUserMarker = addMarker(userLocation, "Ma position actuelle", R.drawable.maps_and_flags)
+        currentUserMarker =
+            addMarker(userLocation, "Ma position actuelle", R.drawable.maps_and_flags)
     }
 
     private fun updateDestination(destination: GeoPoint) {
@@ -573,14 +602,19 @@ class MapsActivity : AppCompatActivity(), LocationListener {
         removeAllMarkers()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initLocationOverlay()
                 initLocationTracking()
             } else {
-                Toast.makeText(this, "Permission de localisation refusée.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Permission de localisation refusée.", Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }

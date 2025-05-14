@@ -9,8 +9,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import tg.univlome.epl.R
-import tg.univlome.epl.ui.batiment.NordBatimentFragment
-import tg.univlome.epl.ui.batiment.SudBatimentFragment
 
 class BatimentFragment : Fragment() {
     private var currentSelectedNav: View? = null

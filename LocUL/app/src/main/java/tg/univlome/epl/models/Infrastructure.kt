@@ -1,10 +1,7 @@
 package tg.univlome.epl.models
 
-import tg.univlome.epl.R
-import tg.univlome.epl.models.Salle
 import java.io.Serializable
 
-// Infrastructure.kt
 data class Infrastructure(
     val extraProp: String = "" // uniquement les ajouts spécifiques
 ) : Lieu(), Serializable {

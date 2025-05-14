@@ -14,7 +14,8 @@ import tg.univlome.epl.R
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.home.SalleActivity
 
-class SalleViewAllAdapter(private var salles: List<Salle>) : RecyclerView.Adapter<SalleViewAllAdapter.SalleViewHolder>() {
+class SalleViewAllAdapter(private var salles: List<Salle>) :
+    RecyclerView.Adapter<SalleViewAllAdapter.SalleViewHolder>() {
 
     class SalleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img: ImageView = view.findViewById(R.id.imgSalle)
@@ -24,7 +25,8 @@ class SalleViewAllAdapter(private var salles: List<Salle>) : RecyclerView.Adapte
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SalleViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_all_salle, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_all_salle, parent, false)
         return SalleViewHolder(view)
     }
 
@@ -38,8 +40,14 @@ class SalleViewAllAdapter(private var salles: List<Salle>) : RecyclerView.Adapte
                 .asBitmap()
                 .load(salle.image)
                 .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                    ) {
+                        val drawable = android.graphics.drawable.BitmapDrawable(
+                            holder.itemView.resources,
+                            resource
+                        )
                         holder.img.setImageDrawable(drawable)
                     }
 

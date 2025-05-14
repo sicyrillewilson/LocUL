@@ -3,10 +3,10 @@
 package tg.univlome.epl
 
 import android.app.Application
+import android.preference.PreferenceManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import org.osmdroid.config.Configuration
-import android.preference.PreferenceManager
 
 class MyApp : Application() {
     override fun onCreate() {

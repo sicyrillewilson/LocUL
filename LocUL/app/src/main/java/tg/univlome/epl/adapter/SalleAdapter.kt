@@ -36,10 +36,12 @@ class SalleAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_SALLE) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_salle, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_salle, parent, false)
             SalleViewHolder(view)
         } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_voir_tout, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_voir_tout, parent, false)
             ButtonViewHolder(view)
         }
     }
@@ -55,8 +57,14 @@ class SalleAdapter(
                     .asBitmap()
                     .load(salle.image)
                     .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                            val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                        ) {
+                            val drawable = android.graphics.drawable.BitmapDrawable(
+                                holder.itemView.resources,
+                                resource
+                            )
                             holder.img.setImageDrawable(drawable)
                         }
 

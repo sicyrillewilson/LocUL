@@ -10,20 +10,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.BatimentFragmentAdapter
-import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.adapter.InfraFragmentAdapter
+import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.models.modelsfragments.FragmentModel
-import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
-import tg.univlome.epl.utils.BatimentUtils
 import tg.univlome.epl.utils.InfraUtils
 
 class ViewAllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
@@ -51,15 +47,25 @@ class ViewAllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = InfraFragmentAdapter(infras)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllInfraHome)
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerAllInfraHome
+        )
         getUserLocation()
 
         return view
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -68,7 +74,13 @@ class ViewAllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                InfraUtils.updateInfrastructures(userGeoPoint, infras, filteredList, adapter, fragmentModel)
+                InfraUtils.updateInfrastructures(
+                    userGeoPoint,
+                    infras,
+                    filteredList,
+                    adapter,
+                    fragmentModel
+                )
             }
         }
     }

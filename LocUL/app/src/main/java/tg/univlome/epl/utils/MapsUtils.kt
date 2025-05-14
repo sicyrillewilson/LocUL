@@ -4,9 +4,7 @@ package tg.univlome.epl.utils
 
 import android.Manifest
 import android.app.Activity
-import org.osmdroid.util.GeoPoint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -15,12 +13,8 @@ import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.Call
@@ -31,14 +25,14 @@ import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polyline
 import tg.univlome.epl.R
 import java.io.IOException
-import org.osmdroid.util.BoundingBox
-import kotlin.math.*
 
 object MapsUtils {
 
@@ -56,7 +50,8 @@ object MapsUtils {
     }
 
     fun saveUserLocation(context: Context, location: GeoPoint) {
-        val sharedPreferences = context.getSharedPreferences("UserLocationPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("UserLocationPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
         val json = gson.toJson(location)
@@ -64,7 +59,8 @@ object MapsUtils {
     }
 
     fun loadUserLocation(context: Context): GeoPoint {
-        val sharedPreferences = context.getSharedPreferences("UserLocationPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("UserLocationPrefs", Context.MODE_PRIVATE)
         val gson = Gson()
         val json = sharedPreferences.getString("userLocation", null)
         val type = object : TypeToken<GeoPoint>() {}.type
@@ -72,7 +68,8 @@ object MapsUtils {
     }
 
     fun saveDestination(context: Context, destination: GeoPoint) {
-        val sharedPreferences = context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
         val json = gson.toJson(destination)
@@ -82,7 +79,8 @@ object MapsUtils {
 
 
     fun loadDestination(context: Context): GeoPoint {
-        val sharedPreferences = context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
         val gson = Gson()
         val json = sharedPreferences.getString("destination", null)
         val type = object : TypeToken<GeoPoint>() {}.type
@@ -90,14 +88,16 @@ object MapsUtils {
     }
 
     fun clearDestination(context: Context) {
-        val sharedPreferences = context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.remove("destination")
         editor.apply()
     }
 
     fun saveMarkerList(context: Context, markerList: MutableList<Marker>) {
-        val sharedPreferences = context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
         val json = gson.toJson(markerList)
@@ -106,7 +106,8 @@ object MapsUtils {
     }
 
     fun loadMarkerList(context: Context): MutableList<Marker> {
-        val sharedPreferences = context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
         val gson = Gson()
         val json = sharedPreferences.getString("markerList", null)
         val type = object : TypeToken<MutableList<Marker>>() {}.type
@@ -114,13 +115,20 @@ object MapsUtils {
     }
 
     fun clearMarkerList(context: Context) {
-        val sharedPreferences = context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.remove("markerList")
         editor.apply()
     }
 
-    fun saveMapState(context: Context, latitude: Double, longitude: Double, zoom: Float, isNightMode: Boolean) {
+    fun saveMapState(
+        context: Context,
+        latitude: Double,
+        longitude: Double,
+        zoom: Float,
+        isNightMode: Boolean
+    ) {
 
     }
 
@@ -144,7 +152,14 @@ object MapsUtils {
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    fun setMiniMap(miniMap: MapView, userLocation: GeoPoint = GeoPoint(0, 0), destination: GeoPoint = GeoPoint(0, 0), context: Context, activity: Activity, resources: Resources) {
+    fun setMiniMap(
+        miniMap: MapView,
+        userLocation: GeoPoint = GeoPoint(0, 0),
+        destination: GeoPoint = GeoPoint(0, 0),
+        context: Context,
+        activity: Activity,
+        resources: Resources
+    ) {
         var start = userLocation
         var end = destination
         // Si la localisation utilisateur n'est pas valide, utiliser la destination comme point de départ
@@ -210,15 +225,23 @@ object MapsUtils {
 
     private fun getRoute(start: GeoPoint, end: GeoPoint, activity: Activity, mapView: MapView) {
         val apiKey = "5b3ce3597851110001cf62480894b05967b24b268cf8fa5b6a5166f7"
-        val url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
+        val url =
+            "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
 
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("MapsActivity", "Erreur lors de la récupération de l'itinéraire : ${e.message}")
+                Log.e(
+                    "MapsActivity",
+                    "Erreur lors de la récupération de l'itinéraire : ${e.message}"
+                )
                 activity.runOnUiThread {
-                    Toast.makeText(activity, "Impossible de récupérer l'itinéraire", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        activity,
+                        "Impossible de récupérer l'itinéraire",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
@@ -243,7 +266,8 @@ object MapsUtils {
                                 activity.runOnUiThread {
                                     var currentPolyline = Polyline()
                                     currentPolyline!!.setPoints(geoPoints)
-                                    currentPolyline!!.outlinePaint.color = ContextCompat.getColor(activity, R.color.mainColor)
+                                    currentPolyline!!.outlinePaint.color =
+                                        ContextCompat.getColor(activity, R.color.mainColor)
                                     currentPolyline!!.outlinePaint.strokeWidth = 5f
 
                                     mapView.overlays.add(currentPolyline)

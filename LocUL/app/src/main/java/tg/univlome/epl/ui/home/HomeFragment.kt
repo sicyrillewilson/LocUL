@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -18,12 +17,12 @@ import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.adapter.BatimentAdapter
-import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.adapter.InfraAdapter
-import tg.univlome.epl.models.Salle
 import tg.univlome.epl.adapter.SalleAdapter
+import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.models.Infrastructure
+import tg.univlome.epl.models.Salle
 import tg.univlome.epl.models.modelsfragments.HomeFragmentModel
 import tg.univlome.epl.ui.LogoFragment
 import tg.univlome.epl.utils.HomeBatimentUtils
@@ -136,11 +135,13 @@ class HomeFragment : Fragment(), LogoFragment.LogoListener {
 
         batimentsEns = mutableListOf()
         batimentsEnsFilteredList = mutableListOf()
-        batimentsEnsAdapter = BatimentAdapter(batimentsEns, fragmentManager, ViewAllBatEnsFragment())
+        batimentsEnsAdapter =
+            BatimentAdapter(batimentsEns, fragmentManager, ViewAllBatEnsFragment())
 
         batimentsAdmin = mutableListOf()
         batimentsAdminFilteredList = mutableListOf()
-        batimentsAdminAdapter = BatimentAdapter(batimentsAdmin, fragmentManager, ViewAllBatAdminFragment())
+        batimentsAdminAdapter =
+            BatimentAdapter(batimentsAdmin, fragmentManager, ViewAllBatAdminFragment())
 
         infras = mutableListOf()
         infrasFilteredList = mutableListOf()
@@ -150,10 +151,44 @@ class HomeFragment : Fragment(), LogoFragment.LogoListener {
         sallesFilteredList = mutableListOf()
         sallesAdapter = SalleAdapter(salles, fragmentManager, ViewAllSalleFragment())
 
-        batsEnsHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerBatiments, fragmentManager, ViewAllBatEnsFragment(), "enseignement")
-        batsAdminHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerBatimentsAdmin, fragmentManager, ViewAllBatAdminFragment(), "administratif")
-        sallesHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerSalles, fragmentManager, ViewAllSalleFragment())
-        infrasHomeFragmentModel = HomeFragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerInfra, fragmentManager, ViewAllInfraFragment())
+        batsEnsHomeFragmentModel = HomeFragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerBatiments,
+            fragmentManager,
+            ViewAllBatEnsFragment(),
+            "enseignement"
+        )
+        batsAdminHomeFragmentModel = HomeFragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerBatimentsAdmin,
+            fragmentManager,
+            ViewAllBatAdminFragment(),
+            "administratif"
+        )
+        sallesHomeFragmentModel = HomeFragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerSalles,
+            fragmentManager,
+            ViewAllSalleFragment()
+        )
+        infrasHomeFragmentModel = HomeFragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerInfra,
+            fragmentManager,
+            ViewAllInfraFragment()
+        )
 
         getUserLocation()
     }
@@ -168,8 +203,12 @@ class HomeFragment : Fragment(), LogoFragment.LogoListener {
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -191,19 +230,43 @@ class HomeFragment : Fragment(), LogoFragment.LogoListener {
                 }
 
                 // Modification pour notifier quand les données sont chargées
-                HomeBatimentUtils.updateBatiments(userGeoPoint, batimentsEns, batimentsEnsFilteredList, batimentsEnsAdapter, batsEnsHomeFragmentModel) {
+                HomeBatimentUtils.updateBatiments(
+                    userGeoPoint,
+                    batimentsEns,
+                    batimentsEnsFilteredList,
+                    batimentsEnsAdapter,
+                    batsEnsHomeFragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
 
-                HomeBatimentUtils.updateBatiments(userGeoPoint, batimentsAdmin, batimentsAdminFilteredList, batimentsAdminAdapter, batsAdminHomeFragmentModel) {
+                HomeBatimentUtils.updateBatiments(
+                    userGeoPoint,
+                    batimentsAdmin,
+                    batimentsAdminFilteredList,
+                    batimentsAdminAdapter,
+                    batsAdminHomeFragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
 
-                HomeInfraUtils.updateInfrastructures(userGeoPoint, infras, infrasFilteredList, infrasAdapter, infrasHomeFragmentModel) {
+                HomeInfraUtils.updateInfrastructures(
+                    userGeoPoint,
+                    infras,
+                    infrasFilteredList,
+                    infrasAdapter,
+                    infrasHomeFragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
 
-                HomeSalleUtils.updateSalles(userGeoPoint, salles, sallesFilteredList, sallesAdapter, sallesHomeFragmentModel) {
+                HomeSalleUtils.updateSalles(
+                    userGeoPoint,
+                    salles,
+                    sallesFilteredList,
+                    sallesAdapter,
+                    sallesHomeFragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
             }

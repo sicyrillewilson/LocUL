@@ -56,14 +56,25 @@ class SudInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = InfraFragmentAdapter(infrasSud)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerSudInfra, "sud")
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerSudInfra,
+            "sud"
+        )
         getUserLocation()
         return view
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -78,7 +89,13 @@ class SudInfraFragment : Fragment(), SearchBarFragment.SearchListener {
                     recyclerSudInfra.visibility = View.VISIBLE
                 }
 
-                InfraUtils.updateInfrastructures(userGeoPoint, infrasSud, filteredList, adapter, fragmentModel) {
+                InfraUtils.updateInfrastructures(
+                    userGeoPoint,
+                    infrasSud,
+                    filteredList,
+                    adapter,
+                    fragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
             }
@@ -96,8 +113,9 @@ class SudInfraFragment : Fragment(), SearchBarFragment.SearchListener {
     }
 
     override fun onSearch(query: String) {
-        filteredList = infrasSud.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        filteredList =
+            infrasSud.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
-    
+
 }

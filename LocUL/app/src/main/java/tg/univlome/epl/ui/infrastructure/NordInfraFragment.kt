@@ -56,14 +56,25 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = InfraFragmentAdapter(infrasNord)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerNordInfra, "nord")
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerNordInfra,
+            "nord"
+        )
         getUserLocation()
         return view
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -78,7 +89,13 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
                     recyclerNordInfra.visibility = View.VISIBLE
                 }
 
-                InfraUtils.updateInfrastructures(userGeoPoint, infrasNord, filteredList, adapter, fragmentModel) {
+                InfraUtils.updateInfrastructures(
+                    userGeoPoint,
+                    infrasNord,
+                    filteredList,
+                    adapter,
+                    fragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
             }
@@ -96,7 +113,8 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
     }
 
     override fun onSearch(query: String) {
-        filteredList = infrasNord.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        filteredList =
+            infrasNord.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
 

@@ -26,10 +26,13 @@ class BatimentService(private val context: Context) {
                         batimentsList.add(createBatimentFromDocument(document))
                     }
                     BatimentUtils.saveBatiments(context, batimentsList)
-                    //batimentsLiveData.value = batimentsList
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("BatimentService", "Erreur lors de la récupération des bâtiments", exception)
+                    Log.e(
+                        "BatimentService",
+                        "Erreur lors de la récupération des bâtiments",
+                        exception
+                    )
                 }
         } else {
             batimentsCollection.get()
@@ -43,7 +46,11 @@ class BatimentService(private val context: Context) {
                     batimentsLiveData.value = batimentsList
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("BatimentService", "Erreur lors de la récupération des bâtiments", exception)
+                    Log.e(
+                        "BatimentService",
+                        "Erreur lors de la récupération des bâtiments",
+                        exception
+                    )
                 }
         }
 

@@ -43,13 +43,13 @@ class SalleService(private val context: Context) {
                             // Sauvegarde UNE SEULE FOIS après avoir tout ajouté
                             SalleUtils.saveSalles(context, sallesList)
 
-                            //sallesLiveData.value = sallesList
-                            //sallesLiveData.postValue(sallesList)
-
-
                         }
                         .addOnFailureListener { exception ->
-                            Log.e("SalleService", "Erreur lors de la récupération des salles", exception)
+                            Log.e(
+                                "SalleService",
+                                "Erreur lors de la récupération des salles",
+                                exception
+                            )
                         }
                 }
                 .addOnFailureListener { exception ->
@@ -82,7 +82,11 @@ class SalleService(private val context: Context) {
 
                         }
                         .addOnFailureListener { exception ->
-                            Log.e("SalleService", "Erreur lors de la récupération des salles", exception)
+                            Log.e(
+                                "SalleService",
+                                "Erreur lors de la récupération des salles",
+                                exception
+                            )
                         }
                 }
                 .addOnFailureListener { exception ->
@@ -93,7 +97,10 @@ class SalleService(private val context: Context) {
         return sallesLiveData
     }
 
-    private fun createSalleFromDocument(document: DocumentSnapshot, batimentMap: Map<String, String>): Salle {
+    private fun createSalleFromDocument(
+        document: DocumentSnapshot,
+        batimentMap: Map<String, String>
+    ): Salle {
         val id = document.id
         val infrastructureId = document.getString("buildingId") ?: ""
         val nom = document.getString("nom") ?: ""
@@ -107,6 +114,18 @@ class SalleService(private val context: Context) {
 
         val situation = batimentMap[infrastructureId] ?: "Bâtiment inconnu"
 
-        return Salle(id, infrastructureId, nom, description, capacite, longitude, latitude, image, situation, type, images)
+        return Salle(
+            id,
+            infrastructureId,
+            nom,
+            description,
+            capacite,
+            longitude,
+            latitude,
+            image,
+            situation,
+            type,
+            images
+        )
     }
 }

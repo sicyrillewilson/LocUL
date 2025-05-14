@@ -9,13 +9,10 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -73,13 +70,20 @@ class InfraActivity : AppCompatActivity() {
                 ui.imgInfra.setImageResource(infrastructure.icon)
             }
             ui.aller.setOnClickListener {
-                MapsUtils.saveDestination(this, GeoPoint(infrastructure.latitude.toDouble(), infrastructure.longitude.toDouble()))
+                MapsUtils.saveDestination(
+                    this,
+                    GeoPoint(
+                        infrastructure.latitude.toDouble(),
+                        infrastructure.longitude.toDouble()
+                    )
+                )
                 val intent = Intent(this, MapsActivity::class.java)
                 ui.aller.context.startActivity(intent)
             }
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED
+            ) {
 
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
                 return
@@ -88,11 +92,13 @@ class InfraActivity : AppCompatActivity() {
             miniMap = ui.miniMap
 
             // Fallback si la localisation n'est pas disponible
-            val destination = GeoPoint(infrastructure.latitude.toDouble(), infrastructure.longitude.toDouble())
+            val destination =
+                GeoPoint(infrastructure.latitude.toDouble(), infrastructure.longitude.toDouble())
             var userLocation: GeoPoint? = null
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                == PackageManager.PERMISSION_GRANTED
+            ) {
 
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     location?.let {

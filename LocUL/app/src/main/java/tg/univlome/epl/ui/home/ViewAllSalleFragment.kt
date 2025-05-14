@@ -10,20 +10,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.InfraFragmentAdapter
 import tg.univlome.epl.adapter.SalleViewAllAdapter
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
-import tg.univlome.epl.utils.HomeSalleUtils
-import tg.univlome.epl.utils.InfraUtils
 import tg.univlome.epl.utils.SalleUtils
 
 class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
@@ -51,15 +47,25 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = SalleViewAllAdapter(salles)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllSalle)
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerAllSalle
+        )
         getUserLocation()
 
         return view
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return

@@ -2,28 +2,33 @@
 
 package tg.univlome.epl
 
+import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -31,26 +36,17 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
 import tg.univlome.epl.databinding.ActivityMainBinding
+import tg.univlome.epl.models.NavItem
+import tg.univlome.epl.ui.LogoFragment
+import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.ui.batiment.BatimentFragment
 import tg.univlome.epl.ui.home.HomeFragment
 import tg.univlome.epl.ui.infrastructure.InfraFragment
-import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.ui.maps.MapsFragment
 import java.util.Locale
-import android.os.Handler
-import android.os.Looper
-import android.view.animation.DecelerateInterpolator
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.os.LocaleListCompat
-import tg.univlome.epl.models.NavItem
-import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.content.Intent
-import android.view.ViewGroup
-import tg.univlome.epl.ui.LogoFragment
 
-class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, LogoFragment.LogoListener {
+class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener,
+    LogoFragment.LogoListener {
     lateinit var ui: ActivityMainBinding
     private var selectedItem: NavItem? = null
     private lateinit var drawerLayout: DrawerLayout
@@ -85,7 +81,8 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
 
         // Appliquer la langue
-        currentLanguageCode = sharedPreferences.getString("language_code", Locale.getDefault().language)
+        currentLanguageCode =
+            sharedPreferences.getString("language_code", Locale.getDefault().language)
         if (currentLanguageCode != null) {
             setLocale(this, currentLanguageCode!!)
         }
@@ -176,6 +173,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
                         showSearchBarFragment(fragment)
                         showLogo(null)
                     }
+
                     is LogoFragment.LogoListener -> {
                         showLogo(fragment)
                         showSearchBarFragment(null)
@@ -465,7 +463,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
 
         // Charger les préférences sauvegardées
         val sharedPreferences =
-            activity.getSharedPreferences("AppSettings", AppCompatActivity.MODE_PRIVATE)
+            activity.getSharedPreferences("AppSettings", MODE_PRIVATE)
         val savedLanguageCode = sharedPreferences.getString(
             "language_code",
             Locale.getDefault().language

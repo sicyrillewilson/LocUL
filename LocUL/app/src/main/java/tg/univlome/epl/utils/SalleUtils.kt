@@ -1,9 +1,9 @@
 package tg.univlome.epl.utils
 
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,8 +36,14 @@ object SalleUtils {
             .addToBackStack(null)
             .commit()
     }
-    
-    fun updateSalles(userLocation: GeoPoint, salles: MutableList<Salle>, filteredList: MutableList<Salle>, adapter: SalleViewAllAdapter, fragmentModel: FragmentModel) {
+
+    fun updateSalles(
+        userLocation: GeoPoint,
+        salles: MutableList<Salle>,
+        filteredList: MutableList<Salle>,
+        adapter: SalleViewAllAdapter,
+        fragmentModel: FragmentModel
+    ) {
         //salleService = SalleService()
         salleService = SalleService(fragmentModel.fragmentContext)
         this.filteredList = filteredList
@@ -50,7 +56,8 @@ object SalleUtils {
             if (sals != null) {
                 for (salle in sals) {
                     try {
-                        val salleLocation = GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble())
+                        val salleLocation =
+                            GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble())
                         val distance = MapsUtils.calculateDistance(userLocation, salleLocation)
                         Log.d("SalleUtils", "Distance calculée pour ${salle.nom}: $distance mètres")
 
@@ -63,20 +70,29 @@ object SalleUtils {
 
                         salle.distance = formattedDistance
 
-                        Log.d("SalleUtils", "Distance mise à jour pour ${salle.nom}: ${salle.distance}")
+                        Log.d(
+                            "SalleUtils",
+                            "Distance mise à jour pour ${salle.nom}: ${salle.distance}"
+                        )
 
                     } catch (e: Exception) {
-                        Log.e("SalleUtils", "Erreur lors de la mise à jour de la distance pour ${salle.nom}", e)
+                        Log.e(
+                            "SalleUtils",
+                            "Erreur lors de la mise à jour de la distance pour ${salle.nom}",
+                            e
+                        )
                     }
                     when (fragmentModel.situation) {
                         "" -> {
                             salles.add(salle)
                         }
+
                         "sud" -> {
                             if (salle.situation == "Campus sud") {
                                 salles.add(salle)
                             }
                         }
+
                         "nord" -> {
                             if (salle.situation == "Campus nord") {
                                 salles.add(salle)
@@ -89,9 +105,14 @@ object SalleUtils {
 
             this.adapter = SalleViewAllAdapter(salles)
 
-            val recyclerBatiments = fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
+            val recyclerBatiments =
+                fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
             recyclerBatiments?.layoutManager =
-                LinearLayoutManager(fragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
+                LinearLayoutManager(
+                    fragmentModel.fragmentContext,
+                    LinearLayoutManager.VERTICAL,
+                    false
+                )
             recyclerBatiments?.adapter = adapter
         })
     }

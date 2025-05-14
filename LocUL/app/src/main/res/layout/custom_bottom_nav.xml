@@ -4,88 +4,88 @@
     android:id="@+id/customBottomNav"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@drawable/bottom_nav_background"
-    android:orientation="horizontal"
-    android:layout_marginTop="5dp"
     android:layout_marginStart="8dp"
+    android:layout_marginTop="5dp"
     android:layout_marginEnd="8dp"
+    android:background="@drawable/bottom_nav_background"
     android:gravity="center"
+    android:orientation="horizontal"
     android:padding="10dp">
 
     <LinearLayout
         android:id="@+id/container_home"
         android:layout_width="wrap_content"
-        android:layout_weight="1"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <!-- Item Accueil -->
         <LinearLayout
             android:id="@+id/nav_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:background="@drawable/nav_item_bg"
             android:gravity="center"
-            android:background="@drawable/nav_item_bg">
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/icon_home"
                 android:layout_width="17dp"
                 android:layout_height="22dp"
                 android:src="@drawable/home_icon"
-                app:tint="@color/mainColor"/>
+                app:tint="@color/mainColor" />
 
             <TextView
                 android:id="@+id/text_home"
                 android:layout_width="wrap_content"
-                android:minWidth="80dp"
                 android:layout_height="wrap_content"
-                android:text="@string/accueil"
-                android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
+                android:minWidth="80dp"
+                android:text="@string/accueil"
+                android:textColor="@color/mainColor"
+                android:textSize="13sp"
                 android:textStyle="bold"
-                android:visibility="gone"
-                android:textColor="@color/mainColor" />
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/container_batiment"
         android:layout_width="wrap_content"
-        android:layout_weight="1"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/nav_batiment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:background="@drawable/nav_item_bg"
             android:gravity="center"
-            android:background="@drawable/nav_item_bg">
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/icon_batiment"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/batiment_nav_icon"
-                app:tint="@color/mainColor"/>
+                app:tint="@color/mainColor" />
 
             <TextView
                 android:id="@+id/text_batiment"
                 android:layout_width="wrap_content"
-                android:minWidth="100dp"
                 android:layout_height="wrap_content"
-                android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
-                android:textStyle="bold"
-                android:textColor="@color/mainColor"
-                android:text="@string/batiments"
+                android:minWidth="100dp"
                 android:paddingStart="8dp"
+                android:text="@string/batiments"
+                android:textColor="@color/mainColor"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
@@ -93,38 +93,38 @@
     <LinearLayout
         android:id="@+id/container_salle"
         android:layout_width="wrap_content"
-        android:layout_weight="1"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/nav_salle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:background="@drawable/nav_item_bg"
             android:gravity="center"
-            android:background="@drawable/nav_item_bg">
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/icon_salle"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/infra_nav_icon"
-                app:tint="@color/mainColor"/>
+                app:tint="@color/mainColor" />
 
             <TextView
                 android:id="@+id/text_salle"
                 android:layout_width="wrap_content"
-                android:minWidth="60dp"
                 android:layout_height="wrap_content"
-                android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
-                android:textStyle="bold"
-                android:textColor="@color/mainColor"
-                android:text="@string/infrastructures"
+                android:minWidth="60dp"
                 android:paddingStart="8dp"
+                android:text="@string/infrastructures"
+                android:textColor="@color/mainColor"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
@@ -132,38 +132,38 @@
     <LinearLayout
         android:id="@+id/container_maps"
         android:layout_width="wrap_content"
-        android:layout_weight="1"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/nav_maps"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:background="@drawable/nav_item_bg"
             android:gravity="center"
-            android:background="@drawable/nav_item_bg">
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/icon_maps"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/map_loc"
-                app:tint="@color/mainColor"/>
+                app:tint="@color/mainColor" />
 
             <TextView
                 android:id="@+id/text_maps"
                 android:layout_width="wrap_content"
-                android:minWidth="60dp"
                 android:layout_height="wrap_content"
-                android:textSize="13sp"
                 android:fontFamily="@font/gotham_medium"
                 android:gravity="center"
-                android:textStyle="bold"
-                android:textColor="@color/mainColor"
-                android:text="@string/carte"
+                android:minWidth="60dp"
                 android:paddingStart="8dp"
+                android:text="@string/carte"
+                android:textColor="@color/mainColor"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>

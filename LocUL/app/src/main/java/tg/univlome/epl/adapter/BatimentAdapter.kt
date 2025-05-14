@@ -31,15 +31,17 @@ class BatimentAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < minOf(batiments.size, min))VIEW_TYPE_BATIMENT else VIEW_TYPE_BUTTON
+        return if (position < minOf(batiments.size, min)) VIEW_TYPE_BATIMENT else VIEW_TYPE_BUTTON
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_BATIMENT) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_batiment, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_batiment, parent, false)
             BatimentViewHolder(view)
         } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_voir_tout, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_voir_tout, parent, false)
             ButtonViewHolder(view)
         }
     }
@@ -55,8 +57,14 @@ class BatimentAdapter(
                     .asBitmap()
                     .load(batiment.image)
                     .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                            val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                        ) {
+                            val drawable = android.graphics.drawable.BitmapDrawable(
+                                holder.itemView.resources,
+                                resource
+                            )
                             holder.img.setImageDrawable(drawable)
                         }
 

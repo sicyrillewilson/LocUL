@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="115dp"
-    android:background="@drawable/rounded_frame"
-    android:orientation="horizontal"
     android:layout_gravity="center"
     android:layout_marginBottom="20dp"
+    android:background="@drawable/rounded_frame"
+    android:orientation="horizontal"
     android:padding="3dp"
     android:paddingEnd="6dp">
 
@@ -13,16 +13,16 @@
     <LinearLayout
         android:layout_width="165dp"
         android:layout_height="match_parent"
-        android:background="@drawable/rounded_frame"
-        android:layout_marginEnd="10dp" >
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rounded_frame">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:scaleType="fitXY"
+            android:background="@drawable/img_backgroung"
             android:clipToOutline="true"
-            android:background="@drawable/img_backgroung" />
+            android:gravity="center"
+            android:scaleType="fitXY" />
 
     </LinearLayout>
 
@@ -34,14 +34,14 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:gravity="center_vertical"
-            android:ellipsize="end"
             android:layout_gravity="center"
             android:layout_marginTop="2dp"
-            android:background="@color/shimmer_placeholder_color"
             android:layout_marginBottom="5dp"
+            android:background="@color/shimmer_placeholder_color"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
             android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <!-- Ligne de séparation -->
         <View
@@ -49,15 +49,15 @@
             android:layout_height="2dp"
             android:layout_gravity="center"
             android:layout_marginEnd="5dp"
-            android:background="@android:color/darker_gray"
-            android:layout_marginBottom="6dp"/>
+            android:layout_marginBottom="6dp"
+            android:background="@android:color/darker_gray" />
 
         <View
             android:layout_width="120dp"
-            android:fontFamily="@font/gotham_book"
             android:layout_height="20dp"
             android:background="@color/shimmer_placeholder_color"
-            android:textSize="14sp"/>
+            android:fontFamily="@font/gotham_book"
+            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -68,15 +68,15 @@
             <View
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:background="@color/shimmer_placeholder_color"
-                android:layout_marginEnd="15dp"/>
+                android:layout_marginEnd="15dp"
+                android:background="@color/shimmer_placeholder_color" />
 
             <View
                 android:layout_width="60dp"
-                android:fontFamily="@font/gotham_book"
                 android:layout_height="16dp"
                 android:background="@color/shimmer_placeholder_color"
-                android:textSize="13sp"/>
+                android:fontFamily="@font/gotham_book"
+                android:textSize="13sp" />
 
         </LinearLayout>
 

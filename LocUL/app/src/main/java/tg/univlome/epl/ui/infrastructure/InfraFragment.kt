@@ -9,7 +9,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import tg.univlome.epl.R
-import tg.univlome.epl.ui.infrastructure.SudInfraFragment
 
 class InfraFragment : Fragment() {
     private var currentSelectedNav: View? = null

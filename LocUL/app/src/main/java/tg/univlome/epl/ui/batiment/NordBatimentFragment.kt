@@ -17,8 +17,8 @@ import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
@@ -56,14 +56,25 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = BatimentFragmentAdapter(batiments)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerNordBatiments, "nord")
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerNordBatiments,
+            "nord"
+        )
         getUserLocation()
         return view
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -77,7 +88,13 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
                     shimmerNordBatiments.visibility = View.GONE
                     recyclerNordBatiments.visibility = View.VISIBLE
                 }
-                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, fragmentModel) {
+                BatimentUtils.updateBatiments(
+                    userGeoPoint,
+                    batiments,
+                    filteredList,
+                    adapter,
+                    fragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
             }
@@ -95,7 +112,8 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
     }
 
     override fun onSearch(query: String) {
-        filteredList = batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        filteredList =
+            batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
 

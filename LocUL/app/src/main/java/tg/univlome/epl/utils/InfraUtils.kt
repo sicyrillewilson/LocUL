@@ -1,9 +1,9 @@
 package tg.univlome.epl.utils
 
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,10 +11,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.BatimentFragmentAdapter
 import tg.univlome.epl.adapter.InfraFragmentAdapter
 import tg.univlome.epl.models.Infrastructure
-import tg.univlome.epl.models.Salle
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.maps.MapsFragment
@@ -38,8 +36,15 @@ object InfraUtils {
             .addToBackStack(null)
             .commit()
     }
-    
-    fun updateInfrastructures(userLocation: GeoPoint, infrastructures: MutableList<Infrastructure>, filteredList: MutableList<Infrastructure>, adapter: InfraFragmentAdapter, fragmentModel: FragmentModel, onDataLoaded: () -> Unit = {}) {
+
+    fun updateInfrastructures(
+        userLocation: GeoPoint,
+        infrastructures: MutableList<Infrastructure>,
+        filteredList: MutableList<Infrastructure>,
+        adapter: InfraFragmentAdapter,
+        fragmentModel: FragmentModel,
+        onDataLoaded: () -> Unit = {}
+    ) {
         infraService = InfrastructureService(fragmentModel.fragmentContext)
         this.filteredList = filteredList
         this.infras = infrastructures
@@ -47,54 +52,76 @@ object InfraUtils {
 
         Log.d("InfraUtils", "updateInfrastructures appelée avec : $userLocation")
         // Charger les bâtiments
-        infraService.getInfrastructures().observe(fragmentModel.viewLifecycleOwner, Observer { infras ->
-            if (infras != null) {
-                for (infrastructure in infras) {
-                    try {
-                        val infrastructureLocation = GeoPoint(infrastructure.latitude.toDouble(), infrastructure.longitude.toDouble())
-                        val distance = MapsUtils.calculateDistance(userLocation, infrastructureLocation)
-                        Log.d("InfraUtils", "Distance calculée pour ${infrastructure.nom}: $distance mètres")
+        infraService.getInfrastructures()
+            .observe(fragmentModel.viewLifecycleOwner, Observer { infras ->
+                if (infras != null) {
+                    for (infrastructure in infras) {
+                        try {
+                            val infrastructureLocation = GeoPoint(
+                                infrastructure.latitude.toDouble(),
+                                infrastructure.longitude.toDouble()
+                            )
+                            val distance =
+                                MapsUtils.calculateDistance(userLocation, infrastructureLocation)
+                            Log.d(
+                                "InfraUtils",
+                                "Distance calculée pour ${infrastructure.nom}: $distance mètres"
+                            )
 
-                        // Conversion en km si la distance dépasse 1000 m
-                        val formattedDistance = if (distance >= 1000) {
-                            String.format("%.2f km", distance / 1000)
-                        } else {
-                            String.format("%.2f m", distance)
+                            // Conversion en km si la distance dépasse 1000 m
+                            val formattedDistance = if (distance >= 1000) {
+                                String.format("%.2f km", distance / 1000)
+                            } else {
+                                String.format("%.2f m", distance)
+                            }
+
+                            infrastructure.distance = formattedDistance
+
+                            Log.d(
+                                "InfraUtils",
+                                "Distance mise à jour pour ${infrastructure.nom}: ${infrastructure.distance}"
+                            )
+
+                        } catch (e: Exception) {
+                            Log.e(
+                                "InfraUtils",
+                                "Erreur lors de la mise à jour de la distance pour ${infrastructure.nom}",
+                                e
+                            )
                         }
-
-                        infrastructure.distance = formattedDistance
-
-                        Log.d("InfraUtils", "Distance mise à jour pour ${infrastructure.nom}: ${infrastructure.distance}")
-
-                    } catch (e: Exception) {
-                        Log.e("InfraUtils", "Erreur lors de la mise à jour de la distance pour ${infrastructure.nom}", e)
-                    }
-                    when (fragmentModel.situation) {
-                        "" -> {
-                            infrastructures.add(infrastructure)
-                        }
-                        "sud" -> {
-                            if (infrastructure.situation == "Campus sud") {
+                        when (fragmentModel.situation) {
+                            "" -> {
                                 infrastructures.add(infrastructure)
                             }
-                        }
-                        "nord" -> {
-                            if (infrastructure.situation == "Campus nord") {
-                                infrastructures.add(infrastructure)
+
+                            "sud" -> {
+                                if (infrastructure.situation == "Campus sud") {
+                                    infrastructures.add(infrastructure)
+                                }
+                            }
+
+                            "nord" -> {
+                                if (infrastructure.situation == "Campus nord") {
+                                    infrastructures.add(infrastructure)
+                                }
                             }
                         }
                     }
                 }
-            }
-            this.filteredList = infrastructures.toMutableList()
+                this.filteredList = infrastructures.toMutableList()
 
-            this.adapter = InfraFragmentAdapter(infrastructures)
+                this.adapter = InfraFragmentAdapter(infrastructures)
 
-            val recyclerBatiments = fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
-            recyclerBatiments?.layoutManager =
-                LinearLayoutManager(fragmentModel.fragmentContext, LinearLayoutManager.VERTICAL, false)
-            recyclerBatiments?.adapter = adapter
-        })
+                val recyclerBatiments =
+                    fragmentModel.view?.findViewById<RecyclerView>(fragmentModel.recyclerViewId)
+                recyclerBatiments?.layoutManager =
+                    LinearLayoutManager(
+                        fragmentModel.fragmentContext,
+                        LinearLayoutManager.VERTICAL,
+                        false
+                    )
+                recyclerBatiments?.adapter = adapter
+            })
         onDataLoaded()
     }
 

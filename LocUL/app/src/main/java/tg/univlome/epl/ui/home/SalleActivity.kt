@@ -12,12 +12,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageView
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -110,43 +108,60 @@ class SalleActivity : AppCompatActivity() {
             } else {
                 ui.imgSalle.setImageResource(salle.icon)
             }
-            ui.aller.setOnClickListener {
-                MapsUtils.saveDestination(this, GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble()))
-                val intent = Intent(this, MapsActivity::class.java)
-                ui.aller.context.startActivity(intent)
-            }
+            if (!salle.latitude.isNullOrBlank() && !salle.longitude.isNullOrBlank()) {
+                val latitude = salle.latitude.toDouble()
+                val longitude = salle.longitude.toDouble()
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                ui.aller.setOnClickListener {
+                    MapsUtils.saveDestination(this, GeoPoint(latitude, longitude))
+                    val intent = Intent(this, MapsActivity::class.java)
+                    ui.aller.context.startActivity(intent)
+                }
 
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
-                return
-            }
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
 
-            miniMap = ui.miniMap
+                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+                    return
+                }
 
-            // Fallback si la localisation n'est pas disponible
-            val destination = GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble())
-            var userLocation: GeoPoint? = null
+                miniMap = ui.miniMap
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                // Fallback si la localisation n'est pas disponible
+                val destination = GeoPoint(latitude, longitude)
+                var userLocation: GeoPoint? = null
 
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    location?.let {
-                        userLocation = GeoPoint(it.latitude, it.longitude)
-                        setupMiniMap(userLocation!!, destination)
-                    } ?: run {
-                        // Si la localisation n'est pas disponible, utiliser seulement la destination
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        location?.let {
+                            userLocation = GeoPoint(it.latitude, it.longitude)
+                            setupMiniMap(userLocation!!, destination)
+                        } ?: run {
+                            // Si la localisation n'est pas disponible, utiliser seulement la destination
+                            setupMiniMap(destination, destination)
+                        }
+                    }.addOnFailureListener {
+                        // En cas d'échec, utiliser seulement la destination
                         setupMiniMap(destination, destination)
                     }
-                }.addOnFailureListener {
-                    // En cas d'échec, utiliser seulement la destination
+                } else {
+                    // Sans permission, utiliser seulement la destination
                     setupMiniMap(destination, destination)
                 }
             } else {
-                // Sans permission, utiliser seulement la destination
-                setupMiniMap(destination, destination)
+                // Affiche un message ou fais une action par défaut
+                ui.aller.visibility = View.GONE
+                ui.miniMapLayout.visibility = View.GONE
             }
 
         }

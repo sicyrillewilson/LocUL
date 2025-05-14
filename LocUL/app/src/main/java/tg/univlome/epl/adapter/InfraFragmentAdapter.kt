@@ -14,7 +14,8 @@ import tg.univlome.epl.R
 import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.ui.infrastructure.InfraActivity
 
-class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerView.Adapter<InfraFragmentAdapter.InfraViewHolder>() {
+class InfraFragmentAdapter(private var infras: List<Infrastructure>) :
+    RecyclerView.Adapter<InfraFragmentAdapter.InfraViewHolder>() {
 
     class InfraViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img: ImageView = view.findViewById(R.id.imgInfra)
@@ -24,7 +25,8 @@ class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerV
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfraViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_all_infra, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_all_infra, parent, false)
         return InfraViewHolder(view)
     }
 
@@ -38,8 +40,14 @@ class InfraFragmentAdapter(private var infras: List<Infrastructure>) : RecyclerV
                 .asBitmap()
                 .load(infra.image)
                 .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                    ) {
+                        val drawable = android.graphics.drawable.BitmapDrawable(
+                            holder.itemView.resources,
+                            resource
+                        )
                         holder.img.setImageDrawable(drawable)
                     }
 

@@ -56,14 +56,24 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = BatimentFragmentAdapter(batiments)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatiments)
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerAllBatiments
+        )
         getUserLocation()
         return view
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -78,7 +88,13 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
                     recyclerAllBatiments.visibility = View.VISIBLE
                 }
 
-                BatimentUtils.updateBatiments(userGeoPoint, batiments, filteredList, adapter, fragmentModel) {
+                BatimentUtils.updateBatiments(
+                    userGeoPoint,
+                    batiments,
+                    filteredList,
+                    adapter,
+                    fragmentModel
+                ) {
                     onDataLoadedCallback()
                 }
             }
@@ -96,7 +112,8 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
     }
 
     override fun onSearch(query: String) {
-        filteredList = batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        filteredList =
+            batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
 

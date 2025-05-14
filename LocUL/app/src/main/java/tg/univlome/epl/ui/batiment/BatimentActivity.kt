@@ -73,13 +73,17 @@ class BatimentActivity : AppCompatActivity() {
                 ui.imgBatiment.setImageResource(batiment.icon)
             }
             ui.aller.setOnClickListener {
-                MapsUtils.saveDestination(this, GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble()))
+                MapsUtils.saveDestination(
+                    this,
+                    GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble())
+                )
                 val intent = Intent(this, MapsActivity::class.java)
                 ui.aller.context.startActivity(intent)
             }
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED
+            ) {
 
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
                 return
@@ -92,7 +96,8 @@ class BatimentActivity : AppCompatActivity() {
             var userLocation: GeoPoint? = null
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                == PackageManager.PERMISSION_GRANTED
+            ) {
 
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     location?.let {

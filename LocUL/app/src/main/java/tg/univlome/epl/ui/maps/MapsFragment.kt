@@ -2,21 +2,40 @@
 
 package tg.univlome.epl.ui.maps
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import tg.univlome.epl.R
-import tg.univlome.epl.databinding.FragmentMapsBinding
-import android.Manifest
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.util.Log
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
-import okhttp3.*
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
 import org.osmdroid.config.Configuration
@@ -27,38 +46,21 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.io.IOException
-import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
-import tg.univlome.epl.services.BatimentService
-import tg.univlome.epl.services.InfrastructureService
-import tg.univlome.epl.services.SalleService
-import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import android.os.Handler
-import android.os.Looper
-import android.view.animation.DecelerateInterpolator
-import androidx.annotation.RequiresPermission
-import androidx.core.content.ContextCompat
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import tg.univlome.epl.MainActivity
+import tg.univlome.epl.R
+import tg.univlome.epl.databinding.FragmentMapsBinding
 import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.Infrastructure
 import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.services.BatimentService
+import tg.univlome.epl.services.InfrastructureService
+import tg.univlome.epl.services.SalleService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.MapsUtils
+import java.io.IOException
 
-class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationListener {
+class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListener {
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
 
@@ -103,11 +105,12 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         loadMapData(view)
     }
 
-    private fun loadMapData(view: View){
+    private fun loadMapData(view: View) {
         // Initialiser mapView en premier
         mapView = binding.mapView
 
-        Configuration.getInstance().load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
+        Configuration.getInstance()
+            .load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
         Configuration.getInstance().userAgentValue = requireActivity().packageName
 
         if (isAdded && isVisible && context != null && activity != null) { // Ajout de vérifs
@@ -149,7 +152,11 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         // Charger les données depuis Firebase et les afficher sur la carte
         loadLieux()
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
             view.post {
@@ -161,14 +168,16 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         binding.focusLocation.setOnClickListener {
             userLocation?.let {
                 mapView.controller.animateTo(it)
-            } ?: Toast.makeText(requireContext(), "Position actuelle inconnue", Toast.LENGTH_SHORT).show()
+            } ?: Toast.makeText(requireContext(), "Position actuelle inconnue", Toast.LENGTH_SHORT)
+                .show()
         }
 
         binding.focusDestination.setOnClickListener {
             if (destination != null && destination != GeoPoint(0.0, 0.0)) {
                 destination?.let {
                     mapView.controller.animateTo(it)
-                } ?: Toast.makeText(requireContext(), "Destination inconnue", Toast.LENGTH_SHORT).show()
+                } ?: Toast.makeText(requireContext(), "Destination inconnue", Toast.LENGTH_SHORT)
+                    .show()
             } else {
                 Toast.makeText(requireContext(), "Destination inconnue", Toast.LENGTH_SHORT).show()
             }
@@ -208,13 +217,22 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     @SuppressLint("MissingPermission")
     private fun initLocationTracking() {
-        if (isAdded){
+        if (isAdded) {
             locationManager = requireActivity().getSystemService(LocationManager::class.java)
             val isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             if (!isLocationEnabled) {
-                Toast.makeText(requireContext(), "Veuillez activer la localisation", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Veuillez activer la localisation",
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this) // Maj toutes les 3 sec, 10m de différence
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    3000,
+                    10f,
+                    this
+                ) // Maj toutes les 3 sec, 10m de différence
             }
         }
     }
@@ -232,7 +250,10 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 userLocation = GeoPoint(location.latitude, location.longitude)
                 addMarkerUserLocation()
 
-                if (userLocation != null && (lastLocation == null || location.distanceTo(lastLocation!!) > 3)) {
+                if (userLocation != null && (lastLocation == null || location.distanceTo(
+                        lastLocation!!
+                    ) > 3)
+                ) {
                     lastLocation = location
                     if (destination != null && destination != GeoPoint(0.0, 0.0)) {
                         if (markerList.isNotEmpty()) {
@@ -255,10 +276,11 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             filtrerLieux("") // Affiche tout au départ
         })
 
-        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
-            infrastructures?.let { tousLesLieux.addAll(it) }
-            filtrerLieux("")
-        })
+        infrastructureService.getInfrastructures()
+            .observe(viewLifecycleOwner, Observer { infrastructures ->
+                infrastructures?.let { tousLesLieux.addAll(it) }
+                filtrerLieux("")
+            })
 
         salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
             salles?.let { tousLesLieux.addAll(it) }
@@ -283,7 +305,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             ajouterLieuSurCarte(lieu)
         }
 
-        if (userLocation != null){
+        if (userLocation != null) {
             addMarkerUserLocation()
         }
     }
@@ -316,8 +338,12 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         // Vérification de la permission
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            == PackageManager.PERMISSION_GRANTED
+        ) {
 
             // Essai rapide via FusedLocationProviderClient
             fusedLocationClient.lastLocation
@@ -342,7 +368,11 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                     }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(requireContext(), "Erreur de localisation : ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Erreur de localisation : ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                     binding.locationProgressBar.visibility = View.GONE
                 }
 
@@ -354,7 +384,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun startGPSLocation() {
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val provider = LocationManager.GPS_PROVIDER
 
         locationManager.requestSingleUpdate(provider, object : LocationListener {
@@ -374,14 +405,15 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             }
 
             @Deprecated("Deprecated in Java")
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+            }
 
             override fun onProviderEnabled(provider: String) {}
             override fun onProviderDisabled(provider: String) {}
         }, null)
     }
 
-    private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint ) {
+    private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint) {
 
         addMarkerUserLocation(userLocation!!)
 
@@ -398,15 +430,26 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         getRoute(userLocation, userDestination)
     }
 
-    private fun addMarker(position: GeoPoint, title: String, icon: Int = R.drawable.default_marker, imageUrl: String? = null): Marker? {
+    private fun addMarker(
+        position: GeoPoint,
+        title: String,
+        icon: Int = R.drawable.default_marker,
+        imageUrl: String? = null
+    ): Marker? {
 
         if (!isAdded || mapView == null) {
-            Log.w("MapsFragment", "Fragment non attaché ou MapView null, impossible d'ajouter le marqueur")
+            Log.w(
+                "MapsFragment",
+                "Fragment non attaché ou MapView null, impossible d'ajouter le marqueur"
+            )
             return null
         }
 
         if (mapView == null) {
-            Log.w("MapsFragment", "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms...")
+            Log.w(
+                "MapsFragment",
+                "mapView n'est pas encore initialisé. Nouvelle tentative dans 200 ms..."
+            )
             Handler(Looper.getMainLooper()).postDelayed({
                 addMarker(position, title, icon, imageUrl)
             }, 200)
@@ -421,12 +464,12 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 mapView.overlays.remove(oldMarker)
             }
         }
-        if (oldMarker != null){
+        if (oldMarker != null) {
             markerList.remove(oldMarker)
         }
 
         if (mapView == null) {
-            Log.e("MapsFragment", "MapView est nul. Impossible d'ajouter un marqueur.");
+            Log.e("MapsFragment", "MapView est nul. Impossible d'ajouter un marqueur.")
             return null
         }
         Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
@@ -439,7 +482,10 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                 .asBitmap()
                 .load(imageUrl)
                 .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
                         if (isAdded) {
                             val drawable = BitmapDrawable(resources, resource)
                             marker.image = drawable
@@ -454,8 +500,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         val resizedDrawable = MapsUtils.resizeIcon(icon, resources)
 
         marker.icon = resizedDrawable
-        marker.setOnMarkerClickListener{ clickedMarker, _ ->
-            if (clickedMarker.title != binding.destinationText.text && clickedMarker.position != userLocation && clickedMarker.position != destination){
+        marker.setOnMarkerClickListener { clickedMarker, _ ->
+            if (clickedMarker.title != binding.destinationText.text && clickedMarker.position != userLocation && clickedMarker.position != destination) {
                 binding.destinationText.text = clickedMarker.title
                 //binding.destinationLayout.visibility = View.VISIBLE
                 showDestinationLayout()
@@ -483,7 +529,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     }
 
     fun showDestinationLayout() {
-        if (binding.destinationLayout.visibility != View.VISIBLE){
+        if (binding.destinationLayout.visibility != View.VISIBLE) {
             binding.destinationLayout.apply {
                 visibility = View.VISIBLE
                 translationX = -width.toFloat()  // commence hors de l'écran à gauche
@@ -519,7 +565,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     private fun hideOtherMarkers() {
         for (marker in markerList) {
-            if (marker.position != userLocation && marker.position != destination){
+            if (marker.position != userLocation && marker.position != destination) {
                 mapView.overlays.remove(marker)
             }
         }
@@ -530,7 +576,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     private fun reloadOtherMarker() {
         for (marker in markerList) {
-            if (marker.position != userLocation && marker.position != destination){
+            if (marker.position != userLocation && marker.position != destination) {
                 mapView.overlays.add(marker)
             }
         }
@@ -541,15 +587,23 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
 
     private fun getRoute(start: GeoPoint, end: GeoPoint) {
         val apiKey = "5b3ce3597851110001cf62480894b05967b24b268cf8fa5b6a5166f7"
-        val url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
+        val url =
+            "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
 
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("MapsFragment", "Erreur lors de la récupération de l'itinéraire : ${e.message}")
+                Log.e(
+                    "MapsFragment",
+                    "Erreur lors de la récupération de l'itinéraire : ${e.message}"
+                )
                 requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Impossible de récupérer l'itinéraire", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Impossible de récupérer l'itinéraire",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
@@ -575,7 +629,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
                                     requireActivity().runOnUiThread {
                                         currentPolyline = Polyline()
                                         currentPolyline!!.setPoints(geoPoints)
-                                        currentPolyline!!.outlinePaint.color = resources.getColor(R.color.mainColor, null)
+                                        currentPolyline!!.outlinePaint.color =
+                                            resources.getColor(R.color.mainColor, null)
                                         currentPolyline!!.outlinePaint.strokeWidth = 5f
 
                                         mapView.overlays.add(currentPolyline)
@@ -594,7 +649,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
         })
     }
 
-    private fun addMarkerUserLocation(userLocation: GeoPoint? = this.userLocation){
+    private fun addMarkerUserLocation(userLocation: GeoPoint? = this.userLocation) {
         if (!isAdded || mapView == null || userLocation == null) {
             Log.w("MapsFragment", "Conditions non remplies pour ajouter le marqueur de position")
             return
@@ -606,7 +661,8 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
             markerList.remove(it)
         }
 
-        currentUserMarker = addMarker(userLocation!!, "Ma position actuelle",  R.drawable.maps_and_flags)
+        currentUserMarker =
+            addMarker(userLocation!!, "Ma position actuelle", R.drawable.maps_and_flags)
     }
 
     private fun updateDestination(destination: GeoPoint) {
@@ -673,14 +729,22 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener , LocationList
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initLocationOverlay()
                 initLocationTracking()
             } else {
-                Toast.makeText(requireContext(), "Permission de localisation refusée.", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Permission de localisation refusée.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }

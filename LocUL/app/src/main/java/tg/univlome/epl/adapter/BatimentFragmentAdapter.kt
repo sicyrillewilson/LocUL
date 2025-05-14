@@ -14,7 +14,8 @@ import tg.univlome.epl.R
 import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.ui.batiment.BatimentActivity
 
-class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
+class BatimentFragmentAdapter(private var batiments: List<Batiment>) :
+    RecyclerView.Adapter<BatimentFragmentAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val img = view.findViewById<ImageView>(R.id.imgBatiment)
@@ -24,7 +25,8 @@ class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerV
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_all_batiment, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_all_batiment, parent, false)
         return ViewHolder(view)
     }
 
@@ -38,8 +40,14 @@ class BatimentFragmentAdapter(private var batiments: List<Batiment>) : RecyclerV
                 .asBitmap()
                 .load(batiment.image)
                 .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                    ) {
+                        val drawable = android.graphics.drawable.BitmapDrawable(
+                            holder.itemView.resources,
+                            resource
+                        )
                         holder.img.setImageDrawable(drawable)
                     }
 

@@ -1,4 +1,4 @@
-    package tg.univlome.epl.adapter
+package tg.univlome.epl.adapter
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -15,7 +15,6 @@ import com.bumptech.glide.Glide
 import tg.univlome.epl.FragmentUtils
 import tg.univlome.epl.R
 import tg.univlome.epl.models.Infrastructure
-import tg.univlome.epl.ui.batiment.BatimentActivity
 import tg.univlome.epl.ui.infrastructure.InfraActivity
 
 //data class Infra(val nom: String, val situation: String, val distance: String, val icon: Int)
@@ -39,10 +38,12 @@ class InfraAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_INFRA) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_infra, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_infra, parent, false)
             InfraViewHolder(view)
         } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_voir_tout, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_voir_tout, parent, false)
             ButtonViewHolder(view)
         }
     }
@@ -58,8 +59,14 @@ class InfraAdapter(
                     .asBitmap()
                     .load(infra.image)
                     .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                            val drawable = android.graphics.drawable.BitmapDrawable(holder.itemView.resources, resource)
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                        ) {
+                            val drawable = android.graphics.drawable.BitmapDrawable(
+                                holder.itemView.resources,
+                                resource
+                            )
                             holder.img.setImageDrawable(drawable)
                         }
 

@@ -1,8 +1,8 @@
 package tg.univlome.epl.utils
 
-import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,8 +33,15 @@ object HomeSalleUtils {
             .addToBackStack(null)
             .commit()
     }
-    
-    fun updateSalles(userLocation: GeoPoint, salles: MutableList<Salle>, filteredList: MutableList<Salle>, adapter: SalleAdapter, homeFragmentModel: HomeFragmentModel, onDataLoaded: () -> Unit = {}) {
+
+    fun updateSalles(
+        userLocation: GeoPoint,
+        salles: MutableList<Salle>,
+        filteredList: MutableList<Salle>,
+        adapter: SalleAdapter,
+        homeFragmentModel: HomeFragmentModel,
+        onDataLoaded: () -> Unit = {}
+    ) {
         //salleService = SalleService()
         salleService = SalleService(homeFragmentModel.fragmentContext)
         this.filteredList = filteredList
@@ -47,9 +54,13 @@ object HomeSalleUtils {
             if (sals != null) {
                 for (salle in sals) {
                     try {
-                        val salleLocation = GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble())
+                        val salleLocation =
+                            GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble())
                         val distance = MapsUtils.calculateDistance(userLocation, salleLocation)
-                        Log.d("HomeSalleUtils", "Distance calculée pour ${salle.nom}: $distance mètres")
+                        Log.d(
+                            "HomeSalleUtils",
+                            "Distance calculée pour ${salle.nom}: $distance mètres"
+                        )
 
                         // Conversion en km si la distance dépasse 1000 m
                         val formattedDistance = if (distance >= 1000) {
@@ -60,21 +71,37 @@ object HomeSalleUtils {
 
                         salle.distance = formattedDistance
 
-                        Log.d("HomeSalleUtils", "Distance mise à jour pour ${salle.nom}: ${salle.distance}")
+                        Log.d(
+                            "HomeSalleUtils",
+                            "Distance mise à jour pour ${salle.nom}: ${salle.distance}"
+                        )
 
                     } catch (e: Exception) {
-                        Log.e("HomeSalleUtils", "Erreur lors de la mise à jour de la distance pour ${salle.nom}", e)
+                        Log.e(
+                            "HomeSalleUtils",
+                            "Erreur lors de la mise à jour de la distance pour ${salle.nom}",
+                            e
+                        )
                     }
                     salles.add(salle)
                 }
             }
             this.filteredList = salles.toMutableList()
 
-            this.adapter = SalleAdapter(salles, homeFragmentModel.fragmentManager, homeFragmentModel.newFragment)
+            this.adapter = SalleAdapter(
+                salles,
+                homeFragmentModel.fragmentManager,
+                homeFragmentModel.newFragment
+            )
 
-            val recyclerBatiments = homeFragmentModel.view?.findViewById<RecyclerView>(homeFragmentModel.recyclerViewId)
+            val recyclerBatiments =
+                homeFragmentModel.view?.findViewById<RecyclerView>(homeFragmentModel.recyclerViewId)
             recyclerBatiments?.layoutManager =
-                LinearLayoutManager(homeFragmentModel.fragmentContext, LinearLayoutManager.HORIZONTAL, false)
+                LinearLayoutManager(
+                    homeFragmentModel.fragmentContext,
+                    LinearLayoutManager.HORIZONTAL,
+                    false
+                )
             recyclerBatiments?.adapter = adapter
         })
         onDataLoaded()

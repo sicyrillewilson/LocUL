@@ -1,7 +1,5 @@
 package tg.univlome.epl.models
 
-import tg.univlome.epl.R
-import tg.univlome.epl.models.Infrastructure
 import java.io.Serializable
 
 data class Batiment(

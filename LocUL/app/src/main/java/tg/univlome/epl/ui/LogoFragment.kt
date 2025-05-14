@@ -2,15 +2,15 @@ package tg.univlome.epl.ui
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import tg.univlome.epl.R
 
 class LogoFragment : Fragment() {
 
-    interface LogoListener {}
+    interface LogoListener
 
     private var logoListener: LogoListener? = null
 
@@ -21,6 +21,7 @@ class LogoFragment : Fragment() {
     fun getLogoListener(): LogoListener? {
         return this.logoListener
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

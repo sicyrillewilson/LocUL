@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import tg.univlome.epl.models.Infrastructure
-import tg.univlome.epl.utils.BatimentUtils
 import tg.univlome.epl.utils.InfraUtils
 
 class InfrastructureService(private val context: Context) {
@@ -27,10 +26,13 @@ class InfrastructureService(private val context: Context) {
                         infrastructuresList.add(createInfrastructureFromDocument(document))
                     }
                     InfraUtils.saveInfras(context, infrastructuresList)
-                    //infrastructuresLiveData.value = infrastructuresList
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("InfrastructureService", "Erreur lors de la récupération des infrastructures", exception)
+                    Log.e(
+                        "InfrastructureService",
+                        "Erreur lors de la récupération des infrastructures",
+                        exception
+                    )
                 }
         } else {
             infrastructuresCollection.get()
@@ -43,7 +45,11 @@ class InfrastructureService(private val context: Context) {
                     infrastructuresLiveData.value = infrastructuresList
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("InfrastructureService", "Erreur lors de la récupération des infrastructures", exception)
+                    Log.e(
+                        "InfrastructureService",
+                        "Erreur lors de la récupération des infrastructures",
+                        exception
+                    )
                 }
         }
 
@@ -61,6 +67,16 @@ class InfrastructureService(private val context: Context) {
         val situation = document.getString("situation") ?: ""
         val type = document.getString("type") ?: ""
 
-        return Infrastructure(id, nom, description, longitude, latitude, image, situation, type, images)
+        return Infrastructure(
+            id,
+            nom,
+            description,
+            longitude,
+            latitude,
+            image,
+            situation,
+            type,
+            images
+        )
     }
 }

@@ -15,8 +15,8 @@ import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.adapter.BatimentFragmentAdapter
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
@@ -47,7 +47,13 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = BatimentFragmentAdapter(batimentsAdmin)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllBatimentsAdmin)
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerAllBatimentsAdmin
+        )
         fragmentModel.type = "administratif"
         getUserLocation()
 
@@ -55,8 +61,12 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
     }
 
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -65,7 +75,13 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                BatimentUtils.updateBatiments(userGeoPoint, batimentsAdmin, filteredList, adapter, fragmentModel)
+                BatimentUtils.updateBatiments(
+                    userGeoPoint,
+                    batimentsAdmin,
+                    filteredList,
+                    adapter,
+                    fragmentModel
+                )
             }
         }
     }
@@ -81,7 +97,8 @@ class ViewAllBatAdminFragment : Fragment(), SearchBarFragment.SearchListener {
     }
 
     override fun onSearch(query: String) {
-        filteredList = batimentsAdmin.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
+        filteredList =
+            batimentsAdmin.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)
     }
 }
