@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bottom_nav_default">#F0E9F6</color>
     <color name="bottom_nav_default_item">#E6DEF6</color>
+    <color name="red">#D7FF0000</color>
     <color name="gray">#808080</color>
     <color name="mainColor">#1F3563</color>
     <color name="selected_dot_color">@color/white</color>
