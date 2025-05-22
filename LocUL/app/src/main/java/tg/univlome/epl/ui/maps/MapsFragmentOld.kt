@@ -2,21 +2,32 @@
 
 package tg.univlome.epl.ui.maps
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import tg.univlome.epl.R
-import tg.univlome.epl.databinding.FragmentMapsBinding
-import android.Manifest
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import okhttp3.*
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
 import org.osmdroid.config.Configuration
@@ -28,25 +39,17 @@ import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.io.IOException
-import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
+import tg.univlome.epl.MainActivity
+import tg.univlome.epl.R
+import tg.univlome.epl.databinding.FragmentMapsBinding
+import tg.univlome.epl.models.Lieu
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.services.SalleService
-import android.annotation.SuppressLint
-import android.graphics.drawable.BitmapDrawable
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import tg.univlome.epl.MainActivity
-import tg.univlome.epl.models.Lieu
-import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.SearchBarFragment
+import java.io.IOException
 
-class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationListener {
+class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener, LocationListener {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -84,7 +87,8 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Configuration.getInstance().load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
+        Configuration.getInstance()
+            .load(requireContext(), requireActivity().getSharedPreferences("osmdroid", 0))
         Configuration.getInstance().userAgentValue = requireActivity().packageName
 
         // Initialisation du service Firebase
@@ -119,7 +123,11 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         // Charger les données depuis Firebase et les afficher sur la carte
         loadLieux()
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
             view.post {
@@ -142,9 +150,14 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
 
     @SuppressLint("MissingPermission")
     private fun initLocationTracking() {
-        if (isAdded){
+        if (isAdded) {
             locationManager = requireActivity().getSystemService(LocationManager::class.java)
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10f, this) // Maj toutes les 3 sec, 10m de différence
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                3000,
+                10f,
+                this
+            ) // Maj toutes les 3 sec, 10m de différence
         }
     }
 
@@ -169,13 +182,14 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         })
 
         // Charger les infrastructures
-        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
-            if (infrastructures != null) {
-                for (infrastructure in infrastructures) {
-                    ajouterLieuSurCarte(infrastructure)
+        infrastructureService.getInfrastructures()
+            .observe(viewLifecycleOwner, Observer { infrastructures ->
+                if (infrastructures != null) {
+                    for (infrastructure in infrastructures) {
+                        ajouterLieuSurCarte(infrastructure)
+                    }
                 }
-            }
-        })
+            })
 
         // Charger les salles
         salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
@@ -194,7 +208,13 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
                 val lat = lieu.latitude.toDouble()
                 val lon = lieu.longitude.toDouble()
                 val position = GeoPoint(lat, lon)
-                markerList.add(addMarker(position, lieu.nom, lieu.image))  // Store the marker in the list
+                markerList.add(
+                    addMarker(
+                        position,
+                        lieu.nom,
+                        lieu.image
+                    )
+                )  // Store the marker in the list
             } catch (e: NumberFormatException) {
                 Log.e("MapsFragment", "Coordonnées invalides pour ${lieu.nom}")
             }
@@ -216,14 +236,19 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
 
                         // Définition de la destination
                         if (destination == null) {
-                            destination = GeoPoint(userLocation!!.latitude + 0.009, userLocation!!.longitude)
+                            destination =
+                                GeoPoint(userLocation!!.latitude + 0.009, userLocation!!.longitude)
                         } else {
                             updateRoute(userLocation!!, destination!!)
                         }
 
                         // getRoute(userLocation!!, destination!!)
                     } else {
-                        Toast.makeText(requireContext(), "Localisation non trouvée !", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Localisation non trouvée !",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
@@ -231,7 +256,7 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         mapView.overlays.add(locationOverlay)
     }
 
-    private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint ) {
+    private fun updateRoute(userLocation: GeoPoint, userDestination: GeoPoint) {
 
         addMarker(userLocation!!, "Ma position actuelle")
         addMarker(userDestination!!, "Ma destination")
@@ -252,7 +277,7 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         getRoute(userLocation, userDestination!!)
     }
 
-    private fun addMarker(position: GeoPoint, title: String,  imageUrl: String? = null): Marker {
+    private fun addMarker(position: GeoPoint, title: String, imageUrl: String? = null): Marker {
         var oldMarker = Marker(mapView)
         for (marker in markerList) {
             if (marker.position == position && marker.title == title) {
@@ -273,7 +298,10 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
                 .asBitmap()
                 .load(imageUrl)
                 .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
                         val drawable = BitmapDrawable(resources, resource)
                         marker.image = drawable
                         mapView.invalidate() // Rafraîchir la carte après chargement
@@ -287,7 +315,8 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
         val bitmap = (drawable as BitmapDrawable).bitmap
 
         // Redimensionner l'image
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 40, 40, false) // Modifier la taille selon le besoin
+        val scaledBitmap =
+            Bitmap.createScaledBitmap(bitmap, 40, 40, false) // Modifier la taille selon le besoin
         val resizedDrawable = BitmapDrawable(resources, scaledBitmap)
 
         marker.icon = resizedDrawable
@@ -307,7 +336,8 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
 
     private fun getRoute(start: GeoPoint, end: GeoPoint) {
         val apiKey = "5b3ce3597851110001cf62480894b05967b24b268cf8fa5b6a5166f7"
-        val url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
+        val url =
+            "https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}"
 
         val request = Request.Builder().url(url).build()
 
@@ -373,7 +403,10 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
             if (batiments != null) {
                 val batiments = batiments.filter { batiment ->
                     val name = batiment.nom?.lowercase() ?: ""
-                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
+                    return@filter name.contains(lowerCaseQuery) || isSubsequence(
+                        lowerCaseQuery,
+                        name
+                    )
                 }
                 for (batiment in batiments) {
                     ajouterLieuSurCarte(batiment)
@@ -381,23 +414,30 @@ class MapsFragmentOld : Fragment(), SearchBarFragment.SearchListener , LocationL
             }
         })
 
-        infrastructureService.getInfrastructures().observe(viewLifecycleOwner, Observer { infrastructures ->
-            if (infrastructures != null) {
-                val infrastructures = infrastructures.filter { infrastructure ->
-                    val name = infrastructure.nom?.lowercase() ?: ""
-                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
+        infrastructureService.getInfrastructures()
+            .observe(viewLifecycleOwner, Observer { infrastructures ->
+                if (infrastructures != null) {
+                    val infrastructures = infrastructures.filter { infrastructure ->
+                        val name = infrastructure.nom?.lowercase() ?: ""
+                        return@filter name.contains(lowerCaseQuery) || isSubsequence(
+                            lowerCaseQuery,
+                            name
+                        )
+                    }
+                    for (infrastructure in infrastructures) {
+                        ajouterLieuSurCarte(infrastructure)
+                    }
                 }
-                for (infrastructure in infrastructures) {
-                    ajouterLieuSurCarte(infrastructure)
-                }
-            }
-        })
+            })
 
         salleService.getSalles().observe(viewLifecycleOwner, Observer { salles ->
             if (salles != null) {
                 val salles = salles.filter { salle ->
                     val name = salle.nom?.lowercase() ?: ""
-                    return@filter name.contains(lowerCaseQuery) || isSubsequence(lowerCaseQuery, name)
+                    return@filter name.contains(lowerCaseQuery) || isSubsequence(
+                        lowerCaseQuery,
+                        name
+                    )
                 }
                 for (salle in salles) {
                     ajouterLieuSurCarte(salle)

@@ -2,26 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
     android:layout_height="match_parent"
+    android:layout_marginEnd="10dp"
     android:background="@drawable/rounded_frame"
     android:orientation="horizontal"
-    android:layout_marginEnd="10dp"
-    android:paddingEnd="6dp"
-    android:padding="3dp">
+    android:padding="3dp"
+    android:paddingEnd="6dp">
 
     <LinearLayout
         android:layout_width="150dp"
         android:layout_height="match_parent"
-        android:background="@drawable/rounded_frame"
-        android:layout_marginEnd="8dp" >
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/rounded_frame">
 
         <ImageView
             android:id="@+id/imgSalle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:gravity="center"
-            android:clipToOutline="true"
             android:background="@drawable/img_backgroung"
+            android:clipToOutline="true"
+            android:gravity="center"
+            android:scaleType="fitXY"
             android:src="@drawable/img" />
 
     </LinearLayout>
@@ -36,24 +36,24 @@
             android:id="@+id/txtNomSalle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/gotham_book"
             android:layout_gravity="center"
-            android:ellipsize="end"
             android:layout_marginTop="7dp"
+            android:layout_marginBottom="7dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/gotham_book"
             android:maxLines="1"
             android:text="Nom Salle"
-            android:layout_marginBottom="7dp"
             android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/situationSalle"
             android:layout_width="wrap_content"
-            android:fontFamily="@font/gotham_book"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/gotham_book"
             android:text="Campus Nord"
-            android:visibility="gone"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:visibility="gone" />
 
         <!-- Ligne de séparation -->
         <View
@@ -67,14 +67,14 @@
         <TextView
             android:id="@+id/batimentSalle"
             android:layout_width="wrap_content"
-            android:fontFamily="@font/gotham_book"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:ellipsize="end"
             android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/gotham_book"
             android:maxLines="2"
             android:text="Batiment A"
-            android:textSize="13sp"/>
+            android:textSize="13sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"

@@ -2,28 +2,33 @@
 
 package tg.univlome.epl
 
+import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -31,31 +36,60 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
 import tg.univlome.epl.databinding.ActivityMainBinding
+import tg.univlome.epl.models.NavItem
+import tg.univlome.epl.ui.LogoFragment
+import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.ui.batiment.BatimentFragment
 import tg.univlome.epl.ui.home.HomeFragment
 import tg.univlome.epl.ui.infrastructure.InfraFragment
-import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.ui.maps.MapsFragment
 import java.util.Locale
-import android.os.Handler
-import android.os.Looper
-import android.view.animation.DecelerateInterpolator
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.os.LocaleListCompat
-import tg.univlome.epl.models.NavItem
-import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.content.Intent
-import android.view.ViewGroup
-import tg.univlome.epl.ui.LogoFragment
 
-class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, LogoFragment.LogoListener {
+/**
+ * Activité principale de l'application : `MainActivity`
+ *
+ * Description :
+ * Cette activité est le point d’entrée visuel de l’application. Elle centralise :
+ * - L’interface de navigation latérale (`DrawerLayout`)
+ * - L’affichage des fragments (accueil, bâtiments, salles, carte)
+ * - La gestion de la langue, du thème et des permissions de localisation
+ * - L’intégration des fragments `LogoFragment` et `SearchBarFragment` pour la barre de recherche dynamique
+ *
+ * Composants principaux :
+ * - `DrawerLayout`, `NavigationView`, `Toolbar` : composants d'interface
+ * - `NavItem` : modèle utilisé pour représenter les éléments de navigation
+ * - `HomeFragment`, `BatimentFragment`, `InfraFragment`, `MapsFragment` : fragments principaux
+ * - `SearchBarFragment`, `LogoFragment` : fragments d’en-tête dynamiques
+ *
+ * Bibliothèques utilisées :
+ * - OSMDroid (via MapsFragment)
+ * - Firebase (optionnel, indirect)
+ * - AndroidX : AppCompat, RecyclerView, Fragment, Lifecycle
+ *
+ * Fonctionnalités intégrées :
+ * - Gestion du thème (clair, sombre, système)
+ * - Gestion multilingue (français/anglais)
+ * - Permissions runtime pour la localisation
+ * - Comportement personnalisé du bouton retour (double clic pour quitter)
+ *
+ * @see NavItem
+ * @see HomeFragment
+ * @see LogoFragment
+ * @see SearchBarFragment
+ */
+class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener,
+    LogoFragment.LogoListener {
+
+    // Liaison de la vue
     lateinit var ui: ActivityMainBinding
+
+    // Navigation
     private var selectedItem: NavItem? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
+
+    // Fragments de recherche et logo
     private lateinit var searchBarFragment: SearchBarFragment
     private lateinit var logoFragment: LogoFragment
     private var currentLanguageCode: String? = null
@@ -63,6 +97,8 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
     private var doubleBackToExitPressedOnce = false // Variable pour gérer le double appui
     private var currentFragment: Fragment? = null // Pour suivre quel fragment est affiché
     private var navItems = listOf<NavItem>()
+
+    // Demande de permission de localisation
     private val locationPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -73,9 +109,10 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
             }
         }
 
-    // Modifiez la méthode onCreate dans MainActivity.kt en ajoutant
-// une vérification explicite du fragment actuel après l'application du thème
-
+    /**
+     * Méthode appelée lors de la création de l'activité.
+     * Initialise la navigation, le thème, la langue, les fragments et les permissions.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityMainBinding.inflate(layoutInflater)
@@ -85,7 +122,8 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
 
         // Appliquer la langue
-        currentLanguageCode = sharedPreferences.getString("language_code", Locale.getDefault().language)
+        currentLanguageCode =
+            sharedPreferences.getString("language_code", Locale.getDefault().language)
         if (currentLanguageCode != null) {
             setLocale(this, currentLanguageCode!!)
         }
@@ -176,6 +214,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
                         showSearchBarFragment(fragment)
                         showLogo(null)
                     }
+
                     is LogoFragment.LogoListener -> {
                         showLogo(fragment)
                         showSearchBarFragment(null)
@@ -196,6 +235,10 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         }
     }
 
+    /**
+     * Initialise les éléments de navigation (`NavItem`) et configure le comportement de sélection.
+     * Chaque item déclenche le chargement de son fragment associé.
+     */
     private fun chargerItems() {
         navItems = listOf(
             NavItem(
@@ -263,6 +306,12 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         }
     }
 
+    /**
+     * Applique les effets visuels et la logique de sélection d’un élément du menu.
+     *
+     * @param item Élément sélectionné dans le menu.
+     * @param navItems Liste complète des items pour réinitialisation.
+     */
     fun setItem(item: NavItem, navItems: List<NavItem>) {
         // Réinitialiser tous les items
         for (otherItem in navItems) {
@@ -274,7 +323,6 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
                     R.color.gray
                 )
             ) // Couleur inactive
-            //collapseItem(otherItem.layout)
             if (otherItem.textView.text == this.getString(R.string.infrastructures)) {
                 item.textView.minWidth = 0
             }
@@ -290,6 +338,9 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         loadFragment(item.fragment)
     }
 
+    /**
+     * Effectue également une animation d'arrière-plan pour l'item sélectionné.
+     */
     private fun animateItemSelection(item: NavItem) {
         item.layout.setBackgroundResource(R.drawable.nav_item_bg)
 
@@ -305,6 +356,9 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         item.icon.setColorFilter(ContextCompat.getColor(this, R.color.black))
     }
 
+    /**
+     * Effectue une animation d'arrière-plan pour l'item sélectionné.
+     */
     private fun _animateItemSelection(item: NavItem) {
         // Appliquer le style de fond
         item.layout.setBackgroundResource(R.drawable.nav_item_bg)
@@ -358,6 +412,11 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
             .start()
     }
 
+    /**
+     * Affiche la barre de recherche (`SearchBarFragment`) si un listener est fourni.
+     *
+     * @param listener Listener implémenté par le fragment actuel ou `null` pour masquer la barre.
+     */
     fun showSearchBarFragment(listener: SearchBarFragment.SearchListener?) {
         if (listener != null) {
             // Afficher la barre de recherche et définir le listener du fragment actif
@@ -373,6 +432,9 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         }
     }
 
+    /**
+     * Affiche ou masque le logo (`LogoFragment`) en fonction du fragment actif.
+     */
     fun showLogo(listener: LogoFragment.LogoListener?) {
         if (listener != null) {
             logoFragment.setLogoListener(listener)
@@ -386,6 +448,11 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         }
     }
 
+    /**
+     * Charge dynamiquement un fragment dans le conteneur principal.
+     *
+     * @param fragment Fragment à afficher.
+     */
     fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, fragment)
@@ -393,6 +460,11 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         currentFragment = fragment
     }
 
+    /**
+     * Charge le fragment MapsFragment dans le conteneur principal.
+     *
+     * @param fragment Fragment à afficher.
+     */
     fun loadMapsFragment() {
         for (item in navItems) {
             if (item.fragment is MapsFragment) {
@@ -402,42 +474,13 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            // Si le drawer est ouvert, fermez-le
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            if (currentFragment is HomeFragment) {
-                // Si on est sur HomeFragment, gérer le double appui pour quitter l'application
-                if (doubleBackToExitPressedOnce) {
-                    super.onBackPressed() // Quitter l'application
-                    return
-                }
-
-                this.doubleBackToExitPressedOnce = true
-                // Afficher un message à l'utilisateur
-                Toast.makeText(this, "Appuyez à nouveau pour quitter", Toast.LENGTH_SHORT)
-                    .show()
-
-                // Remettre la variable à false après un délai
-                Handler(Looper.getMainLooper()).postDelayed({
-                    doubleBackToExitPressedOnce = false
-                }, 2000) // Le délai pour un deuxième appui est de 2 secondes
-            } else {
-                chargerItems()
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
+    /**
+     * Affiche une boîte de dialogue de paramètres permettant à l'utilisateur
+     * de choisir la langue et le thème de l'application.
+     *
+     * @param activity Activité appelante.
+     * @param show Si `true`, la boîte de dialogue est immédiatement affichée.
+     */
     fun showSettingsDialog(activity: Activity, show: Boolean) {
         val dialog = Dialog(activity)
         val view = LayoutInflater.from(activity).inflate(R.layout.settings, null)
@@ -465,7 +508,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
 
         // Charger les préférences sauvegardées
         val sharedPreferences =
-            activity.getSharedPreferences("AppSettings", AppCompatActivity.MODE_PRIVATE)
+            activity.getSharedPreferences("AppSettings", MODE_PRIVATE)
         val savedLanguageCode = sharedPreferences.getString(
             "language_code",
             Locale.getDefault().language
@@ -546,6 +589,12 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         }
     }
 
+    /**
+     * Applique la langue spécifiée à l'application en mettant à jour la configuration du contexte.
+     *
+     * @param activity Activité cible.
+     * @param languageCode Code de langue (ex: "fr", "en").
+     */
     fun setLocale(activity: Activity, languageCode: String) {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
@@ -555,6 +604,46 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener, Logo
         config.setLayoutDirection(locale)
 
         activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
+    }
+
+    /**
+     * Gère le comportement du bouton retour, avec une vérification de double appui
+     * pour quitter l'application depuis le `HomeFragment`.
+     */
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            // Si le drawer est ouvert, fermez-le
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            if (currentFragment is HomeFragment) {
+                // Si on est sur HomeFragment, gérer le double appui pour quitter l'application
+                if (doubleBackToExitPressedOnce) {
+                    super.onBackPressed() // Quitter l'application
+                    return
+                }
+
+                this.doubleBackToExitPressedOnce = true
+                // Afficher un message à l'utilisateur
+                Toast.makeText(this, "Appuyez à nouveau pour quitter", Toast.LENGTH_SHORT)
+                    .show()
+
+                // Remettre la variable à false après un délai
+                Handler(Looper.getMainLooper()).postDelayed({
+                    doubleBackToExitPressedOnce = false
+                }, 2000) // Le délai pour un deuxième appui est de 2 secondes
+            } else {
+                chargerItems()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
     }
 
     override fun onSearch(query: String) {}

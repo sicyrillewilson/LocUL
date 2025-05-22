@@ -10,22 +10,42 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.util.GeoPoint
 import tg.univlome.epl.MainActivity
 import tg.univlome.epl.R
-import tg.univlome.epl.adapter.InfraFragmentAdapter
 import tg.univlome.epl.adapter.SalleViewAllAdapter
 import tg.univlome.epl.models.Salle
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
-import tg.univlome.epl.utils.HomeSalleUtils
-import tg.univlome.epl.utils.InfraUtils
 import tg.univlome.epl.utils.SalleUtils
 
+/**
+ * Fragment ViewAllSalleFragment : Affiche la liste complète des salles
+ *
+ * Description :
+ * Ce fragment permet d'afficher toutes les salles présentes sur le campus universitaire,
+ * qu'elles soient d'enseignement, d'administration ou polyvalentes. Les données sont
+ * récupérées depuis `SalleUtils`, enrichies par la distance depuis l'utilisateur, et
+ * affichées grâce à un `SalleViewAllAdapter`.
+ *
+ * Il offre également une fonctionnalité de recherche en temps réel sur le nom des salles.
+ *
+ * Composants principaux :
+ * - SalleUtils : utilitaire pour le chargement et la mise à jour des salles
+ * - SalleViewAllAdapter : adaptateur pour l'affichage des salles dans une RecyclerView
+ * - FragmentModel : modèle de configuration du fragment
+ * - SearchBarFragment : barre de recherche dynamique
+ *
+ * Bibliothèques utilisées :
+ * - Google Play Services : récupération de la position GPS
+ * - OSMDroid : manipulation de coordonnées géographiques
+ *
+ * @see SalleUtils pour la gestion des données de salle
+ * @see SearchBarFragment pour les fonctionnalités de recherche utilisateur
+ */
 class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var salles: MutableList<Salle>
@@ -38,6 +58,12 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    /**
+     * Initialise la vue du fragment, configure les composants et déclenche
+     * la récupération de la localisation de l’utilisateur.
+     *
+     * @return Vue racine du fragment
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,15 +77,29 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
         filteredList = mutableListOf()
         adapter = SalleViewAllAdapter(salles)
 
-        fragmentModel = FragmentModel(view, requireContext(), requireActivity(), viewLifecycleOwner, R.id.recyclerAllSalle)
+        fragmentModel = FragmentModel(
+            view,
+            requireContext(),
+            requireActivity(),
+            viewLifecycleOwner,
+            R.id.recyclerAllSalle
+        )
         getUserLocation()
 
         return view
     }
 
+    /**
+     * Récupère la position actuelle de l’utilisateur et met à jour la liste des salles
+     * avec les distances correspondantes.
+     */
     private fun getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
@@ -73,16 +113,27 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
         }
     }
 
+    /**
+     * Affiche la barre de recherche intégrée lorsque ce fragment est actif.
+     */
     override fun onResume() {
         super.onResume()
         (activity as MainActivity).showSearchBarFragment(this)
     }
 
+    /**
+     * Cache la barre de recherche lorsque l’utilisateur quitte le fragment.
+     */
     override fun onPause() {
         super.onPause()
         (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
+    /**
+     * Filtre dynamiquement la liste des salles selon la recherche utilisateur.
+     *
+     * @param query Texte de recherche fourni par l'utilisateur
+     */
     override fun onSearch(query: String) {
         filteredList = salles.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()
         adapter.updateList(filteredList)

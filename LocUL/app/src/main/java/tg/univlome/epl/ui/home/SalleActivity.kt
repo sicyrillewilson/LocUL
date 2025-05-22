@@ -12,12 +12,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageView
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -36,11 +34,47 @@ import tg.univlome.epl.models.Salle
 import tg.univlome.epl.ui.maps.MapsActivity
 import tg.univlome.epl.utils.MapsUtils
 
+/**
+ * Activité SalleActivity : Activité de détail d’une salle
+ *
+ * Description :
+ * Cette activité permet d'afficher les informations complètes d'une salle universitaire :
+ *  - Nom, situation géographique, description et distance par rapport à l’utilisateur
+ *  - Images supplémentaires affichées dans un carrousel avec indicateurs personnalisés
+ *  - Carte miniature (`miniMap`) indiquant la position de la salle et, si possible, celle de l’utilisateur
+ *  - Un bouton "Aller" permettant d’ouvrir la carte principale (`MapsActivity`) avec l’itinéraire
+ *
+ * Elle utilise les bibliothèques `Glide` pour le chargement des images, `OSMDroid` pour la carte
+ * et `FusedLocationProviderClient` pour la récupération de la position actuelle.
+ *
+ * Composants UI :
+ *  - `ActivitySalleBinding` : ViewBinding pour accéder aux éléments d’interface
+ *  - `ViewPager2` + `TabLayout` : affichage des images avec points personnalisés
+ *  - `MapView` : carte statique pour visualisation de l’itinéraire
+ *
+ * Composants techniques :
+ *  - `Glide` pour le chargement des images
+ *  - `MapsUtils` pour configurer la carte miniature et enregistrer la destination
+ *
+ * Permissions requises :
+ *  - `ACCESS_FINE_LOCATION` : localisation précise
+ *  - `ACCESS_COARSE_LOCATION` : localisation approximative
+ *
+ * @see MapsUtils.setMiniMap pour l'affichage de la carte
+ * @see MapsActivity pour la navigation détaillée
+ * @see ImageAdapter pour le carrousel d’images
+ */
 class SalleActivity : AppCompatActivity() {
+
     lateinit var ui: ActivitySalleBinding
     private lateinit var miniMap: MapView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    /**
+     * Méthode principale appelée à la création de l'activité.
+     * Initialise l’interface utilisateur, récupère les données de la salle,
+     * configure les images, la carte miniature, les actions, et applique les autorisations.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivitySalleBinding.inflate(layoutInflater)
@@ -57,12 +91,17 @@ class SalleActivity : AppCompatActivity() {
         val images = salle?.images ?: emptyList()
 
         if (images.size <= 1) {
-            findViewById<FrameLayout>(R.id.imageContainer).visibility = View.GONE
+            ui.imageContainer.visibility = View.GONE
         } else {
-            val viewPager = findViewById<ViewPager2>(R.id.imagePager)
-            val tabLayout = findViewById<TabLayout>(R.id.imageIndicator)
+            ui.imageContainer.visibility = View.VISIBLE
+            val viewPager = ui.imagePager
+            val tabLayout = ui.imageIndicator
 
-            viewPager.adapter = ImageAdapter(images) // Adapter à créer ou adapter ton code existant
+            // Déplacer la première image à la fin de la liste
+            val mainImage = salle?.image
+            val reorderedImages = (images.filter { it != mainImage }) + mainImage
+
+            viewPager.adapter = ImageAdapter(reorderedImages as List<String>)
 
             TabLayoutMediator(tabLayout, viewPager) { _, _ -> }.attach()
 
@@ -110,43 +149,60 @@ class SalleActivity : AppCompatActivity() {
             } else {
                 ui.imgSalle.setImageResource(salle.icon)
             }
-            ui.aller.setOnClickListener {
-                MapsUtils.saveDestination(this, GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble()))
-                val intent = Intent(this, MapsActivity::class.java)
-                ui.aller.context.startActivity(intent)
-            }
+            if (!salle.latitude.isNullOrBlank() && !salle.longitude.isNullOrBlank()) {
+                val latitude = salle.latitude.toDouble()
+                val longitude = salle.longitude.toDouble()
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                ui.aller.setOnClickListener {
+                    MapsUtils.saveDestination(this, GeoPoint(latitude, longitude))
+                    val intent = Intent(this, MapsActivity::class.java)
+                    ui.aller.context.startActivity(intent)
+                }
 
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
-                return
-            }
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
 
-            miniMap = ui.miniMap
+                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+                    return
+                }
 
-            // Fallback si la localisation n'est pas disponible
-            val destination = GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble())
-            var userLocation: GeoPoint? = null
+                miniMap = ui.miniMap
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                // Fallback si la localisation n'est pas disponible
+                val destination = GeoPoint(latitude, longitude)
+                var userLocation: GeoPoint? = null
 
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    location?.let {
-                        userLocation = GeoPoint(it.latitude, it.longitude)
-                        setupMiniMap(userLocation!!, destination)
-                    } ?: run {
-                        // Si la localisation n'est pas disponible, utiliser seulement la destination
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        location?.let {
+                            userLocation = GeoPoint(it.latitude, it.longitude)
+                            setupMiniMap(userLocation!!, destination)
+                        } ?: run {
+                            // Si la localisation n'est pas disponible, utiliser seulement la destination
+                            setupMiniMap(destination, destination)
+                        }
+                    }.addOnFailureListener {
+                        // En cas d'échec, utiliser seulement la destination
                         setupMiniMap(destination, destination)
                     }
-                }.addOnFailureListener {
-                    // En cas d'échec, utiliser seulement la destination
+                } else {
+                    // Sans permission, utiliser seulement la destination
                     setupMiniMap(destination, destination)
                 }
             } else {
-                // Sans permission, utiliser seulement la destination
-                setupMiniMap(destination, destination)
+                // Affiche un message ou fais une action par défaut
+                ui.aller.visibility = View.GONE
+                ui.miniMapLayout.visibility = View.GONE
             }
 
         }
@@ -156,6 +212,16 @@ class SalleActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Configure une carte miniature (`miniMap`) pour afficher la position de la salle
+     * et celle de l’utilisateur, si disponible.
+     *
+     * @param start Point de départ (position de l’utilisateur)
+     * @param end Point de destination (salle)
+     *
+     * @requiresPermission Manifest.permission.ACCESS_FINE_LOCATION
+     * @requiresPermission Manifest.permission.ACCESS_COARSE_LOCATION
+     */
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun setupMiniMap(start: GeoPoint, end: GeoPoint) {
         // Postpone pour s'assurer que la vue est bien layoutée
