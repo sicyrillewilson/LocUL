@@ -24,6 +24,31 @@ import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.InfraUtils
 
+/**
+ * Fragment NordInfraFragment : Affiche les infrastructures situées au nord du campus
+ *
+ * Description :
+ * Ce fragment permet d’afficher dynamiquement toutes les infrastructures localisées
+ * sur le campus nord. Les données sont chargées à partir de `InfraUtils`, enrichies
+ * avec la distance depuis la localisation actuelle de l’utilisateur et affichées
+ * à l’aide d’un `InfraFragmentAdapter`.
+ *
+ * Il inclut également une barre de recherche permettant un filtrage en temps réel.
+ * Un effet Shimmer est utilisé durant le chargement pour améliorer l’expérience utilisateur.
+ *
+ * Composants principaux :
+ * - InfraUtils : utilitaire de chargement et filtrage des infrastructures
+ * - InfraFragmentAdapter : adaptateur pour l’affichage dans la RecyclerView
+ * - FragmentModel : modèle d’interaction entre la vue, le contexte et le cycle de vie
+ *
+ * Bibliothèques utilisées :
+ * - Google Play Services : récupération de la géolocalisation
+ * - OSMDroid : manipulation de coordonnées GPS
+ * - Facebook Shimmer : effet de chargement visuel
+ *
+ * @see InfraUtils pour la logique métier et la mise à jour des données
+ * @see SearchBarFragment pour la gestion de la recherche utilisateur
+ */
 class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var infrasNord: MutableList<Infrastructure>
@@ -39,6 +64,12 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         super.onCreate(savedInstanceState)
     }
 
+    /**
+     * Initialise et retourne la vue du fragment,
+     * prépare les composants et déclenche la localisation utilisateur.
+     *
+     * @return Vue complète du fragment initialisé
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,6 +99,10 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         return view
     }
 
+    /**
+     * Récupère la géolocalisation de l’utilisateur et appelle
+     * InfraUtils pour charger les infrastructures du campus nord.
+     */
     private fun getUserLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -102,16 +137,27 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         }
     }
 
+    /**
+     * Affiche la barre de recherche intégrée lorsque ce fragment est actif.
+     */
     override fun onResume() {
         super.onResume()
         (activity as MainActivity).showSearchBarFragment(this)
     }
 
+    /**
+     * Cache la barre de recherche lorsque l’utilisateur quitte le fragment.
+     */
     override fun onPause() {
         super.onPause()
         (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
+    /**
+     * Met à jour dynamiquement la liste affichée selon le texte saisi dans la barre de recherche.
+     *
+     * @param query Chaîne de caractères à rechercher dans les noms d'infrastructures
+     */
     override fun onSearch(query: String) {
         filteredList =
             infrasNord.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()

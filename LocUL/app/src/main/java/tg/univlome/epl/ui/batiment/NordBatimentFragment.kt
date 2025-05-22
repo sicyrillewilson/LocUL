@@ -24,6 +24,29 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.BatimentUtils
 
+/**
+ * Fragment NordBatimentFragment : Affiche les bâtiments situés sur le Campus Nord.
+ *
+ * Description :
+ * Ce fragment permet de visualiser dynamiquement les bâtiments du **campus nord**,
+ * en se basant sur la localisation actuelle de l’utilisateur.
+ * Il calcule les distances entre l’utilisateur et les bâtiments, les affiche dans
+ * une `RecyclerView` avec un effet de chargement shimmer, et permet un filtrage
+ * en temps réel via la barre de recherche.
+ *
+ * Composants principaux :
+ * - `BatimentUtils` : outil central de récupération, filtrage et affichage
+ * - `BatimentFragmentAdapter` : adaptateur de liste pour les bâtiments
+ * - `FragmentModel` : encapsule les métadonnées de fragment (vue, contexte, type)
+ *
+ * Bibliothèques utilisées :
+ * - Google Play Services (`FusedLocationProviderClient`) : pour la géolocalisation
+ * - OSMDroid : pour manipuler les coordonnées géographiques
+ * - Facebook Shimmer : pour l’effet de chargement fluide
+ *
+ * @see BatimentUtils pour la logique métier de mise à jour
+ * @see SearchBarFragment pour le support du filtrage textuel en direct
+ */
 class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var batiments: MutableList<Batiment>
@@ -39,6 +62,12 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         super.onCreate(savedInstanceState)
     }
 
+    /**
+     * Crée et retourne la vue du fragment, initialise les composants UI,
+     * démarre l’effet shimmer et déclenche la récupération de la localisation.
+     *
+     * @return Vue complète du fragment initialisé
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,6 +97,10 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         return view
     }
 
+    /**
+     * Récupère la localisation actuelle de l'utilisateur pour filtrer les bâtiments.
+     * Utilise `BatimentUtils.updateBatiments` avec le paramètre de situation "nord".
+     */
     private fun getUserLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -101,16 +134,27 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         }
     }
 
+    /**
+     * Affiche la barre de recherche intégrée lorsque ce fragment est actif.
+     */
     override fun onResume() {
         super.onResume()
         (activity as MainActivity).showSearchBarFragment(this)
     }
 
+    /**
+     * Cache la barre de recherche lorsque l’utilisateur quitte le fragment.
+     */
     override fun onPause() {
         super.onPause()
         (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
+    /**
+     * Filtre dynamiquement la liste des bâtiments selon le texte de recherche saisi.
+     *
+     * @param query Le mot-clé saisi dans la barre de recherche
+     */
     override fun onSearch(query: String) {
         filteredList =
             batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()

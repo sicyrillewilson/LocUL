@@ -34,11 +34,43 @@ import org.osmdroid.views.overlay.Polyline
 import tg.univlome.epl.R
 import java.io.IOException
 
+/**
+ * Objet MapsUtils : Fournit des utilitaires liés à la carte et à la géolocalisation,
+ * utilisés pour la manipulation de données sur les cartes OpenStreetMap avec OSMDroid.
+ *
+ * Description :
+ * Cet objet contient un ensemble de fonctions utilitaires pour gérer les cartes,
+ * la géolocalisation, les marqueurs, et l’itinéraire entre deux points. Elle permet
+ * également la sauvegarde et la récupération des données de géolocalisation via
+ * les préférences partagées de l’application Android.
+ * Elle est utilisée dans le contexte d'une application de visualisation et navigation
+ * vers des bâtiments à l'aide d'une carte embarquée.
+ *
+ * Composants principaux :
+ *  - Calcul de distance entre deux points géographiques
+ *  - Sauvegarde/chargement des positions utilisateur et destination
+ *  - Gestion et affichage des marqueurs
+ *  - Affichage de l’itinéraire sur carte (OpenRouteService)
+ *  - Configuration d'une carte miniature (miniMap)
+ *
+ * Bibliothèques utilisées :
+ * - OSMDroid pour l’affichage et la manipulation de la carte
+ * - OpenRouteService pour le calcul d’itinéraires
+ *
+ * @see MapsActivity pour l'utilisation principale de cette classe
+ */
 object MapsUtils {
 
     private val client = OkHttpClient()
     private val iconCache = mutableMapOf<Int, BitmapDrawable>()
 
+    /**
+     * Calcule la distance en mètres entre deux points géographiques.
+     *
+     * @param start Le point de départ.
+     * @param end Le point d’arrivée.
+     * @return Distance en mètres.
+     */
     fun calculateDistance(start: GeoPoint, end: GeoPoint): Double {
         val results = FloatArray(1)
         android.location.Location.distanceBetween(
@@ -49,6 +81,12 @@ object MapsUtils {
         return results[0].toDouble() // Retourne la distance en mètres
     }
 
+    /**
+     * Sauvegarde la position de l’utilisateur dans les préférences partagées.
+     *
+     * @param context Contexte de l’application.
+     * @param location Localisation à sauvegarder.
+     */
     fun saveUserLocation(context: Context, location: GeoPoint) {
         val sharedPreferences =
             context.getSharedPreferences("UserLocationPrefs", Context.MODE_PRIVATE)
@@ -56,8 +94,15 @@ object MapsUtils {
         val gson = Gson()
         val json = gson.toJson(location)
         editor.putString("userLocation", json)
+        editor.apply()
     }
 
+    /**
+     * Charge la position de l’utilisateur depuis les préférences partagées.
+     *
+     * @param context Contexte de l’application.
+     * @return La position sauvegardée, ou (0.0, 0.0) par défaut.
+     */
     fun loadUserLocation(context: Context): GeoPoint {
         val sharedPreferences =
             context.getSharedPreferences("UserLocationPrefs", Context.MODE_PRIVATE)
@@ -67,6 +112,12 @@ object MapsUtils {
         return gson.fromJson(json, type) ?: GeoPoint(0.0, 0.0)
     }
 
+    /**
+     * Sauvegarde une nouvelle destination dans les préférences.
+     *
+     * @param context Contexte de l’application.
+     * @param destination Destination à sauvegarder.
+     */
     fun saveDestination(context: Context, destination: GeoPoint) {
         val sharedPreferences =
             context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
@@ -78,6 +129,12 @@ object MapsUtils {
     }
 
 
+    /**
+     * Récupère la dernière destination sauvegardée depuis les préférences.
+     *
+     * @param context Contexte de l’application.
+     * @return Destination sauvegardée ou (0.0, 0.0) si aucune.
+     */
     fun loadDestination(context: Context): GeoPoint {
         val sharedPreferences =
             context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
@@ -87,6 +144,11 @@ object MapsUtils {
         return gson.fromJson(json, type) ?: GeoPoint(0.0, 0.0)
     }
 
+    /**
+     * Supprime la destination sauvegardée.
+     *
+     * @param context Contexte de l’application.
+     */
     fun clearDestination(context: Context) {
         val sharedPreferences =
             context.getSharedPreferences("DestinationPrefs", Context.MODE_PRIVATE)
@@ -95,6 +157,12 @@ object MapsUtils {
         editor.apply()
     }
 
+    /**
+     * Sauvegarde la liste des marqueurs récupérés depuis la map dans les préférences.
+     *
+     * @param context Contexte de l’application.
+     * @param markerList Liste des marqueurs à sauvegarder.
+     */
     fun saveMarkerList(context: Context, markerList: MutableList<Marker>) {
         val sharedPreferences =
             context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
@@ -105,6 +173,12 @@ object MapsUtils {
         editor.apply()
     }
 
+    /**
+     * Récupère la liste des marqueurs depuis les préférences.
+     *
+     * @param context Contexte de l’application.
+     * @return Liste de marqueurs sauvegardés ou une liste vide.
+     */
     fun loadMarkerList(context: Context): MutableList<Marker> {
         val sharedPreferences =
             context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
@@ -114,6 +188,11 @@ object MapsUtils {
         return gson.fromJson(json, type) ?: mutableListOf()
     }
 
+    /**
+     * Supprime la liste des marqueurs sauvegardés.
+     *
+     * @param context Contexte de l’application.
+     */
     fun clearMarkerList(context: Context) {
         val sharedPreferences =
             context.getSharedPreferences("MarkerListPrefs", Context.MODE_PRIVATE)
@@ -122,16 +201,14 @@ object MapsUtils {
         editor.apply()
     }
 
-    fun saveMapState(
-        context: Context,
-        latitude: Double,
-        longitude: Double,
-        zoom: Float,
-        isNightMode: Boolean
-    ) {
-
-    }
-
+    /**
+     * Redimensionne une icône pour l'affichage sur la carte et la met en cache pour les chargements
+     * ultérieurs.
+     *
+     * @param icon ID de la ressource drawable.
+     * @param resources Accès aux ressources.
+     * @return Drawable redimensionné ou `null` si non disponible.
+     */
     fun resizeIcon(icon: Int = R.drawable.default_marker, resources: Resources): BitmapDrawable? {
         return iconCache[icon] ?: run {
             val drawable = ResourcesCompat.getDrawable(resources, icon, null) ?: return null
@@ -151,6 +228,20 @@ object MapsUtils {
         }
     }
 
+    /**
+     * Configure une carte miniature statique montrant la position de l'utilisateur et sa destination.
+     * Affiche les marqueurs de départ et d’arrivée ainsi que l’itinéraire calculé.
+     *
+     * @param miniMap Vue MapView à configurer.
+     * @param userLocation Position de l'utilisateur (par défaut (0,0)).
+     * @param destination Position de destination (par défaut (0,0)).
+     * @param context Contexte de l’application.
+     * @param activity Activité appelante.
+     * @param resources Accès aux ressources.
+     *
+     * @permission ACCESS_FINE_LOCATION
+     * @permission ACCESS_COARSE_LOCATION
+     */
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     fun setMiniMap(
         miniMap: MapView,
@@ -223,6 +314,14 @@ object MapsUtils {
         }
     }
 
+    /**
+     * Récupère et trace l’itinéraire entre deux points en utilisant l’API OpenRouteService.
+     *
+     * @param start Point de départ.
+     * @param end Point d’arrivée.
+     * @param activity Activité pour l’exécution sur le thread principal.
+     * @param mapView Carte à mettre à jour.
+     */
     private fun getRoute(start: GeoPoint, end: GeoPoint, activity: Activity, mapView: MapView) {
         val apiKey = "5b3ce3597851110001cf62480894b05967b24b268cf8fa5b6a5166f7"
         val url =

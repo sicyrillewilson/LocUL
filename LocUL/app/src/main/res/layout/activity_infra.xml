@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -124,6 +125,39 @@
                     android:textSize="16sp" />
 
             </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/imageContainer"
+                android:layout_width="match_parent"
+                android:layout_height="210dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/mini_map_bg"
+                android:visibility="gone">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/imagePager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/mini_map_bg"
+                    android:clipChildren="false"
+                    android:clipToOutline="true"
+                    android:clipToPadding="false"
+                    android:scaleType="fitXY" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/imageIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="-30dp"
+                    android:background="@android:color/transparent"
+                    app:tabBackground="@drawable/dot_selector"
+                    app:tabIndicatorColor="@android:color/transparent"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabSelectedTextColor="@color/selected_dot_color"
+                    app:tabTextColor="@color/unselected_dot_color" />
+
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/miniMapLayout"

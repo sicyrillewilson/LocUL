@@ -22,6 +22,33 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.BatimentUtils
 
+/**
+ * Fragment ViewAllBatEnsFragment : Affiche la liste complète des bâtiments d’enseignement
+ *
+ * Description :
+ * Ce fragment permet la visualisation de tous les bâtiments liés à l’enseignement
+ * sur le campus universitaire. Il récupère les données depuis `BatimentService` et
+ * les affiche à l’aide d’un `RecyclerView` géré par `BatimentFragmentAdapter`.
+ *
+ * Il utilise la géolocalisation de l’utilisateur pour calculer la distance avec
+ * chaque bâtiment via `MapsUtils`, et permet une recherche dynamique sur le nom
+ * des bâtiments grâce à `SearchBarFragment`.
+ *
+ * Composants principaux :
+ * - `RecyclerView` : affiche la liste complète des bâtiments d’enseignement
+ * - `FusedLocationProviderClient` : pour localiser l’utilisateur
+ * - `BatimentFragmentAdapter` : adaptateur d’affichage des bâtiments
+ * - `FragmentModel` : modèle contenant les informations du fragment
+ * - `SearchBarFragment` : barre de recherche dynamique
+ *
+ * Bibliothèques utilisées :
+ * - Google Play Services pour la localisation
+ * - OSMDroid pour les coordonnées
+ *
+ * @see BatimentUtils pour le traitement des données de bâtiment
+ * @see MapsUtils pour le calcul des distances géographiques
+ * @see SearchBarFragment pour la recherche utilisateur
+ */
 class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var batimentsEns: MutableList<Batiment>
@@ -34,6 +61,12 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    /**
+     * Initialise la vue du fragment, configure la localisation, le modèle de fragment
+     * et déclenche la récupération des données de bâtiments d’enseignement.
+     *
+     * @return Vue construite pour le fragment
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -60,6 +93,10 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
         return view
     }
 
+    /**
+     * Récupère la localisation actuelle de l’utilisateur pour permettre
+     * le calcul de la distance entre l’utilisateur et chaque bâtiment.
+     */
     private fun getUserLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -86,16 +123,28 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
         }
     }
 
+    /**
+     * Affiche la barre de recherche intégrée lorsque ce fragment est actif.
+     */
     override fun onResume() {
         super.onResume()
         (activity as MainActivity).showSearchBarFragment(this)
     }
 
+    /**
+     * Cache la barre de recherche lorsque l’utilisateur quitte le fragment.
+     */
     override fun onPause() {
         super.onPause()
         (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
+    /**
+     * Filtre dynamiquement la liste des bâtiments affichés selon le texte
+     * saisi par l’utilisateur dans la barre de recherche.
+     *
+     * @param query Texte recherché
+     */
     override fun onSearch(query: String) {
         filteredList =
             batimentsEns.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()

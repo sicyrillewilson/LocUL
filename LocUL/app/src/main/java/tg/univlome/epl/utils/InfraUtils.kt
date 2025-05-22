@@ -17,6 +17,30 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.maps.MapsFragment
 
+/**
+ * Objet InfraUtils : Fournit des fonctions utilitaires pour la gestion
+ * des infrastructures sur le campus universitaire.
+ *
+ * Description :
+ * Cet objet permet d'interagir avec les infrastructures en facilitant :
+ *  - Le chargement dynamique des infrastructures à partir d'un service distant
+ *  - Le filtrage selon leur situation géographique (Campus sud, nord, etc.)
+ *  - L'affichage de la distance par rapport à l'utilisateur
+ *  - L'ouverture d'une carte localisant une infrastructure
+ *  - La sauvegarde et le chargement local des infrastructures via SharedPreferences
+ *
+ * Composants principaux :
+ *  - InfrastructureService : service de récupération des données
+ *  - InfraFragmentAdapter : adaptateur RecyclerView pour afficher les infrastructures
+ *  - MapsFragment : fragment de carte utilisé pour localiser une infrastructure
+ *
+ * Bibliothèques utilisées :
+ *  - Gson pour la sérialisation JSON
+ *  - OSMDroid pour la manipulation des points géographiques
+ *
+ * @see InfrastructureService pour l'accès aux données des infrastructures
+ * @see MapsFragment pour l'affichage de la carte d'une infrastructure
+ */
 object InfraUtils {
 
     private lateinit var infraService: InfrastructureService
@@ -24,6 +48,12 @@ object InfraUtils {
     private lateinit var infras: MutableList<Infrastructure>
     private lateinit var adapter: InfraFragmentAdapter
 
+    /**
+     * Ouvre le fragment de carte (MapsFragment) centré sur la position d'une infrastructure donnée.
+     *
+     * @param infrastructure Infrastructure dont la position est à afficher.
+     * @param fragmentActivity L’activité hôte dans laquelle charger le fragment.
+     */
     fun ouvrirMapsFragment(infrastructure: Infrastructure, fragmentActivity: FragmentActivity) {
         val fragment = MapsFragment()
         val bundle = Bundle()
@@ -37,6 +67,17 @@ object InfraUtils {
             .commit()
     }
 
+    /**
+     * Met à jour dynamiquement la liste des infrastructures avec la distance depuis l’utilisateur,
+     * filtre selon la situation (sud, nord...), et recharge la RecyclerView avec l’adaptateur.
+     *
+     * @param userLocation Position géographique actuelle de l’utilisateur.
+     * @param infrastructures Liste cible à remplir avec les infrastructures chargées.
+     * @param filteredList Liste utilisée pour afficher les éléments filtrés.
+     * @param adapter Adaptateur lié à la RecyclerView à mettre à jour.
+     * @param fragmentModel Modèle contenant le contexte, la vue et les infos du fragment appelant.
+     * @param onDataLoaded Callback optionnel exécuté après le chargement.
+     */
     fun updateInfrastructures(
         userLocation: GeoPoint,
         infrastructures: MutableList<Infrastructure>,
@@ -51,7 +92,8 @@ object InfraUtils {
         this.adapter = adapter
 
         Log.d("InfraUtils", "updateInfrastructures appelée avec : $userLocation")
-        // Charger les bâtiments
+
+        // Récupération des infrastructures depuis le service
         infraService.getInfrastructures()
             .observe(fragmentModel.viewLifecycleOwner, Observer { infras ->
                 if (infras != null) {
@@ -89,6 +131,7 @@ object InfraUtils {
                                 e
                             )
                         }
+                        // Filtrage selon la situation géographique
                         when (fragmentModel.situation) {
                             "" -> {
                                 infrastructures.add(infrastructure)
@@ -108,8 +151,9 @@ object InfraUtils {
                         }
                     }
                 }
-                this.filteredList = infrastructures.toMutableList()
 
+                // Mise à jour de la liste filtrée et de l'adaptateur
+                this.filteredList = infrastructures.toMutableList()
                 this.adapter = InfraFragmentAdapter(infrastructures)
 
                 val recyclerBatiments =
@@ -125,6 +169,12 @@ object InfraUtils {
         onDataLoaded()
     }
 
+    /**
+     * Sauvegarde la liste des infrastructures localement dans les préférences partagées (JSON).
+     *
+     * @param context Contexte utilisé pour accéder aux préférences.
+     * @param infras Liste des infrastructures à sauvegarder.
+     */
     fun saveInfras(context: Context, infras: MutableList<Infrastructure>) {
         val sharedPreferences = context.getSharedPreferences("InfrasPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -134,6 +184,12 @@ object InfraUtils {
         editor.apply()
     }
 
+    /**
+     * Charge les infrastructures précédemment sauvegardées depuis les préférences partagées.
+     *
+     * @param context Contexte utilisé pour accéder aux préférences.
+     * @return Liste des infrastructures sauvegardées ou null si aucune donnée trouvée.
+     */
     fun loadInfras(context: Context): MutableList<Infrastructure>? {
         val sharedPreferences = context.getSharedPreferences("InfrasPrefs", Context.MODE_PRIVATE)
         val gson = Gson()

@@ -24,6 +24,35 @@ import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.BatimentUtils
 
+/**
+ * Fragment AllBatimentFragment : Affiche tous les bâtiments sans filtrage géographique
+ *
+ * Description :
+ * Ce fragment présente la liste complète des bâtiments disponibles sur le campus universitaire,
+ * sans distinction de situation (nord/sud). Il utilise :
+ *  - un effet de chargement Shimmer pour l’attente des données
+ *  - la localisation de l’utilisateur pour calculer les distances par bâtiment
+ *  - une interface de recherche (SearchBar) pour filtrer dynamiquement par nom
+ *
+ * Une fois les données chargées, elles sont affichées dans une `RecyclerView` avec
+ * l’adaptateur `BatimentFragmentAdapter`. Ce fragment communique avec `BatimentUtils`
+ * pour le traitement de la logique métier et la géolocalisation.
+ *
+ * Composants principaux :
+ *  - `RecyclerView` : liste des bâtiments
+ *  - `ShimmerFrameLayout` : animation de chargement
+ *  - `FusedLocationProviderClient` : localisation utilisateur
+ *  - `SearchBarFragment` : filtrage via une barre de recherche
+ *
+ * Bibliothèques utilisées :
+ *  - Google Location Services
+ *  - Facebook Shimmer
+ *  - OSMDroid pour la gestion des coordonnées
+ *
+ * @see BatimentUtils pour la logique de filtrage et calcul de distance
+ * @see BatimentFragmentAdapter pour l’affichage des éléments
+ * @see SearchBarFragment pour la recherche textuelle
+ */
 class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
 
     private lateinit var batiments: MutableList<Batiment>
@@ -39,6 +68,12 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         super.onCreate(savedInstanceState)
     }
 
+    /**
+     * Initialise le layout du fragment, les vues UI, la localisation,
+     * les listes de données et lance le chargement.
+     *
+     * @return Vue initialisée du fragment
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,6 +102,10 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         return view
     }
 
+    /**
+     * Récupère la position actuelle de l’utilisateur à l’aide de Google Location Services.
+     * Une fois la position obtenue, déclenche le chargement des bâtiments via `BatimentUtils`.
+     */
     private fun getUserLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -101,16 +140,28 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         }
     }
 
+    /**
+     * Affiche la barre de recherche intégrée lorsque ce fragment est actif.
+     */
     override fun onResume() {
         super.onResume()
         (activity as MainActivity).showSearchBarFragment(this)
     }
 
+    /**
+     * Cache la barre de recherche lorsque l’utilisateur quitte le fragment.
+     */
     override fun onPause() {
         super.onPause()
         (activity as MainActivity).showSearchBarFragment(null) // Cacher la barre si on quitte
     }
 
+    /**
+     * Effectue un filtrage dynamique de la liste des bâtiments en fonction du texte recherché.
+     * Met à jour l’adaptateur avec les résultats filtrés.
+     *
+     * @param query Chaîne entrée par l’utilisateur dans la barre de recherche
+     */
     override fun onSearch(query: String) {
         filteredList =
             batiments.filter { it.nom.contains(query, ignoreCase = true) }.toMutableList()

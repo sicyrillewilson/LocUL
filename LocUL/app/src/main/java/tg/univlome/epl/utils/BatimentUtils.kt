@@ -18,6 +18,31 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.maps.MapsFragment
 
+/**
+ * Objet BatimentUtils : Fournit des fonctions utilitaires pour la gestion
+ * des bâtiments sur le campus universitaire.
+ *
+ * Description :
+ * Cet objet centralise les opérations relatives aux bâtiments :
+ *  - Chargement dynamique des bâtiments à partir du service distant (Firestore)
+ *  - Filtrage selon la situation géographique (sud, nord, etc.) ou le type (enseignement, administratif...)
+ *  - Calcul de la distance entre l'utilisateur et chaque bâtiment
+ *  - Ouverture d'une carte localisant un bâtiment spécifique
+ *  - Sauvegarde et chargement local de la liste des bâtiments (JSON via SharedPreferences)
+ *
+ * Composants principaux :
+ *  - BatimentService : service de récupération des données depuis Firestore
+ *  - BatimentFragmentAdapter : adaptateur RecyclerView pour afficher les bâtiments
+ *  - MapsFragment : fragment de carte pour localiser un bâtiment
+ *  - FragmentModel : modèle encapsulant le contexte de fragment (UI + logique)
+ *
+ * Bibliothèques utilisées :
+ *  - Gson pour la sérialisation JSON
+ *  - OSMDroid pour la manipulation de coordonnées géographiques
+ *
+ * @see BatimentService pour la gestion distante des bâtiments
+ * @see MapsFragment pour la carte centrée sur un bâtiment
+ */
 object BatimentUtils {
 
     private lateinit var batimentService: BatimentService
@@ -25,6 +50,12 @@ object BatimentUtils {
     private lateinit var batiments: MutableList<Batiment>
     private lateinit var adapter: BatimentFragmentAdapter
 
+    /**
+     * Ouvre un fragment de carte (MapsFragment) centré sur la position du bâtiment donné.
+     *
+     * @param batiment Bâtiment à localiser sur la carte.
+     * @param fragmentActivity Activité hôte dans laquelle le fragment sera affiché.
+     */
     fun ouvrirMapsFragment(batiment: Batiment, fragmentActivity: FragmentActivity) {
         val fragment = MapsFragment()
         val bundle = Bundle()
@@ -38,6 +69,13 @@ object BatimentUtils {
             .commit()
     }
 
+    /**
+     * Ouvre le fragment de carte depuis une activité en sauvegardant la destination.
+     *
+     * @param batiment Bâtiment cible à localiser.
+     * @param activity Activité actuelle (doit hériter de MainActivity).
+     * @param fragmentContext Contexte utilisé pour accéder aux préférences partagées.
+     */
     fun ouvrirMapsFragment(
         batiment: Batiment,
         activity: FragmentActivity,
@@ -50,6 +88,17 @@ object BatimentUtils {
         (activity as? MainActivity)?.loadMapsFragment()
     }
 
+    /**
+     * Met à jour dynamiquement la liste des bâtiments avec la distance depuis l’utilisateur,
+     * applique des filtres par type ou situation (sud, nord, etc.), et recharge la RecyclerView.
+     *
+     * @param userLocation Position géographique actuelle de l'utilisateur.
+     * @param batiments Liste cible à remplir avec les bâtiments chargés.
+     * @param filteredList Liste utilisée pour stocker les bâtiments filtrés.
+     * @param adapter Adaptateur lié à la RecyclerView pour l'affichage.
+     * @param fragmentModel Modèle contenant la vue, le contexte et les métadonnées du fragment.
+     * @param onDataLoaded Callback optionnel à exécuter après chargement.
+     */
     fun updateBatiments(
         userLocation: GeoPoint,
         batiments: MutableList<Batiment>,
@@ -138,6 +187,12 @@ object BatimentUtils {
         onDataLoaded()
     }
 
+    /**
+     * Sauvegarde la liste des bâtiments localement dans les préférences partagées (JSON).
+     *
+     * @param context Contexte utilisé pour accéder aux préférences.
+     * @param batiments Liste des bâtiments à sauvegarder.
+     */
     fun saveBatiments(context: Context, batiments: MutableList<Batiment>) {
         val sharedPreferences = context.getSharedPreferences("BatimentsPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -147,6 +202,12 @@ object BatimentUtils {
         editor.apply()
     }
 
+    /**
+     * Charge les bâtiments précédemment sauvegardés depuis les préférences partagées.
+     *
+     * @param context Contexte utilisé pour accéder aux préférences.
+     * @return Liste des bâtiments sauvegardés ou null si aucune donnée.
+     */
     fun loadBatiments(context: Context): MutableList<Batiment>? {
         val sharedPreferences = context.getSharedPreferences("BatimentsPrefs", Context.MODE_PRIVATE)
         val gson = Gson()

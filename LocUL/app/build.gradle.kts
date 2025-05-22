@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("org.jetbrains.dokka") version "1.9.10"
 }
 
 android {
@@ -82,4 +83,23 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("com.airbnb.android:lottie:+")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    implementation(kotlin("stdlib"))
+}
+
+tasks.dokkaHtml.configure {
+    @Suppress("DEPRECATION")
+    outputDirectory.set(buildDir.resolve("dokka/html"))
+}
+
+@Suppress("DEPRECATION")
+val dokkaPdf by tasks.registering(Exec::class) {
+    dependsOn("dokkaHtml")
+    group = "documentation"
+    description = "Génère la documentation PDF depuis HTML avec wkhtmltopdf"
+
+    val htmlPath = buildDir.resolve("dokka/html/index.html")
+    val outputPdf = buildDir.resolve("dokka/documentation.pdf")
+
+    commandLine("wkhtmltopdf", htmlPath.absolutePath, outputPdf.absolutePath)
 }
