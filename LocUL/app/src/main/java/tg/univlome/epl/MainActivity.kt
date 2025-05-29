@@ -8,9 +8,11 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -174,7 +176,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener,
                 }
 
                 R.id.share -> {
-
+                    shareAndOpenApp()
                 }
 
                 R.id.contact -> {
@@ -636,6 +638,24 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener,
                 chargerItems()
             }
         }
+    }
+
+    /**
+     * Permet le partage du lien vers l'application
+     */
+    private fun shareAndOpenApp() {
+        val url = "https://exemple.com"
+
+        // Lance le menu de partage
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, "Découvrez cette super app : $url")
+        }
+
+        // Petit délai pour éviter le clash entre les deux Intents
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent.createChooser(shareIntent, "Partager l'application via :"))
+        }, 1000) // 1 seconde de délai pour laisser le navigateur s'ouvrir d'abord
     }
 
     override fun onResume() {

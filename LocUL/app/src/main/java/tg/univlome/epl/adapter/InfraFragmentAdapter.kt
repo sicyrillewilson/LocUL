@@ -35,7 +35,7 @@ import tg.univlome.epl.ui.infrastructure.InfraActivity
  *
  * @see tg.univlome.epl.ui.infrastructure.InfraActivity
  * @see tg.univlome.epl.ui.infrastructure.AllInfraFragment
- * @see tg.univlome.epl.ui.infrastructure.ViewAllInfraFragment
+ * @see tg.univlome.epl.ui.home.ViewAllInfraFragment
  */
 class InfraFragmentAdapter(private var infras: List<Infrastructure>) :
     RecyclerView.Adapter<InfraFragmentAdapter.InfraViewHolder>() {
