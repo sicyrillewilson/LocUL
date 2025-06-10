@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="115dp"
+    android:layout_gravity="center"
+    android:layout_marginBottom="20dp"
+    android:background="@drawable/rounded_frame"
+    android:orientation="horizontal"
+    android:padding="3dp"
+    android:paddingEnd="6dp">
+
+    <LinearLayout
+        android:layout_width="165dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rounded_frame">
+
+        <ImageView
+            android:id="@+id/imgInfra"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/img_backgroung"
+            android:clipToOutline="true"
+            android:gravity="center"
+            android:scaleType="fitXY"
+            android:src="@drawable/img" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtNomInfra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/gotham_book"
+            android:gravity="center_vertical"
+            android:lines="2"
+            android:maxLines="2"
+            android:text="Nom Infra"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Ligne de séparation -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="6dp"
+            android:background="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/situationInfra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/gotham_book"
+            android:text="Campus Nord"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="15dp"
+                android:contentDescription="Icône bâtiment"
+                android:src="@drawable/route_icon" />
+
+            <!-- Distance -->
+            <TextView
+                android:id="@+id/txtDistanceInfra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gotham_book"
+                android:text="200m"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

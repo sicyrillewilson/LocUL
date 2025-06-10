@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="115dp"
+    android:layout_gravity="center"
+    android:layout_marginBottom="20dp"
+    android:background="@drawable/rounded_frame"
+    android:orientation="horizontal"
+    android:padding="3dp"
+    android:paddingEnd="6dp">
+
+    <!-- Icône de la salle -->
+    <LinearLayout
+        android:layout_width="165dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rounded_frame">
+
+        <ImageView
+            android:id="@+id/imgSalle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/img_backgroung"
+            android:clipToOutline="true"
+            android:gravity="center"
+            android:scaleType="fitXY"
+            android:src="@drawable/img" />
+
+    </LinearLayout>
+
+    <!-- Bloc nom + distance -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Nom de la salle -->
+        <TextView
+            android:id="@+id/txtNomSalle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/gotham_book"
+            android:maxLines="1"
+            android:text="Nom Salle"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/situationSalle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/gotham_book"
+            android:text="Campus Nord"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <!-- Ligne de séparation -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/batimentSalle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/gotham_book"
+            android:gravity="center_horizontal"
+            android:maxLines="2"
+            android:text="EPL (Ecole Polytechnique de Lome---)"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="15dp"
+                android:contentDescription="Icône bâtiment"
+                android:src="@drawable/route_icon" />
+
+            <!-- Distance -->
+            <TextView
+                android:id="@+id/txtDistanceSalle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gotham_book"
+                android:text="200m"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

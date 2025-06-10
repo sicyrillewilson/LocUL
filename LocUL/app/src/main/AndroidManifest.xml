@@ -11,31 +11,46 @@
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <application
+        android:name=".MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/loc_ul_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/loc_ul_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LocUL"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31"
-        android:hardwareAccelerated="true"
-        android:largeHeap="true">
+        tools:targetApi="31">
+        <activity
+            android:name=".ui.maps.MapsActivity"
+            android:exported="false" />
 
-        <meta-data android:name="android.hardware.opengles.aep" android:value="false" />
-
+        <meta-data
+            android:name="android.hardware.opengles.aep"
+            android:value="false" />
         <meta-data
             android:name="org.osmdroid.config"
             android:value="true" />
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
 
         <activity
-            android:name=".MainActivity2"
+            android:name=".ui.batiment.BatimentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.infrastructure.InfraActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.home.SalleActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

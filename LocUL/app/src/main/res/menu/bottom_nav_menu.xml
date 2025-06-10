@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home_icon"
+        android:title="Accueil" />
+
+    <item
+        android:id="@+id/nav_batiment"
+        android:icon="@drawable/batiment_nav_icon"
+        android:title="Batiments" />
+
+    <item
+        android:id="@+id/nav_salle"
+        android:icon="@drawable/salle_nav_icon"
+        android:title="Infrastructures" />
+
+    <item
+        android:id="@+id/nav_maps"
+        android:icon="@drawable/salle_nav_icon"
+        android:title="maps" />
+
+</menu>

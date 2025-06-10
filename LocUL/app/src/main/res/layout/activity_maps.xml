@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.maps.MapsActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <ProgressBar
+            android:id="@+id/locationProgressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/btnRetour"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="start|top"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="75dp"
+            android:background="@drawable/background_circulaire_2"
+            android:gravity="center"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="25dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                android:src="@drawable/back_icon"
+                app:tint="@color/black" />
+
+        </LinearLayout>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/theme_icon"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_margin="15dp"
+            android:background="@drawable/background_circulaire_2"
+            android:padding="2dp"
+            android:src="@drawable/theme_icon"
+            android:visibility="gone"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/focus_location"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="15dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/focus_location"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/focus_destination"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="15dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/destination"
+            app:layout_constraintBottom_toTopOf="@id/focus_location"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/recharger"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_margin="15dp"
+            android:layout_marginTop="70dp"
+            android:background="@drawable/background_circulaire_2"
+            android:padding="7dp"
+            android:src="@drawable/recharger"
+            android:visibility="gone"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/theme_icon" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/hide"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_margin="15dp"
+            android:layout_marginTop="70dp"
+            android:background="@drawable/background_circulaire_2"
+            android:padding="3dp"
+            android:src="@drawable/no_hide"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recharger" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

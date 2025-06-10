@@ -2,4 +2,28 @@
     <string name="app_name">LocUL</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_drawer_open">Ouvrir le menu de navigation</string>
+    <string name="navigation_drawer_close">Fermer le menu de navigation</string>
+    <string name="francais">Français</string>
+    <string name="anglais">Anglais</string>
+    <string name="clair">Clair</string>
+    <string name="sombre">Sombre</string>
+    <string name="systeme">Système</string>
+    <string name="infrastructures">Infrastructures</string>
+    <string name="accueil">Accueil</string>
+    <string name="carte">Carte</string>
+    <string name="batiments_d_enseignement">Bâtiments d\'enseignement</string>
+    <string name="batiment_administratifs">Bâtiments administratifs</string>
+    <string name="batiments">Bâtiments</string>
+    <string name="salles">Salles</string>
+    <string name="autres_infrastructures">Autres infrastructures</string>
+    <string name="tout">Tout</string>
+    <string name="campus_nord">Campus Nord</string>
+    <string name="campus_sud">Campus Sud</string>
+    <string name="reglages">Réglages</string>
+    <string name="langage">Langage</string>
+    <string name="theme">Thème</string>
+    <string name="appliquer">Appliquer</string>
+    <string name="recherche">Recherche...</string>
+    <string name="app_desc">Repérer vous à l\'Université de Lomé</string>
 </resources>
