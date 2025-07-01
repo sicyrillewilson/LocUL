@@ -114,11 +114,37 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener,
      * Initialise la navigation, le thème, la langue, les fragments et les permissions.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+
+        // Vérifie si l'activité a déjà été redémarrée
+        val hasRestarted = sharedPreferences.getBoolean("theme_applied_once", false)
+
+        // Appliquer langue
+        currentLanguageCode =
+            sharedPreferences.getString("language_code", Locale.getDefault().language)
+        if (currentLanguageCode != null) {
+            setLocale(this, currentLanguageCode!!)
+        }
+
+        // Appliquer le thème
+        val savedTheme = sharedPreferences.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_NO)
+        AppCompatDelegate.setDefaultNightMode(savedTheme)
+
+        if (!hasRestarted) {
+            // Marque comme redémarré
+            sharedPreferences.edit().putBoolean("theme_applied_once", true).apply()
+
+            // Redémarre l'activité pour appliquer le thème proprement
+            finish()
+            startActivity(intent)
+            return // Stoppe ici le flux du premier démarrage
+        }
+
         super.onCreate(savedInstanceState)
         ui = ActivityMainBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        // Charger les paramètres sauvegardés
+        /*// Charger les paramètres sauvegardés
         val sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
 
         // Appliquer la langue
@@ -130,7 +156,7 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener,
 
         // Appliquer le thème
         val savedTheme = sharedPreferences.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_NO)
-        AppCompatDelegate.setDefaultNightMode(savedTheme)
+        AppCompatDelegate.setDefaultNightMode(savedTheme)*/
 
         window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
 

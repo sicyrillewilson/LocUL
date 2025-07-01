@@ -115,7 +115,9 @@ class NordBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            //val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val contextSafe = context ?: return@addOnSuccessListener
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, contextSafe)
             val onDataLoadedCallback = {
                 shimmerNordBatiments.stopShimmer()
                 shimmerNordBatiments.visibility = View.GONE

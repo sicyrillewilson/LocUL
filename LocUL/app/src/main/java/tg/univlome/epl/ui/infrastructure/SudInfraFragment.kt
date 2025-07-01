@@ -117,7 +117,9 @@ class SudInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            //val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val contextSafe = context ?: return@addOnSuccessListener
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, contextSafe)
             val onDataLoadedCallback = {
                 shimmerSudInfra.stopShimmer()
                 shimmerSudInfra.visibility = View.GONE

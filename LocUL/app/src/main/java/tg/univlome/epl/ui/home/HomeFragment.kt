@@ -292,7 +292,9 @@ class HomeFragment : Fragment(), LogoFragment.LogoListener {
                 }
             }*/
 
-            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            //val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val contextSafe = context ?: return@addOnSuccessListener
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, contextSafe)
 
             // Créer un compteur pour suivre les chargements terminés
             var loadedSections = 0

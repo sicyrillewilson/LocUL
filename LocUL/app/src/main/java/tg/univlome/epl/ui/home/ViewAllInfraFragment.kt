@@ -108,7 +108,9 @@ class ViewAllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            //val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val contextSafe = context ?: return@addOnSuccessListener
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, contextSafe)
             InfraUtils.updateInfrastructures(
                 userGeoPoint,
                 infras,
