@@ -23,6 +23,7 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.InfraUtils
+import tg.univlome.epl.utils.MapsUtils
 
 /**
  * Fragment NordInfraFragment : Affiche les infrastructures situées au nord du campus
@@ -116,23 +117,21 @@ class NordInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                val onDataLoadedCallback = {
-                    shimmerNordInfra.stopShimmer()
-                    shimmerNordInfra.visibility = View.GONE
-                    recyclerNordInfra.visibility = View.VISIBLE
-                }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val onDataLoadedCallback = {
+                shimmerNordInfra.stopShimmer()
+                shimmerNordInfra.visibility = View.GONE
+                recyclerNordInfra.visibility = View.VISIBLE
+            }
 
-                InfraUtils.updateInfrastructures(
-                    userGeoPoint,
-                    infrasNord,
-                    filteredList,
-                    adapter,
-                    fragmentModel
-                ) {
-                    onDataLoadedCallback()
-                }
+            InfraUtils.updateInfrastructures(
+                userGeoPoint,
+                infrasNord,
+                filteredList,
+                adapter,
+                fragmentModel
+            ) {
+                onDataLoadedCallback()
             }
         }
     }

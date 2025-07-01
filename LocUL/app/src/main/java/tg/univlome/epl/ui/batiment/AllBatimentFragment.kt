@@ -23,6 +23,7 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.BatimentUtils
+import tg.univlome.epl.utils.MapsUtils
 
 /**
  * Fragment AllBatimentFragment : Affiche tous les bâtiments sans filtrage géographique
@@ -119,23 +120,21 @@ class AllBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                val onDataLoadedCallback = {
-                    shimmerAllBatiments.stopShimmer()
-                    shimmerAllBatiments.visibility = View.GONE
-                    recyclerAllBatiments.visibility = View.VISIBLE
-                }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val onDataLoadedCallback = {
+                shimmerAllBatiments.stopShimmer()
+                shimmerAllBatiments.visibility = View.GONE
+                recyclerAllBatiments.visibility = View.VISIBLE
+            }
 
-                BatimentUtils.updateBatiments(
-                    userGeoPoint,
-                    batiments,
-                    filteredList,
-                    adapter,
-                    fragmentModel
-                ) {
-                    onDataLoadedCallback()
-                }
+            BatimentUtils.updateBatiments(
+                userGeoPoint,
+                batiments,
+                filteredList,
+                adapter,
+                fragmentModel
+            ) {
+                onDataLoadedCallback()
             }
         }
     }

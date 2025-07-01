@@ -81,6 +81,23 @@ object MapsUtils {
         return results[0].toDouble() // Retourne la distance en mètres
     }
 
+    fun fusedLocationClient(location: android.location.Location?, context: Context): GeoPoint {
+        return if (location != null) {
+            // Sauvegarde la localisation obtenue
+            MapsUtils.saveUserLocation(context, GeoPoint(location.latitude, location.longitude))
+            GeoPoint(location.latitude, location.longitude)
+        } else {
+            // 🔄 Récupère la dernière position sauvegardée ou utilise une valeur par défaut
+            val savedLocation = MapsUtils.loadUserLocation(context)
+            if (savedLocation.latitude != 0.0 || savedLocation.longitude != 0.0) {
+                savedLocation
+            } else {
+                // Valeur par défaut (ex : Université de Lomé)
+                GeoPoint(6.1707, 1.2310)
+            }
+        }
+    }
+
     /**
      * Sauvegarde la position de l’utilisateur dans les préférences partagées.
      *

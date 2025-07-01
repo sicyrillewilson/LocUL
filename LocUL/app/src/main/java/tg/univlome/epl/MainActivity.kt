@@ -294,6 +294,14 @@ class MainActivity : AppCompatActivity(), SearchBarFragment.SearchListener,
         // Charge le fragment par défaut
         loadFragment(defaultItem.fragment)
 
+        if (defaultItem.fragment is HomeFragment) {
+            showLogo(defaultItem.fragment as LogoFragment.LogoListener)
+            showSearchBarFragment(null)
+        } else if (defaultItem.fragment is SearchBarFragment.SearchListener) {
+            showSearchBarFragment(defaultItem.fragment as SearchBarFragment.SearchListener)
+            showLogo(null)
+        }
+
         for (item in navItems) {
             item.layout.setOnClickListener {
                 if (selectedItem == item) {

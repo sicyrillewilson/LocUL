@@ -23,6 +23,7 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.BatimentUtils
+import tg.univlome.epl.utils.MapsUtils
 
 /**
  * Fragment SudBatimentFragment : Affiche les bâtiments du campus sud
@@ -113,23 +114,21 @@ class SudBatimentFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                val onDataLoadedCallback = {
-                    shimmerSudBatiments.stopShimmer()
-                    shimmerSudBatiments.visibility = View.GONE
-                    recyclerSudBatiments.visibility = View.VISIBLE
-                }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val onDataLoadedCallback = {
+                shimmerSudBatiments.stopShimmer()
+                shimmerSudBatiments.visibility = View.GONE
+                recyclerSudBatiments.visibility = View.VISIBLE
+            }
 
-                BatimentUtils.updateBatiments(
-                    userGeoPoint,
-                    batiments,
-                    filteredList,
-                    adapter,
-                    fragmentModel
-                ) {
-                    onDataLoadedCallback()
-                }
+            BatimentUtils.updateBatiments(
+                userGeoPoint,
+                batiments,
+                filteredList,
+                adapter,
+                fragmentModel
+            ) {
+                onDataLoadedCallback()
             }
         }
     }

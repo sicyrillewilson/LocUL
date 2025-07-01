@@ -21,6 +21,7 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.BatimentService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.BatimentUtils
+import tg.univlome.epl.utils.MapsUtils
 
 /**
  * Fragment ViewAllBatEnsFragment : Affiche la liste complète des bâtiments d’enseignement
@@ -110,16 +111,14 @@ class ViewAllBatEnsFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                BatimentUtils.updateBatiments(
-                    userGeoPoint,
-                    batimentsEns,
-                    filteredList,
-                    adapter,
-                    fragmentModel
-                )
-            }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            BatimentUtils.updateBatiments(
+                userGeoPoint,
+                batimentsEns,
+                filteredList,
+                adapter,
+                fragmentModel
+            )
         }
     }
 

@@ -23,6 +23,7 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.InfraUtils
+import tg.univlome.epl.utils.MapsUtils
 
 /**
  * Fragment AllInfraFragment : Affiche toutes les infrastructures sans filtrage de situation
@@ -119,23 +120,21 @@ class AllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                val onDataLoadedCallback = {
-                    shimmerAllInfra.stopShimmer()
-                    shimmerAllInfra.visibility = View.GONE
-                    recyclerAllInfra.visibility = View.VISIBLE
-                }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            val onDataLoadedCallback = {
+                shimmerAllInfra.stopShimmer()
+                shimmerAllInfra.visibility = View.GONE
+                recyclerAllInfra.visibility = View.VISIBLE
+            }
 
-                InfraUtils.updateInfrastructures(
-                    userGeoPoint,
-                    infrasAll,
-                    filteredList,
-                    adapter,
-                    fragmentModel
-                ) {
-                    onDataLoadedCallback()
-                }
+            InfraUtils.updateInfrastructures(
+                userGeoPoint,
+                infrasAll,
+                filteredList,
+                adapter,
+                fragmentModel
+            ) {
+                onDataLoadedCallback()
             }
         }
     }

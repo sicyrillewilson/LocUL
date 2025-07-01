@@ -20,6 +20,7 @@ import tg.univlome.epl.models.Salle
 import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
+import tg.univlome.epl.utils.MapsUtils
 import tg.univlome.epl.utils.SalleUtils
 
 /**
@@ -106,10 +107,8 @@ class ViewAllSalleFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                SalleUtils.updateSalles(userGeoPoint, salles, filteredList, adapter, fragmentModel)
-            }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            SalleUtils.updateSalles(userGeoPoint, salles, filteredList, adapter, fragmentModel)
         }
     }
 

@@ -28,6 +28,7 @@ import tg.univlome.epl.ui.LogoFragment
 import tg.univlome.epl.utils.HomeBatimentUtils
 import tg.univlome.epl.utils.HomeInfraUtils
 import tg.univlome.epl.utils.HomeSalleUtils
+import tg.univlome.epl.utils.MapsUtils
 
 /**
  * Fragment HomeFragment : Fragment d’accueil affichant les sections principales
@@ -276,60 +277,73 @@ class HomeFragment : Fragment(), LogoFragment.LogoListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-
-                // Créer un compteur pour suivre les chargements terminés
-                var loadedSections = 0
-                val totalSections = 4 // 4 sections à charger
-
-                val onDataLoadedCallback = {
-                    loadedSections++
-                    if (loadedSections >= totalSections) {
-                        hideShimmer()
-                    }
+            /*val userGeoPoint = if (location != null) {
+                // Sauvegarde la localisation obtenue
+                MapsUtils.saveUserLocation(requireContext(), GeoPoint(location.latitude, location.longitude))
+                GeoPoint(location.latitude, location.longitude)
+            } else {
+                // 🔄 Récupère la dernière position sauvegardée ou utilise une valeur par défaut
+                val savedLocation = MapsUtils.loadUserLocation(requireContext())
+                if (savedLocation.latitude != 0.0 || savedLocation.longitude != 0.0) {
+                    savedLocation
+                } else {
+                    // Valeur par défaut (ex : Université de Lomé)
+                    GeoPoint(6.1707, 1.2310)
                 }
+            }*/
 
-                // Modification pour notifier quand les données sont chargées
-                HomeBatimentUtils.updateBatiments(
-                    userGeoPoint,
-                    batimentsEns,
-                    batimentsEnsFilteredList,
-                    batimentsEnsAdapter,
-                    batsEnsHomeFragmentModel
-                ) {
-                    onDataLoadedCallback()
-                }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
 
-                HomeBatimentUtils.updateBatiments(
-                    userGeoPoint,
-                    batimentsAdmin,
-                    batimentsAdminFilteredList,
-                    batimentsAdminAdapter,
-                    batsAdminHomeFragmentModel
-                ) {
-                    onDataLoadedCallback()
-                }
+            // Créer un compteur pour suivre les chargements terminés
+            var loadedSections = 0
+            val totalSections = 4 // 4 sections à charger
 
-                HomeInfraUtils.updateInfrastructures(
-                    userGeoPoint,
-                    infras,
-                    infrasFilteredList,
-                    infrasAdapter,
-                    infrasHomeFragmentModel
-                ) {
-                    onDataLoadedCallback()
+            val onDataLoadedCallback = {
+                loadedSections++
+                if (loadedSections >= totalSections) {
+                    hideShimmer()
                 }
+            }
 
-                HomeSalleUtils.updateSalles(
-                    userGeoPoint,
-                    salles,
-                    sallesFilteredList,
-                    sallesAdapter,
-                    sallesHomeFragmentModel
-                ) {
-                    onDataLoadedCallback()
-                }
+            // Modification pour notifier quand les données sont chargées
+            HomeBatimentUtils.updateBatiments(
+                userGeoPoint,
+                batimentsEns,
+                batimentsEnsFilteredList,
+                batimentsEnsAdapter,
+                batsEnsHomeFragmentModel
+            ) {
+                onDataLoadedCallback()
+            }
+
+            HomeBatimentUtils.updateBatiments(
+                userGeoPoint,
+                batimentsAdmin,
+                batimentsAdminFilteredList,
+                batimentsAdminAdapter,
+                batsAdminHomeFragmentModel
+            ) {
+                onDataLoadedCallback()
+            }
+
+            HomeInfraUtils.updateInfrastructures(
+                userGeoPoint,
+                infras,
+                infrasFilteredList,
+                infrasAdapter,
+                infrasHomeFragmentModel
+            ) {
+                onDataLoadedCallback()
+            }
+
+            HomeSalleUtils.updateSalles(
+                userGeoPoint,
+                salles,
+                sallesFilteredList,
+                sallesAdapter,
+                sallesHomeFragmentModel
+            ) {
+                onDataLoadedCallback()
             }
         }
     }

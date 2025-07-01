@@ -21,6 +21,7 @@ import tg.univlome.epl.models.modelsfragments.FragmentModel
 import tg.univlome.epl.services.InfrastructureService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.InfraUtils
+import tg.univlome.epl.utils.MapsUtils
 
 /**
  * Fragment ViewAllInfraFragment : Affiche la liste complète des infrastructures
@@ -107,16 +108,14 @@ class ViewAllInfraFragment : Fragment(), SearchBarFragment.SearchListener {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            location?.let {
-                val userGeoPoint = GeoPoint(it.latitude, it.longitude)
-                InfraUtils.updateInfrastructures(
-                    userGeoPoint,
-                    infras,
-                    filteredList,
-                    adapter,
-                    fragmentModel
-                )
-            }
+            val userGeoPoint = MapsUtils.fusedLocationClient(location, requireContext())
+            InfraUtils.updateInfrastructures(
+                userGeoPoint,
+                infras,
+                filteredList,
+                adapter,
+                fragmentModel
+            )
         }
     }
 

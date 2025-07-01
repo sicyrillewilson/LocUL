@@ -692,6 +692,7 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
         super.onResume()
         mapView.onResume()
         (activity as MainActivity).showSearchBarFragment(this)
+        (activity as MainActivity).showLogo(null)
     }
 
     override fun onPause() {
