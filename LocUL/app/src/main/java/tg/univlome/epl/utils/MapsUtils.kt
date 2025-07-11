@@ -226,9 +226,21 @@ object MapsUtils {
      * @param resources Accès aux ressources.
      * @return Drawable redimensionné ou `null` si non disponible.
      */
-    fun resizeIcon(icon: Int = R.drawable.default_marker, resources: Resources): BitmapDrawable? {
+    fun resizeIcon(
+        icon: Int = R.drawable.default_marker,
+        resources: Resources,
+        tintColor: Int = android.graphics.Color.BLACK
+    ): BitmapDrawable? {
         return iconCache[icon] ?: run {
             val drawable = ResourcesCompat.getDrawable(resources, icon, null) ?: return null
+
+            // Nettoie toute teinte existante
+            drawable.setTintList(null)
+            drawable.clearColorFilter()
+
+            // Applique la teinte noire
+            drawable.setTint(tintColor)
+
             val bitmap = Bitmap.createBitmap(
                 drawable.intrinsicWidth,
                 drawable.intrinsicHeight,

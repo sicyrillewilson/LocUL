@@ -47,7 +47,7 @@
                 android:layout_height="25dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="centerInside"
-                android:src="@drawable/back_icon"
+                android:src="@drawable/back_icon_maps"
                 app:tint="@color/black" />
 
         </LinearLayout>
