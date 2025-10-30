@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/gotham_bold"
         android:paddingTop="8dp"
-        android:text="LocUL"
+        android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="25sp"
         android:textStyle="bold" />
