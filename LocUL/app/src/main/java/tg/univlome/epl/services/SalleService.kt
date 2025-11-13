@@ -73,8 +73,14 @@ class SalleService(private val context: Context) {
                                 sallesList.add(createSalleFromDocument(document, batimentMap))
                             }
 
+                            // Trier les salles : d’abord par nom de bâtiment, puis par nom de salle
+                            val sallesTriees = sallesList.sortedWith(
+                                compareBy<Salle> { it.situation.lowercase() } // tri par nom de bâtiment
+                                    .thenBy { it.nom.lowercase() }             // puis par nom de salle
+                            )
+
                             // Sauvegarde UNE SEULE FOIS après avoir tout ajouté
-                            SalleUtils.saveSalles(context, sallesList)
+                            SalleUtils.saveSalles(context, sallesTriees.toMutableList())
 
                         }
                         .addOnFailureListener { exception ->
@@ -106,10 +112,16 @@ class SalleService(private val context: Context) {
                                 sallesList.add(createSalleFromDocument(document, batimentMap))
                             }
 
-                            // Sauvegarde UNE SEULE FOIS après avoir tout ajouté
-                            SalleUtils.saveSalles(context, sallesList)
+                            // Trier les salles : d’abord par nom de bâtiment, puis par nom de salle
+                            val sallesTriees = sallesList.sortedWith(
+                                compareBy<Salle> { it.situation.lowercase() } // tri par nom de bâtiment
+                                    .thenBy { it.nom.lowercase() }             // puis par nom de salle
+                            )
 
-                            sallesLiveData.value = sallesList
+                            // Sauvegarde UNE SEULE FOIS après avoir tout ajouté
+                            SalleUtils.saveSalles(context, sallesTriees.toMutableList())
+                            sallesLiveData.value = sallesTriees
+
 
                         }
                         .addOnFailureListener { exception ->

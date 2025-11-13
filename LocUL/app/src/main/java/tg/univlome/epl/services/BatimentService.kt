@@ -50,7 +50,9 @@ class BatimentService(private val context: Context) {
         val loadBatiments = BatimentUtils.loadBatiments(context)
         if (loadBatiments != null) {
             batimentsLiveData.value = loadBatiments!!
-            batimentsCollection.get()
+            batimentsCollection
+                .orderBy("nom") // tri par le champ "nom"
+                .get()
                 .addOnSuccessListener { result ->
                     val batimentsList = mutableListOf<Batiment>()
                     for (document in result) {
@@ -66,7 +68,9 @@ class BatimentService(private val context: Context) {
                     )
                 }
         } else {
-            batimentsCollection.get()
+            batimentsCollection
+                .orderBy("nom") // tri par le champ "nom"
+                .get()
                 .addOnSuccessListener { result ->
                     val batimentsList = mutableListOf<Batiment>()
                     for (document in result) {

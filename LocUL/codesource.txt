@@ -9583,10 +9583,10 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\AndroidM
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/loc_ul_launcher"
+        android:icon="@mipmap/ul_map_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/loc_ul_launcher_round"
+        android:roundIcon="@mipmap/ul_map_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LocUL"
         android:usesCleartextTraffic="true"
@@ -11763,12 +11763,12 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_margin="5dp"
-        android:src="@drawable/loc_ul" />
+        android:src="@drawable/ul_map" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LocUL"
+        android:text="@string/app_name"
         android:textColor="@color/mainColor"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -11800,7 +11800,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
             android:layout_gravity="center"
             android:layout_marginEnd="13dp"
             android:fontFamily="@font/gotham_black"
-            android:text="LocUL"
+            android:text="@string/app_name"
             android:textColor="@color/logo_color"
             android:textSize="25sp"
             android:textStyle="bold" />
@@ -11810,7 +11810,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
             android:layout_height="38dp"
             android:layout_gravity="center"
             android:layout_margin="5dp"
-            android:src="@drawable/loc_ul" />
+            android:src="@drawable/ul_map" />
 
     </LinearLayout>
 
@@ -12898,7 +12898,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
         android:layout_height="wrap_content"
         android:fontFamily="@font/gotham_bold"
         android:paddingTop="8dp"
-        android:text="LocUL"
+        android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="25sp"
         android:textStyle="bold" />
@@ -13398,6 +13398,24 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\mipm
 </adaptive-icon> 
  
 =============================================== 
+Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\mipmap-anydpi-v26\ul_map_launcher.xml 
+=============================================== 
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ul_map_launcher_background"/>
+    <foreground android:drawable="@mipmap/ul_map_launcher_foreground"/>
+</adaptive-icon> 
+ 
+=============================================== 
+Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\mipmap-anydpi-v26\ul_map_launcher_round.xml 
+=============================================== 
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ul_map_launcher_background"/>
+    <foreground android:drawable="@mipmap/ul_map_launcher_foreground"/>
+</adaptive-icon> 
+ 
+=============================================== 
 Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\values\colors.xml 
 =============================================== 
 <?xml version="1.0" encoding="utf-8"?>
@@ -13430,7 +13448,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\valu
 Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\values\strings.xml 
 =============================================== 
 <resources>
-    <string name="app_name">LocUL</string>
+    <string name="app_name">ULMap</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navigation_drawer_open">Ouvrir le menu de navigation</string>
@@ -13495,7 +13513,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\valu
 =============================================== 
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">LocUL</string>
+    <string name="app_name">ULMap</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navigation_drawer_open">Open navigation menu</string>
@@ -24977,10 +24995,10 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\AndroidM
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/loc_ul_launcher"
+        android:icon="@mipmap/ul_map_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/loc_ul_launcher_round"
+        android:roundIcon="@mipmap/ul_map_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LocUL"
         android:usesCleartextTraffic="true"
@@ -27157,12 +27175,12 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_margin="5dp"
-        android:src="@drawable/loc_ul" />
+        android:src="@drawable/ul_map" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LocUL"
+        android:text="@string/app_name"
         android:textColor="@color/mainColor"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -27194,7 +27212,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
             android:layout_gravity="center"
             android:layout_marginEnd="13dp"
             android:fontFamily="@font/gotham_black"
-            android:text="LocUL"
+            android:text="@string/app_name"
             android:textColor="@color/logo_color"
             android:textSize="25sp"
             android:textStyle="bold" />
@@ -27204,7 +27222,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
             android:layout_height="38dp"
             android:layout_gravity="center"
             android:layout_margin="5dp"
-            android:src="@drawable/loc_ul" />
+            android:src="@drawable/ul_map" />
 
     </LinearLayout>
 
@@ -28292,7 +28310,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\layo
         android:layout_height="wrap_content"
         android:fontFamily="@font/gotham_bold"
         android:paddingTop="8dp"
-        android:text="LocUL"
+        android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="25sp"
         android:textStyle="bold" />
@@ -28792,6 +28810,24 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\mipm
 </adaptive-icon> 
  
 =============================================== 
+Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\mipmap-anydpi-v26\ul_map_launcher.xml 
+=============================================== 
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ul_map_launcher_background"/>
+    <foreground android:drawable="@mipmap/ul_map_launcher_foreground"/>
+</adaptive-icon> 
+ 
+=============================================== 
+Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\mipmap-anydpi-v26\ul_map_launcher_round.xml 
+=============================================== 
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ul_map_launcher_background"/>
+    <foreground android:drawable="@mipmap/ul_map_launcher_foreground"/>
+</adaptive-icon> 
+ 
+=============================================== 
 Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\values\colors.xml 
 =============================================== 
 <?xml version="1.0" encoding="utf-8"?>
@@ -28824,7 +28860,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\valu
 Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\values\strings.xml 
 =============================================== 
 <resources>
-    <string name="app_name">LocUL</string>
+    <string name="app_name">ULMap</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navigation_drawer_open">Ouvrir le menu de navigation</string>
@@ -28889,7 +28925,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\main\res\valu
 =============================================== 
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">LocUL</string>
+    <string name="app_name">ULMap</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navigation_drawer_open">Open navigation menu</string>
@@ -30792,8 +30828,7 @@ Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\app\src\androidTest\j
 package tg.univlome.epl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import or 
+import androidx.test.platform.app.InstrumentationRegi 
  
 =============================================== 
 Fichier : C:\Users\sicyr\AndroidStudioProjects\LocUL\LocUL\gradle.properties 
