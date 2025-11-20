@@ -24,13 +24,16 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.firestore.FirebaseFirestore
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.ImageAdapter
 import tg.univlome.epl.databinding.ActivitySalleBinding
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.ui.batiment.BatimentActivity
 import tg.univlome.epl.ui.maps.MapsActivity
 import tg.univlome.epl.utils.MapsUtils
 
@@ -203,6 +206,46 @@ class SalleActivity : AppCompatActivity() {
                 // Affiche un message ou fais une action par défaut
                 ui.aller.visibility = View.GONE
                 ui.miniMapLayout.visibility = View.GONE
+            }
+
+            ui.allerParent.setOnClickListener {
+
+                if (salle.infrastructureId.isNullOrBlank()) {
+                    return@setOnClickListener
+                }
+
+                val db = FirebaseFirestore.getInstance()
+                val batimentsCollection = db.collection("batiments")
+
+                batimentsCollection.document(salle.infrastructureId)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        if (document != null && document.exists()) {
+
+                            val images = document.get("images") as? List<String> ?: emptyList()
+                            val image = images.firstOrNull() ?: ""
+                            val type = document.getString("type") ?: ""
+
+                            val batiment = Batiment(
+                                document.id,
+                                document.getString("nom") ?: "",
+                                document.getString("description") ?: "",
+                                document.getString("longitude") ?: "",
+                                document.getString("latitude") ?: "",
+                                image,               // image principale
+                                document.getString("situation") ?: "",
+                                type,                // <-- manquait ici
+                                images               // liste des images
+                            )
+
+                            val intent = Intent(this, BatimentActivity::class.java)
+                            intent.putExtra("batiment", batiment)
+                            startActivity(intent)
+                        }
+                    }
+                    .addOnFailureListener {
+                        // gestion erreur si besoin
+                    }
             }
 
         }

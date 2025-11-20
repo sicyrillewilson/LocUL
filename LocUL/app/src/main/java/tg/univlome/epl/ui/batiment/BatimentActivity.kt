@@ -15,6 +15,7 @@ import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -26,8 +27,12 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.ImageAdapter
+import tg.univlome.epl.adapter.SalleBatimentAdapter
 import tg.univlome.epl.databinding.ActivityBatimentBinding
 import tg.univlome.epl.models.Batiment
+import tg.univlome.epl.models.Salle
+import tg.univlome.epl.services.SalleService
+import tg.univlome.epl.ui.home.ViewAllSalleFragment
 import tg.univlome.epl.ui.maps.MapsActivity
 import tg.univlome.epl.utils.MapsUtils
 
@@ -87,6 +92,29 @@ class BatimentActivity : AppCompatActivity() {
         window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
 
         val batiment = intent.getSerializableExtra("batiment") as? Batiment
+
+        val recyclerSalles = findViewById<RecyclerView>(R.id.recyclerSallesDuBatiment)
+        val salles = mutableListOf<Salle>()
+        val adapter = SalleBatimentAdapter(salles, supportFragmentManager, ViewAllSalleFragment())
+
+        recyclerSalles.adapter = adapter
+        recyclerSalles.layoutManager =
+            androidx.recyclerview.widget.LinearLayoutManager(
+                this,
+                androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
+                false
+            )
+
+        if (batiment != null) {
+            val salleService = SalleService(this)
+            salleService.getSalles().observe(this) { allSalles ->
+                val sallesDuBat = allSalles.filter { it.infrastructureId == batiment.id }
+
+                salles.clear()
+                salles.addAll(sallesDuBat)
+                adapter.notifyDataSetChanged()
+            }
+        }
 
         // Mettre à jour l'interface utilisateur avec les données reçues
 
