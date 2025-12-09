@@ -11,7 +11,8 @@
 
     <!-- Icône du bâtiment -->
     <LinearLayout
-        android:layout_width="165dp"
+        android:layout_width="match_parent"
+        android:layout_weight="0.8"
         android:layout_height="match_parent"
         android:layout_marginEnd="10dp"
         android:background="@drawable/rounded_frame">
@@ -30,19 +31,21 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/txtNomBatiment"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="5dp"
+            android:textAlignment="center"
             android:ellipsize="end"
             android:fontFamily="@font/gotham_book"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:lines="2"
             android:maxLines="2"
             android:text="Nom Bâtiment"
@@ -60,17 +63,19 @@
 
         <TextView
             android:id="@+id/situationBat"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/gotham_book"
+            android:textAlignment="center"
             android:text="Campus Nord"
             android:textSize="14sp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
 
             <ImageView
                 android:layout_width="25dp"

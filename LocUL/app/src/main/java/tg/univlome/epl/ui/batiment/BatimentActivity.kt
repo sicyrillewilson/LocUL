@@ -93,9 +93,10 @@ class BatimentActivity : AppCompatActivity() {
 
         val batiment = intent.getSerializableExtra("batiment") as? Batiment
 
+        /**************************MODIFICATION**************************/
         val recyclerSalles = findViewById<RecyclerView>(R.id.recyclerSallesDuBatiment)
         val salles = mutableListOf<Salle>()
-        val adapter = SalleBatimentAdapter(salles, supportFragmentManager, ViewAllSalleFragment())
+        val adapter = SalleBatimentAdapter(salles)
 
         recyclerSalles.adapter = adapter
         recyclerSalles.layoutManager =
@@ -106,15 +107,56 @@ class BatimentActivity : AppCompatActivity() {
             )
 
         if (batiment != null) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val userPoint = GeoPoint(location.latitude, location.longitude)
+                    val batPoint = GeoPoint(batiment.latitude.toDouble(), batiment.longitude.toDouble())
+
+                    val dist = MapsUtils.calculateDistance(userPoint, batPoint)
+
+                    val formatted = if (dist >= 1000)
+                        String.format("%.2f km", dist / 1000)
+                    else
+                        String.format("%.0f m", dist)
+
+                    batiment.distance = formatted
+                    ui.txtDistance.text = formatted
+                }
+            }
+
             val salleService = SalleService(this)
             salleService.getSalles().observe(this) { allSalles ->
                 val sallesDuBat = allSalles.filter { it.infrastructureId == batiment.id }
 
-                salles.clear()
-                salles.addAll(sallesDuBat)
-                adapter.notifyDataSetChanged()
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    val userPoint = if (location != null)
+                        GeoPoint(location.latitude, location.longitude)
+                    else
+                        null
+
+                    salles.clear()
+
+                    for (salle in sallesDuBat) {
+                        if (userPoint != null) {
+                            val sallePoint = GeoPoint(salle.latitude.toDouble(), salle.longitude.toDouble())
+                            val dist = MapsUtils.calculateDistance(userPoint, sallePoint)
+
+                            val formatted = if (dist >= 1000)
+                                String.format("%.2f km", dist / 1000)
+                            else
+                                String.format("%.0f m", dist)
+
+                            salle.distance = formatted
+                        }
+
+                        salles.add(salle)
+                    }
+
+                    adapter.notifyDataSetChanged()
+                }
             }
         }
+        /**************************MODIFICATION**************************/
 
         // Mettre à jour l'interface utilisateur avec les données reçues
 

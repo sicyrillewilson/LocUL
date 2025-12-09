@@ -11,7 +11,8 @@
 
     <!-- Icône de la salle -->
     <LinearLayout
-        android:layout_width="165dp"
+        android:layout_width="match_parent"
+        android:layout_weight="0.8"
         android:layout_height="match_parent"
         android:layout_marginEnd="10dp"
         android:background="@drawable/rounded_frame">
@@ -31,19 +32,22 @@
     <!-- Bloc nom + distance -->
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <!-- Nom de la salle -->
         <TextView
             android:id="@+id/txtNomSalle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="5dp"
+            android:textAlignment="center"
             android:ellipsize="end"
             android:fontFamily="@font/gotham_book"
+            android:gravity="center"
             android:maxLines="1"
             android:text="Nom Salle"
             android:textSize="15sp"
@@ -51,9 +55,10 @@
 
         <TextView
             android:id="@+id/situationSalle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/gotham_book"
+            android:textAlignment="center"
             android:text="Campus Nord"
             android:textSize="14sp"
             android:visibility="gone" />
@@ -69,24 +74,26 @@
 
         <TextView
             android:id="@+id/batimentSalle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:fontFamily="@font/gotham_book"
+            android:textAlignment="center"
             android:gravity="center_horizontal"
             android:maxLines="2"
             android:text="EPL (Ecole Polytechnique de Lome---)"
             android:textSize="13sp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
 
-            <ImageView
+        <ImageView
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginEnd="15dp"
