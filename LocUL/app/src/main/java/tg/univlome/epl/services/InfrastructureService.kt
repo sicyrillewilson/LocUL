@@ -50,7 +50,9 @@ class InfrastructureService(private val context: Context) {
         val loadInfrastructures = InfraUtils.loadInfras(context)
         if (loadInfrastructures != null) {
             infrastructuresLiveData.value = loadInfrastructures!!
-            infrastructuresCollection.get()
+            infrastructuresCollection
+                .orderBy("nom") // tri par le champ "nom"
+                .get()
                 .addOnSuccessListener { result ->
                     val infrastructuresList = mutableListOf<Infrastructure>()
                     for (document in result) {
@@ -66,7 +68,9 @@ class InfrastructureService(private val context: Context) {
                     )
                 }
         } else {
-            infrastructuresCollection.get()
+            infrastructuresCollection
+                .orderBy("nom") // tri par le champ "nom"
+                .get()
                 .addOnSuccessListener { result ->
                     val infrastructuresList = mutableListOf<Infrastructure>()
                     for (document in result) {

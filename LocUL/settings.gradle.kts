@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "LocUL"
 include(":app")
+include(":OSMBonusPack")

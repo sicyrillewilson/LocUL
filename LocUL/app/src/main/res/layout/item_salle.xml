@@ -9,7 +9,8 @@
     android:paddingEnd="6dp">
 
     <LinearLayout
-        android:layout_width="150dp"
+        android:layout_width="match_parent"
+        android:layout_weight="0.8"
         android:layout_height="match_parent"
         android:layout_marginEnd="8dp"
         android:background="@drawable/rounded_frame">
@@ -29,18 +30,21 @@
     <!-- Bloc nom + distance -->
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/txtNomSalle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="7dp"
             android:layout_marginBottom="7dp"
+            android:textAlignment="center"
             android:ellipsize="end"
             android:fontFamily="@font/gotham_book"
+            android:gravity="center"
             android:maxLines="1"
             android:text="Nom Salle"
             android:textSize="15sp"
@@ -48,9 +52,10 @@
 
         <TextView
             android:id="@+id/situationSalle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/gotham_book"
+            android:textAlignment="center"
             android:text="Campus Nord"
             android:textSize="14sp"
             android:visibility="gone" />
@@ -66,21 +71,23 @@
 
         <TextView
             android:id="@+id/batimentSalle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:fontFamily="@font/gotham_book"
+            android:textAlignment="center"
             android:maxLines="2"
             android:text="Batiment A"
             android:textSize="13sp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
 
             <ImageView
                 android:layout_width="25dp"

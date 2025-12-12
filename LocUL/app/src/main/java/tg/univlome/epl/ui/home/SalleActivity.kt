@@ -24,13 +24,17 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.firestore.FirebaseFirestore
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import tg.univlome.epl.R
 import tg.univlome.epl.adapter.ImageAdapter
 import tg.univlome.epl.databinding.ActivitySalleBinding
+import tg.univlome.epl.models.Batiment
 import tg.univlome.epl.models.Salle
+import tg.univlome.epl.services.BatimentService
+import tg.univlome.epl.ui.batiment.BatimentActivity
 import tg.univlome.epl.ui.maps.MapsActivity
 import tg.univlome.epl.utils.MapsUtils
 
@@ -204,6 +208,28 @@ class SalleActivity : AppCompatActivity() {
                 ui.aller.visibility = View.GONE
                 ui.miniMapLayout.visibility = View.GONE
             }
+
+            /**************************MODIFICATION**************************/
+            ui.allerParent.setOnClickListener {
+
+                if (salle.infrastructureId.isNullOrBlank()) {
+                    return@setOnClickListener
+                }
+
+                val batimentService = BatimentService(this)
+
+                batimentService.getBatiments().observe(this) { batiments ->
+
+                    val batiment = batiments.find { it.id == salle.infrastructureId }
+
+                    if (batiment != null) {
+                        val intent = Intent(this, BatimentActivity::class.java)
+                        intent.putExtra("batiment", batiment)
+                        startActivity(intent)
+                    }
+                }
+            }
+            /**************************MODIFICATION**************************/
 
         }
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -186,7 +187,8 @@
                 android:layout_width="240dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
-                android:layout_margin="25dp"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="25dp"
                 android:background="@drawable/search_icon_bg"
                 android:clickable="true"
                 android:gravity="center">
@@ -202,13 +204,43 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:fontFamily="@font/gotham_book"
+                    android:fontFamily="@font/gotham_bold"
                     android:text="Aller à l'endroit"
                     android:textColor="@color/white"
                     android:textSize="15sp" />
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_margin="15dp">
+
+                <TextView
+                    android:id="@+id/txtInformation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gotham_black"
+                    android:text="Ci-dessous la liste des salles de ce bâtiment"
+                    android:textSize="15sp"
+                    android:layout_gravity="center"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSallesDuBatiment"
+                android:layout_width="match_parent"
+                android:layout_height="125dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="25dp"
+                android:orientation="horizontal"
+                android:overScrollMode="never"
+                tools:listitem="@layout/item_salle" />
 
         </LinearLayout>
 

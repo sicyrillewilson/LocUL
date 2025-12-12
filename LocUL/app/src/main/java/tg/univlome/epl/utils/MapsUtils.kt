@@ -292,8 +292,17 @@ object MapsUtils {
         miniMap.setBuiltInZoomControls(false) // désactiver les boutons zoom
         miniMap.isTilesScaledToDpi = false
 
-        val latPadding = 0.001
-        val lonPadding = 0.001
+        val distanceMeters = calculateDistance(start, end)
+
+        // padding dynamique
+        var latPadding = 0.001
+        var lonPadding = 0.001
+
+        if (distanceMeters < 50) {
+            latPadding = 0.003
+            lonPadding = 0.003
+        }
+
         val boundingBox = BoundingBox(
             maxOf(start.latitude, end.latitude) + latPadding,
             maxOf(start.longitude, end.longitude) + lonPadding,
@@ -303,8 +312,23 @@ object MapsUtils {
 
         // Ajuster la vue pour montrer les deux points
         miniMap.post {
-            miniMap.zoomToBoundingBox(boundingBox, false, 50, 14.0, 14.0.toLong())
+            miniMap.zoomToBoundingBox(boundingBox, false, 75)
 
+            // Après zoomToBoundingBox(boundingBox, false)
+
+            val zoom = miniMap.zoomLevelDouble
+
+            // Empêcher trop de zoom si les points sont très proches
+            val maxZoomAllowed = 17.0
+            if (zoom > maxZoomAllowed) {
+                miniMap.controller.setZoom(maxZoomAllowed)
+            }
+
+            // Empêcher un zoom trop faible si les points sont éloignés
+            val minZoomAllowed = 12.0
+            if (zoom < minZoomAllowed) {
+                miniMap.controller.setZoom(minZoomAllowed)
+            }
 
             // Marqueur de départ
             val startMarker = Marker(miniMap).apply {

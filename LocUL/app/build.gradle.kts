@@ -64,6 +64,7 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.16")
     implementation("org.osmdroid:osmdroid-mapsforge:6.1.16") // Ajout pour ScaleBarOverlay
     implementation("com.squareup.okhttp3:okhttp:4.9.0")  // Pour les requêtes HTTP (GraphHopper)
+    implementation(project(":OSMBonusPack")) // Clusterisation Dynamique des marqueurs
 
     implementation("com.google.android.gms:play-services-location:21.1.0") //exemple
     implementation("com.google.android.gms:play-services-maps:18.2.0") //exemple
