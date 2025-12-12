@@ -59,6 +59,7 @@ import tg.univlome.epl.services.SalleService
 import tg.univlome.epl.ui.SearchBarFragment
 import tg.univlome.epl.utils.MapsUtils
 import java.io.IOException
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 
 class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListener {
     private var _binding: FragmentMapsBinding? = null
@@ -87,6 +88,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
     private var isOtherMarkersHidden = false
     private val tousLesLieux = mutableListOf<Lieu>()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    // Clusters pour l'affichage des markeurs
+    private lateinit var clusterer: RadiusMarkerClusterer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,6 +132,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
 
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
+
+        // Initialisation du clusterer
+        setupClusterer()
 
         val prefs = requireActivity().getSharedPreferences("map_state", 0)
         val latitude = prefs.getString("latitude", "6.1375")!!.toDouble()
@@ -326,7 +333,9 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
                     else -> R.drawable.default_marker
                 }
 
-                addMarker(position, lieu.nom, icon, lieu.image)  // Store the marker in the list
+                //addMarker(position, lieu.nom, icon, lieu.image)  // Store the marker in the list
+
+                addClusterMarker(position, lieu.nom, icon, lieu.image)
             } catch (e: NumberFormatException) {
                 Log.e("MapsFragment", "Coordonnées invalides pour ${lieu.nom}")
             }
@@ -557,6 +566,10 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
 
     private fun removeAllMarkers() {
         for (marker in markerList) {
+            if (::clusterer.isInitialized) {
+                clusterer.items.remove(marker)
+                clusterer.invalidate()
+            }
             mapView.overlays.remove(marker)
         }
         markerList.clear()  // Optionally, clear the list after removal
@@ -564,6 +577,22 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
     }
 
     private fun hideOtherMarkers() {
+        if (!::clusterer.isInitialized) return
+
+        val iterator = clusterer.items.iterator()
+        while (iterator.hasNext()) {
+            val marker = iterator.next()
+            if (marker.position != userLocation && marker.position != destination) {
+                iterator.remove() // retire du cluster
+            }
+        }
+        clusterer.invalidate()
+        mapView.invalidate()
+
+        isOtherMarkersHidden = true
+        binding.hide.setImageResource(R.drawable.no_hide)
+    }
+    private fun hideOtherMarkersOld() {
         for (marker in markerList) {
             if (marker.position != userLocation && marker.position != destination) {
                 mapView.overlays.remove(marker)
@@ -575,6 +604,21 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
     }
 
     private fun reloadOtherMarker() {
+        if (!::clusterer.isInitialized) return
+
+        for (marker in markerList) {
+            if (marker.position != userLocation && marker.position != destination && !clusterer.items.contains(marker)) {
+                clusterer.add(marker)
+            }
+        }
+        clusterer.invalidate()
+        mapView.invalidate()
+
+        isOtherMarkersHidden = false
+        binding.hide.setImageResource(R.drawable.hide)
+    }
+
+    private fun reloadOtherMarkerOld() {
         for (marker in markerList) {
             if (marker.position != userLocation && marker.position != destination) {
                 mapView.overlays.add(marker)
@@ -685,6 +729,96 @@ class MapsFragment : Fragment(), SearchBarFragment.SearchListener, LocationListe
     private fun reloadPreDestinationIcon() {
         currentDestinationMarker?.icon = preDestinationIcon
         mapView.invalidate()
+    }
+
+    private fun setupClusterer() {
+        clusterer = RadiusMarkerClusterer(requireContext())
+        clusterer.setRadius(100) // rayon du cluster en pixels
+        val resizedDrawable = MapsUtils.resizeIcon(R.drawable.cluster_icon, resources)
+        val bitmap = (resizedDrawable as BitmapDrawable).bitmap
+        clusterer.setIcon(bitmap)
+        mapView.overlays.add(clusterer)
+    }
+
+    private fun addClusterMarker(
+        position: GeoPoint,
+        title: String,
+        iconRes: Int = R.drawable.default_marker,
+        imageUrl: String? = null
+    ): Marker? {
+        if (mapView == null) {
+            Log.w("MapsFragment", "mapView n'est pas encore initialisé.")
+            return null
+        }
+
+        // Vérifier les doublons
+        var oldMarker: Marker? = null
+        for (marker in markerList) {
+            if (marker.position == position && marker.title == title) {
+                oldMarker = marker
+                if (::clusterer.isInitialized) {
+                    clusterer.items.remove(marker)
+                    clusterer.invalidate()
+                }
+            }
+        }
+        oldMarker?.let { markerList.remove(it) }
+
+        // Créer le marqueur
+        Log.d("MapsFragment", "Ajout du marqueur: $title à $position")
+        val marker = Marker(mapView)
+        marker.position = position
+        marker.title = title
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.icon = MapsUtils.resizeIcon(iconRes, resources)
+
+        // Charger l'image si elle existe
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(this)
+                .asBitmap()
+                .load(imageUrl)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        val drawable = BitmapDrawable(resources, resource)
+                        marker.image = drawable
+                        mapView.invalidate()
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+        }
+
+        marker.setOnMarkerClickListener { clickedMarker, _ ->
+            if (clickedMarker.title != binding.destinationText.text && clickedMarker.position != userLocation && clickedMarker.position != destination) {
+                binding.destinationText.text = clickedMarker.title
+                //binding.destinationLayout.visibility = View.VISIBLE
+                showDestinationLayout()
+                clickedMarker.showInfoWindow()
+                binding.valider.setOnClickListener {
+                    destination = clickedMarker.position
+                    MapsUtils.saveDestination(requireContext(), destination!!)
+                    updateRoute(userLocation!!, destination!!)
+                    hideOtherMarkers()
+                }
+                binding.annuler.setOnClickListener {
+                    hideDestinationLayout()
+                }
+            } else {
+                clickedMarker.showInfoWindow()
+            }
+            true
+        }
+
+        // Ajouter au clusterer
+        if (::clusterer.isInitialized) {
+            clusterer.add(marker)
+        } else {
+            Log.e("MapsFragment", "Clusterer non initialisé !")
+        }
+
+        markerList.add(marker)
+        mapView.invalidate()
+        return marker
     }
 
 

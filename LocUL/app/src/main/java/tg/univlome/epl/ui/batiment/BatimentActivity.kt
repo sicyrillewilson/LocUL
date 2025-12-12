@@ -128,6 +128,15 @@ class BatimentActivity : AppCompatActivity() {
             salleService.getSalles().observe(this) { allSalles ->
                 val sallesDuBat = allSalles.filter { it.infrastructureId == batiment.id }
 
+                // Si le bâtiment n'a pas de salles : cacher les éléments
+                if (sallesDuBat.isEmpty()) {
+                    ui.txtInformation.visibility = View.GONE
+                    recyclerSalles.visibility = View.GONE
+                } else {
+                    ui.txtInformation.visibility = View.VISIBLE
+                    recyclerSalles.visibility = View.VISIBLE
+                }
+
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     val userPoint = if (location != null)
                         GeoPoint(location.latitude, location.longitude)
